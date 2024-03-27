@@ -9,7 +9,7 @@ import {
   MyVolumesQuery,
 } from "gql/generated/types";
 import { shortenGithash } from "utils/string";
-import { getDefaultExpiration } from "../utils";
+import { getDefaultExpiration, getHostUptimeSchema } from "../utils";
 import { DEFAULT_VOLUME_SIZE } from "./constants";
 import { validateTask } from "./utils";
 import { DistroDropdown } from "./Widgets/DistroDropdown";
@@ -26,6 +26,7 @@ interface Props {
   isVirtualWorkstation: boolean;
   noExpirationCheckboxTooltip: string;
   myPublicKeys: MyPublicKeysQuery["myPublicKeys"];
+  runContinuously?: boolean;
   spawnTaskData?: SpawnTaskQuery["task"];
   userAwsRegion?: string;
   volumes: MyVolumesQuery["myVolumes"];
@@ -43,6 +44,7 @@ export const getFormSchema = ({
   isVirtualWorkstation,
   myPublicKeys,
   noExpirationCheckboxTooltip,
+  runContinuously,
   spawnTaskData,
   useProjectSetupScript = false,
   useSetupScript = false,
@@ -61,6 +63,7 @@ export const getFormSchema = ({
   const availableVolumes = volumes
     ? volumes.filter((v) => v.homeVolume && !v.hostID)
     : [];
+  const hostUptime = getHostUptimeSchema({ runContinuously });
 
   return {
     fields: {},
@@ -196,6 +199,7 @@ export const getFormSchema = ({
             },
           },
         },
+        hostUptime: hostUptime.schema,
         optionalInformationTitle: {
           title: "Optional Host Details",
           type: "null",
@@ -473,6 +477,7 @@ export const getFormSchema = ({
           "ui:data-cy": "key-value-text-area",
         },
       },
+      hostUptime: hostUptime.uiSchema,
       userdataScriptSection: {
         userdataScript: {
           "ui:widget": LeafyGreenTextArea,

@@ -12,6 +12,17 @@ export type FormState = {
     savePublicKey?: boolean;
     newPublicKeyName?: string;
   };
+  hostUptime?: {
+    useDefault: boolean;
+    sleepSchedule: {
+      enabledWeekdays: boolean[];
+      timeSelection: {
+        startTime: string;
+        endTime: string;
+        runContinuously: boolean;
+      };
+    };
+  };
   userdataScriptSection?: {
     runUserdataScript: boolean;
     userdataScript?: string;

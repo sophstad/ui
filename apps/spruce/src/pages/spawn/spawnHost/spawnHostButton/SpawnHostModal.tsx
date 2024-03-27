@@ -81,6 +81,8 @@ export const SpawnHostModal: React.FC<SpawnHostModalProps> = ({
     distroIdQueryParam,
     isMigration: false,
     isVirtualWorkstation: !!formState?.distro?.isVirtualWorkstation,
+    runContinuously:
+      !!formState?.hostUptime?.sleepSchedule?.timeSelection?.runContinuously,
     spawnTaskData: spawnTaskData?.task,
     useSetupScript: !!formState?.setupScriptSection?.defineSetupScriptCheckbox,
     useProjectSetupScript: !!formState?.loadData?.runProjectSpecificSetupScript,

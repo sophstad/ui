@@ -2,7 +2,7 @@ import styled from "@emotion/styled";
 import { Description, Label } from "@leafygreen-ui/typography";
 import { utcToZonedTime, zonedTimeToUtc } from "date-fns-tz";
 import DatePicker from "components/DatePicker";
-import TimePicker from "components/TimePicker";
+import AntdTimePicker from "components/TimePicker";
 import { size } from "constants/tokens";
 import { useUserTimeZone } from "hooks/useUserTimeZone";
 import ElementWrapper from "../ElementWrapper";
@@ -56,7 +56,7 @@ export const DateTimePicker: React.FC<
           disabled={isDisabled}
           disabledDate={disabledDate}
         />
-        <TimePicker
+        <AntdTimePicker
           // @ts-expect-error
           getPopupContainer={getPopupContainer}
           data-cy="time-picker"
@@ -76,6 +76,46 @@ const DateTimeContainer = styled.div`
     margin-right: ${size.xs};
   }
 `;
+
+export const TimePicker: React.FC<
+  {
+    options: {
+      format?: string;
+    };
+  } & SpruceWidgetProps
+> = ({ disabled, id, label, onChange, options, readonly, value = "" }) => {
+  const { description, elementWrapperCSS, format, showLabel } = options;
+
+  const timezone = useUserTimeZone();
+  const currentDateTime = utcToZonedTime(new Date(value || null), timezone);
+  const isDisabled = disabled || readonly;
+  const handleChange = (d: Date) => {
+    onChange(zonedTimeToUtc(d, timezone).toString());
+  };
+
+  return (
+    <ElementWrapper css={elementWrapperCSS}>
+      {showLabel !== false && (
+        <div>
+          <Label disabled={isDisabled} htmlFor={id}>
+            {label}
+          </Label>
+        </div>
+      )}
+      {description && <Description>{description}</Description>}
+      <AntdTimePicker
+        // @ts-expect-error
+        getPopupContainer={getPopupContainer}
+        data-cy="time-picker"
+        format={format}
+        onChange={handleChange}
+        value={currentDateTime}
+        allowClear={false}
+        disabled={isDisabled}
+      />
+    </ElementWrapper>
+  );
+};
 
 // Fixes bug where DatePicker won't handle onClick events
 const getPopupContainer = (triggerNode: HTMLElement) => triggerNode.parentNode;
