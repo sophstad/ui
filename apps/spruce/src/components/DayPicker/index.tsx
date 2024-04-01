@@ -17,24 +17,15 @@ const days = [
 ];
 const emptyState = new Array(days.length).fill(false);
 
-const Day: React.FC<{
-  day: string;
-  handleClick: () => void;
-  selected: boolean;
-}> = ({ day, handleClick, selected }) => (
-  <Circle htmlFor={day} selected={selected}>
-    <InvisibleInput
-      aria-checked={selected}
-      id={day}
-      onChange={handleClick}
-      type="checkbox"
-    />
-    {day.charAt(0)}
-  </Circle>
-);
-
 type DayPickerState = Array<boolean>;
 
+/**
+ * Allows selecting days of the week
+ * @param props - React props
+ * @param props.defaultState - optionally specifies the initial selected days
+ * @param props.onChange - optionally calls a side effect function with the new selection state when a change is made
+ * @returns DayPicker - DayPicker component
+ */
 export const DayPicker: React.FC<{
   defaultState?: DayPickerState;
   onChange?: (value: DayPickerState) => void;
@@ -72,6 +63,22 @@ const Container = styled.div`
   display: flex;
   gap: ${size.s};
 `;
+
+const Day: React.FC<{
+  day: string;
+  handleClick: () => void;
+  selected: boolean;
+}> = ({ day, handleClick, selected }) => (
+  <Circle htmlFor={day} selected={selected} title={day}>
+    <InvisibleInput
+      aria-checked={selected}
+      id={day}
+      onChange={handleClick}
+      type="checkbox"
+    />
+    {day.charAt(0)}
+  </Circle>
+);
 
 const Circle = styled.label<{ selected?: boolean }>`
   all: unset;
