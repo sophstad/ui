@@ -84,6 +84,7 @@ export const SpawnHostModal: React.FC<SpawnHostModalProps> = ({
     runContinuously:
       !!formState?.hostUptime?.sleepSchedule?.timeSelection?.runContinuously,
     spawnTaskData: spawnTaskData?.task,
+    useDefaultUptimeSchedule: !!formState?.hostUptime?.useDefaultUptimeSchedule,
     useSetupScript: !!formState?.setupScriptSection?.defineSetupScriptCheckbox,
     useProjectSetupScript: !!formState?.loadData?.runProjectSpecificSetupScript,
   });

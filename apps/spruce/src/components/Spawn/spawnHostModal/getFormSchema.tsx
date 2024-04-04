@@ -31,6 +31,7 @@ interface Props {
   userAwsRegion?: string;
   volumes: MyVolumesQuery["myVolumes"];
   isMigration: boolean;
+  useDefaultUptimeSchedule?: boolean;
   useSetupScript?: boolean;
   useProjectSetupScript?: boolean;
 }
@@ -46,6 +47,7 @@ export const getFormSchema = ({
   noExpirationCheckboxTooltip,
   runContinuously,
   spawnTaskData,
+  useDefaultUptimeSchedule = true,
   useProjectSetupScript = false,
   useSetupScript = false,
   userAwsRegion,
@@ -63,7 +65,10 @@ export const getFormSchema = ({
   const availableVolumes = volumes
     ? volumes.filter((v) => v.homeVolume && !v.hostID)
     : [];
-  const hostUptime = getHostUptimeSchema({ runContinuously });
+  const hostUptime = getHostUptimeSchema({
+    runContinuously,
+    useDefaultUptimeSchedule,
+  });
 
   return {
     fields: {},

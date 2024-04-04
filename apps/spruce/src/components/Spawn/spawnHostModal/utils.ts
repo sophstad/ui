@@ -1,6 +1,11 @@
 import { SpawnTaskQuery } from "gql/generated/types";
 import { FormState } from "./types";
 
+const daysInWeek = 7;
+const hoursInDay = 24;
+const minimumUptimeHours = (daysInWeek - 1) * hoursInDay;
+const suggestedUptimeHours = (daysInWeek - 2) * hoursInDay;
+
 export const validateTask = (taskData: SpawnTaskQuery["task"]) => {
   const {
     buildVariant,
@@ -15,6 +20,7 @@ export const validateSpawnHostForm = (
     distro,
     expirationDetails,
     homeVolumeDetails,
+    hostUptime,
     publicKeySection,
     region,
     setupScriptSection,
@@ -45,6 +51,10 @@ export const validateSpawnHostForm = (
     ? true
     : !!expirationDetails?.expiration;
 
+  const hasValidUptimeSchedule = hostUptime
+    ? validateUptimeSchedule(hostUptime)
+    : true;
+
   return (
     hasDistro &&
     hasRegion &&
@@ -56,3 +66,41 @@ export const validateSpawnHostForm = (
     hasValidExpiration
   );
 };
+
+const validateUptimeSchedule = ({
+  sleepSchedule,
+  useDefaultUptimeSchedule,
+}: FormState["hostUptime"]): boolean => {
+  if (useDefaultUptimeSchedule) {
+    return true;
+  }
+
+  const {
+    enabledWeekdays,
+    timeSelection: { endTime, runContinuously, startTime },
+  } = sleepSchedule ?? {};
+  const enabledWeekdaysCount = enabledWeekdays.filter((day) => day).length;
+  const enabledHoursCount = runContinuously
+    ? enabledWeekdaysCount * hoursInDay
+    : enabledWeekdaysCount * getDailyUptime({ startTime, endTime });
+  if (enabledHoursCount < suggestedUptimeHours) {
+    // No error
+    return true;
+  }
+  if (enabledHoursCount < minimumUptimeHours) {
+    // Return warning based on whether runContinuously enabled
+    const hourlySuggestion = runContinuously
+      ? suggestedUptimeHours / daysInWeek
+      : suggestedUptimeHours / enabledWeekdaysCount;
+    const warning = `Consider running your host for ${hourlySuggestion} hours per day.`;
+    return false;
+  }
+  // Return error based on whether runContinously enabled
+  const hourlyRequirement = runContinuously
+    ? minimumUptimeHours / daysInWeek
+    : minimumUptimeHours / enabledWeekdaysCount;
+  const error = `Please increase your host uptime to at least ${hourlyRequirement} hours per day.`;
+  return false;
+};
+
+const getDailyUptime = ({ endTime, startTime }) => endTime - startTime;

@@ -27,22 +27,29 @@ export const getDefaultExpiration = () => {
 
 type HostUptimeProps = {
   runContinuously: boolean;
+  useDefaultUptimeSchedule: boolean;
 };
 
-export const getHostUptimeSchema = ({ runContinuously }: HostUptimeProps) => ({
+export const getHostUptimeSchema = ({
+  runContinuously,
+  useDefaultUptimeSchedule,
+}: HostUptimeProps) => ({
   schema: {
     type: "object" as "object",
     title: "Expiration Details",
     properties: {
-      useDefault: {
+      useDefaultUptimeSchedule: {
         type: "boolean" as "boolean",
-        title: "Use default host uptime schedule (M-F, 8am-8pm)",
+        title: "Use default host uptime schedule (Mon–Fri, 8am–8pm)",
+        default: true,
       },
       sleepSchedule: {
         type: "object" as "object",
+        title: "",
         properties: {
           enabledWeekdays: {
             type: "array" as "array",
+            title: "",
             default: [false, true, true, true, true, true, false],
             items: {
               type: "number" as "number",
@@ -50,6 +57,7 @@ export const getHostUptimeSchema = ({ runContinuously }: HostUptimeProps) => ({
           },
           timeSelection: {
             type: "object" as "object",
+            title: "",
             properties: {
               startTime: {
                 type: "string" as "string",
@@ -71,9 +79,11 @@ export const getHostUptimeSchema = ({ runContinuously }: HostUptimeProps) => ({
   },
   uiSchema: {
     sleepSchedule: {
+      "ui:disabled": useDefaultUptimeSchedule,
       enabledWeekdays: {
         "ui:addable": false,
-        "ui:widget": widgets.DayPickerWidget,
+        "ui:showLabel": false,
+        // "ui:widget": widgets.DayPickerWidget,
       },
       timeSelection: {
         "ui:elementWrapperCSS": datePickerCSS,

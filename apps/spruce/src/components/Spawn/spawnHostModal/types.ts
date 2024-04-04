@@ -13,7 +13,7 @@ export type FormState = {
     newPublicKeyName?: string;
   };
   hostUptime?: {
-    useDefault: boolean;
+    useDefaultUptimeSchedule: boolean;
     sleepSchedule: {
       enabledWeekdays: boolean[];
       timeSelection: {
