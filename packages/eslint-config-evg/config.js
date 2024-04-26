@@ -33,7 +33,7 @@ module.exports = {
   overrides: [
     // For React Typescript files in src.
     {
-      files: ["src/**/*.ts", "src/**/*.tsx"],
+      files: ["(.storybook|src)/**/*.(ts|tsx)"],
       plugins: [
         "jsx-a11y",
         "react",

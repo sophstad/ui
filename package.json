@@ -6,9 +6,6 @@
     "packages": [
       "apps/*",
       "packages/*"
-    ],
-    "nohoist": [
-      "**/storybook-addon-apollo-client"
     ]
   },
   "scripts": {
