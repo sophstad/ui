@@ -26,11 +26,12 @@ module.exports = {
     "public",
     "sdlschema",
     "src/gql/generated/types.ts",
+    "storybook-static",
   ],
   overrides: [
     // For React Typescript files in src.
     {
-      files: ["src/**/*.ts", "src/**/*.tsx"],
+      files: ["(.storybook|src)/**/*.(ts|tsx)"],
       parserOptions: {
         project: ["./tsconfig.json"],
       },
