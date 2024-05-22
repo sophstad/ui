@@ -8,9 +8,6 @@ const config: Config = {
   ],
   displayName: "parsley",
   moduleFileExtensions: ["tsx", "ts", "json", "js", "jsx"],
-  moduleNameMapper: {
-    "^uuid$": "<rootDir>/node_modules/uuid/dist/index.js",
-  },
   modulePaths: ["<rootDir>/src"],
   preset: "ts-jest/presets/js-with-ts",
   resetMocks: true,

@@ -15,6 +15,7 @@ module.exports = {
     "eslint:recommended",
     "plugin:import/recommended",
     "plugin:jsdoc/recommended-typescript-error",
+    "plugin:storybook/recommended",
     // Airbnb includes some helpful rules for ESLint and React that aren't covered by recommended.
     // See https://github.com/airbnb/javascript/tree/master/packages for specific rules.
     "airbnb",
@@ -57,17 +58,6 @@ module.exports = {
         "react-hooks/rules-of-hooks": ERROR,
 
         // Disable some Airbnb rules
-        "react/destructuring-assignment": OFF,
-        "react/function-component-definition": [
-          errorIfStrict,
-          {
-            namedComponents: "arrow-function",
-          },
-        ],
-        "react/jsx-filename-extension": [1, { extensions: [".tsx"] }],
-        "react/jsx-props-no-spreading": OFF,
-        "react/prop-types": OFF,
-        "react/react-in-jsx-scope": OFF,
         "react/require-default-props": OFF,
 
         "sort-destructure-keys/sort-destructure-keys": [
@@ -86,14 +76,6 @@ module.exports = {
         "jest/no-mocks-import": OFF,
         "jest/prefer-expect-assertions": OFF,
         "jest/unbound-method": OFF,
-      },
-    },
-    // For Storybook files.
-    {
-      extends: ["plugin:storybook/recommended"],
-      files: ["src/**/*.stories.ts", "src/**/*.stories.tsx"],
-      rules: {
-        "storybook/no-stories-of": ERROR,
       },
     },
     // For Cypress files.
@@ -205,7 +187,7 @@ module.exports = {
           {
             group: "internal",
             pattern:
-              "(analytics|components|constants|context|gql|hoc|hooks|pages|types|utils)/**",
+              "(analytics|components|constants|context|gql|hoc|hooks|pages|test_utils|types|utils)/**",
             position: "before",
           },
         ],
@@ -213,6 +195,17 @@ module.exports = {
       },
     ],
     "import/prefer-default-export": OFF,
+    "react/destructuring-assignment": OFF,
+    "react/function-component-definition": [
+      errorIfStrict,
+      {
+        namedComponents: "arrow-function",
+      },
+    ],
+    "react/jsx-filename-extension": [1, { extensions: [".tsx"] }],
+    "react/jsx-props-no-spreading": OFF,
+    "react/prop-types": OFF,
+    "react/react-in-jsx-scope": OFF,
     "prettier/prettier": errorIfStrict,
   },
   settings: {

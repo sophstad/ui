@@ -4,9 +4,9 @@ import * as glob from "glob";
 import "jest-specific-snapshot";
 import MatchMediaMock from "jest-matchmedia-mock";
 import { projectAnnotations } from "storybook-addon-evg";
-import path from "path";
 import { act, render } from "test_utils";
 import { CustomMeta, CustomStoryObj } from "test_utils/types";
+import path from "path";
 
 let matchMedia;
 
