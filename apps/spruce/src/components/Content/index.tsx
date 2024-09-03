@@ -29,6 +29,7 @@ import { TaskQueue } from "pages/TaskQueue";
 import { UserPatches } from "pages/UserPatches";
 import { VariantHistory } from "pages/VariantHistory";
 import { VersionPage } from "pages/Version";
+import { Waterfall } from "pages/Waterfall";
 import { Layout } from "./Layout";
 
 export const Content: React.FC = () => (
@@ -80,6 +81,7 @@ export const Content: React.FC = () => (
       <Route element={<ProjectSettings />} path={`${routes.projectSettings}/*`}>
         <Route element={null} path={`:${slugs.tab}`} />
       </Route>
+      <Route element={<Waterfall />} path={routes.projectWaterfall} />
       <Route
         element={<ProjectSettingsRedirect />}
         path={redirectRoutes.projectSettings}

@@ -86,6 +86,7 @@ import VERSION_TASK_DURATIONS from "./version-task-durations.graphql";
 import VERSION_TASKS from "./version-tasks.graphql";
 import VERSION from "./version.graphql";
 import VIEWABLE_PROJECTS from "./viewable-projects.graphql";
+import WATERFALL from "./waterfall.graphql";
 
 export {
   AGENT_LOGS,
@@ -147,6 +148,7 @@ export {
   REPO_EVENT_LOGS,
   REPO_SETTINGS,
   REPOTRACKER_ERROR,
+  SECRET_FIELDS,
   SPAWN_EXPIRATION_INFO,
   SPAWN_TASK,
   SPRUCE_CONFIG,
@@ -175,5 +177,5 @@ export {
   VERSION_TASKS,
   VERSION,
   VIEWABLE_PROJECTS,
-  SECRET_FIELDS,
+  WATERFALL,
 };

@@ -881,11 +881,14 @@ export type Image = {
   distros: Array<Distro>;
   events: ImageEventsPayload;
   id: Scalars["String"]["output"];
+  kernel: Scalars["String"]["output"];
   lastDeployed: Scalars["Time"]["output"];
   latestTask?: Maybe<Task>;
+  name: Scalars["String"]["output"];
   operatingSystem: ImageOperatingSystemPayload;
   packages: ImagePackagesPayload;
   toolchains: ImageToolchainsPayload;
+  versionId: Scalars["String"]["output"];
 };
 
 /**
@@ -2180,6 +2183,7 @@ export type Query = {
   userSettings?: Maybe<UserSettings>;
   version: Version;
   viewableProjectRefs: Array<GroupedProjects>;
+  waterfall?: Maybe<Waterfall>;
 };
 
 export type QueryBbGetCreatedTicketsArgs = {
@@ -2318,6 +2322,10 @@ export type QueryUserArgs = {
 
 export type QueryVersionArgs = {
   versionId: Scalars["String"]["input"];
+};
+
+export type QueryWaterfallArgs = {
+  options: WaterfallOptions;
 };
 
 export type RemoveFavoriteProjectInput = {
@@ -3372,6 +3380,41 @@ export type Volume = {
 export type VolumeHost = {
   hostId: Scalars["String"]["input"];
   volumeId: Scalars["String"]["input"];
+};
+
+export type Waterfall = {
+  __typename?: "Waterfall";
+  buildVariants: Array<WaterfallBuildVariant>;
+  versions: Array<Version>;
+};
+
+export type WaterfallBuild = {
+  __typename?: "WaterfallBuild";
+  activated?: Maybe<Scalars["Boolean"]["output"]>;
+  displayName: Scalars["String"]["output"];
+  id: Scalars["String"]["output"];
+  tasks: Array<WaterfallTask>;
+  version: Scalars["String"]["output"];
+};
+
+export type WaterfallBuildVariant = {
+  __typename?: "WaterfallBuildVariant";
+  builds: Array<WaterfallBuild>;
+  displayName: Scalars["String"]["output"];
+  id: Scalars["String"]["output"];
+};
+
+export type WaterfallOptions = {
+  limit?: InputMaybe<Scalars["Int"]["input"]>;
+  projectIdentifier: Scalars["String"]["input"];
+  requesters?: InputMaybe<Array<Scalars["String"]["input"]>>;
+};
+
+export type WaterfallTask = {
+  __typename?: "WaterfallTask";
+  displayName: Scalars["String"]["output"];
+  id: Scalars["String"]["output"];
+  status: Scalars["String"]["output"];
 };
 
 export type Webhook = {
@@ -9440,4 +9483,40 @@ export type ViewableProjectRefsQuery = {
     }>;
     repo?: { __typename?: "RepoRef"; id: string } | null;
   }>;
+};
+
+export type WaterfallQueryVariables = Exact<{
+  options: WaterfallOptions;
+}>;
+
+export type WaterfallQuery = {
+  __typename?: "Query";
+  waterfall?: {
+    __typename?: "Waterfall";
+    buildVariants: Array<{
+      __typename?: "WaterfallBuildVariant";
+      displayName: string;
+      id: string;
+      builds: Array<{
+        __typename?: "WaterfallBuild";
+        activated?: boolean | null;
+        displayName: string;
+        id: string;
+        version: string;
+        tasks: Array<{
+          __typename?: "WaterfallTask";
+          status: string;
+          id: string;
+          displayName: string;
+        }>;
+      }>;
+    }>;
+    versions: Array<{
+      __typename?: "Version";
+      id: string;
+      author: string;
+      activated?: boolean | null;
+      revision: string;
+    }>;
+  } | null;
 };

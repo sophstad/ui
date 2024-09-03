@@ -9,6 +9,7 @@ import { toArray } from "utils/array";
 export enum PageNames {
   Patches = "patches",
   Settings = "settings",
+  Waterfall = "waterfall",
 }
 
 export enum SpawnTab {
@@ -134,6 +135,7 @@ export const routes = {
   preferences: paths.preferences,
   projectPatches: `${paths.project}/:${slugs.projectIdentifier}/${PageNames.Patches}`,
   projectSettings: `${paths.project}/:${slugs.projectIdentifier}/${PageNames.Settings}`,
+  projectWaterfall: `${paths.project}/:${slugs.projectIdentifier}/${PageNames.Waterfall}`,
   spawn: paths.spawn,
   spawnHost: `${paths.spawn}/${SpawnTab.Host}`,
   spawnVolume: `${paths.spawn}/${SpawnTab.Volume}`,
@@ -283,6 +285,11 @@ export const getProjectSettingsRoute = (
   const root = `${paths.project}/${encodedProjectId}/${PageNames.Settings}`;
   return tab ? `${root}/${tab}` : root;
 };
+
+export const getProjectWaterfallRoute = (projectIdentifier: string) =>
+  `${paths.project}/${encodeURIComponent(projectIdentifier)}/${
+    PageNames.Waterfall
+  }`;
 
 export const getDistroSettingsRoute = (
   distroId: string,
