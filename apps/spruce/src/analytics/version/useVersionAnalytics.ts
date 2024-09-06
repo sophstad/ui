@@ -21,13 +21,12 @@ type Action =
   | { name: "Clicked metadata github commit link" }
   | {
       name: "Filtered by build variant and task status group";
-      taskSquareStatuses: string | string[];
+      "filter.task_square_statuses": string | string[];
     }
   | { name: "Clicked metadata previous version link" }
   | { name: "Clicked metadata project patches link" }
   | { name: "Clicked task table task link"; "task.id": string }
   | { name: "Deleted all filters" }
-  | { name: "Clicked enqueue tasks button" }
   | { name: "Filtered downstream tasks table"; "filter.by": string | string[] }
   | { name: "Filtered tasks table"; "filter.by": string | string[] }
   | { name: "Filtered task duration table"; "filter.by": string | string[] }
