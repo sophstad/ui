@@ -633,6 +633,14 @@ export type GeneralSubscription = {
   triggerData?: Maybe<Scalars["StringMap"]["output"]>;
 };
 
+export type GeneratedTaskCountResults = {
+  __typename?: "GeneratedTaskCountResults";
+  buildVariantName?: Maybe<Scalars["String"]["output"]>;
+  estimatedTasks: Scalars["Int"]["output"];
+  taskId?: Maybe<Scalars["String"]["output"]>;
+  taskName?: Maybe<Scalars["String"]["output"]>;
+};
+
 export type GitHubDynamicTokenPermissionGroup = {
   __typename?: "GitHubDynamicTokenPermissionGroup";
   name: Scalars["String"]["output"];
@@ -829,13 +837,47 @@ export type HostEventLogData = {
 export type HostEventLogEntry = {
   __typename?: "HostEventLogEntry";
   data: HostEventLogData;
-  eventType?: Maybe<Scalars["String"]["output"]>;
+  eventType?: Maybe<HostEventType>;
   id: Scalars["String"]["output"];
   processedAt: Scalars["Time"]["output"];
   resourceId: Scalars["String"]["output"];
   resourceType: Scalars["String"]["output"];
   timestamp?: Maybe<Scalars["Time"]["output"]>;
 };
+
+export enum HostEventType {
+  HostAgentDeployed = "HOST_AGENT_DEPLOYED",
+  HostAgentDeployFailed = "HOST_AGENT_DEPLOY_FAILED",
+  HostAgentMonitorDeployed = "HOST_AGENT_MONITOR_DEPLOYED",
+  HostAgentMonitorDeployFailed = "HOST_AGENT_MONITOR_DEPLOY_FAILED",
+  HostConvertedProvisioning = "HOST_CONVERTED_PROVISIONING",
+  HostConvertingProvisioning = "HOST_CONVERTING_PROVISIONING",
+  HostConvertingProvisioningError = "HOST_CONVERTING_PROVISIONING_ERROR",
+  HostCreated = "HOST_CREATED",
+  HostCreatedError = "HOST_CREATED_ERROR",
+  HostDnsNameSet = "HOST_DNS_NAME_SET",
+  HostExpirationWarningSent = "HOST_EXPIRATION_WARNING_SENT",
+  HostIdleNotification = "HOST_IDLE_NOTIFICATION",
+  HostJasperRestarted = "HOST_JASPER_RESTARTED",
+  HostJasperRestarting = "HOST_JASPER_RESTARTING",
+  HostJasperRestartError = "HOST_JASPER_RESTART_ERROR",
+  HostModified = "HOST_MODIFIED",
+  HostProvisioned = "HOST_PROVISIONED",
+  HostProvisionError = "HOST_PROVISION_ERROR",
+  HostProvisionFailed = "HOST_PROVISION_FAILED",
+  HostRunningTaskCleared = "HOST_RUNNING_TASK_CLEARED",
+  HostRunningTaskSet = "HOST_RUNNING_TASK_SET",
+  HostScriptExecuted = "HOST_SCRIPT_EXECUTED",
+  HostScriptExecuteFailed = "HOST_SCRIPT_EXECUTE_FAILED",
+  HostStarted = "HOST_STARTED",
+  HostStatusChanged = "HOST_STATUS_CHANGED",
+  HostStopped = "HOST_STOPPED",
+  HostTaskFinished = "HOST_TASK_FINISHED",
+  HostTemporaryExemptionExpirationWarningSent = "HOST_TEMPORARY_EXEMPTION_EXPIRATION_WARNING_SENT",
+  HostTerminatedExternally = "HOST_TERMINATED_EXTERNALLY",
+  VolumeExpirationWarningSent = "VOLUME_EXPIRATION_WARNING_SENT",
+  VolumeMigrationFailed = "VOLUME_MIGRATION_FAILED",
+}
 
 /**
  * HostEvents is the return value for the hostEvents query.
@@ -1625,7 +1667,7 @@ export type Patch = {
   createTime?: Maybe<Scalars["Time"]["output"]>;
   description: Scalars["String"]["output"];
   duration?: Maybe<PatchDuration>;
-  generatedTaskCounts: Scalars["Map"]["output"];
+  generatedTaskCounts: Array<GeneratedTaskCountResults>;
   githash: Scalars["String"]["output"];
   hidden: Scalars["Boolean"]["output"];
   id: Scalars["ID"]["output"];
@@ -2188,7 +2230,7 @@ export type Query = {
   userSettings?: Maybe<UserSettings>;
   version: Version;
   viewableProjectRefs: Array<GroupedProjects>;
-  waterfall?: Maybe<Waterfall>;
+  waterfall: Waterfall;
 };
 
 export type QueryBbGetCreatedTicketsArgs = {
@@ -3287,7 +3329,7 @@ export type Version = {
   errors: Array<Scalars["String"]["output"]>;
   externalLinksForMetadata: Array<ExternalLinkForMetadata>;
   finishTime?: Maybe<Scalars["Time"]["output"]>;
-  generatedTaskCounts: Scalars["Map"]["output"];
+  generatedTaskCounts: Array<GeneratedTaskCountResults>;
   gitTags?: Maybe<Array<GitTag>>;
   id: Scalars["String"]["output"];
   ignored: Scalars["Boolean"]["output"];
@@ -3386,7 +3428,9 @@ export type VolumeHost = {
 export type Waterfall = {
   __typename?: "Waterfall";
   buildVariants: Array<WaterfallBuildVariant>;
-  versions: Array<Version>;
+  nextPageOrder: Scalars["Int"]["output"];
+  prevPageOrder: Scalars["Int"]["output"];
+  versions: Array<WaterfallVersion>;
 };
 
 export type WaterfallBuild = {
@@ -3407,6 +3451,10 @@ export type WaterfallBuildVariant = {
 
 export type WaterfallOptions = {
   limit?: InputMaybe<Scalars["Int"]["input"]>;
+  /** Return versions with an order lower than maxOrder. Used for paginating forward. */
+  maxOrder?: InputMaybe<Scalars["Int"]["input"]>;
+  /** Return versions with an order greater than minOrder. Used for paginating backward. */
+  minOrder?: InputMaybe<Scalars["Int"]["input"]>;
   projectIdentifier: Scalars["String"]["input"];
   requesters?: InputMaybe<Array<Scalars["String"]["input"]>>;
 };
@@ -3416,6 +3464,12 @@ export type WaterfallTask = {
   displayName: Scalars["String"]["output"];
   id: Scalars["String"]["output"];
   status: Scalars["String"]["output"];
+};
+
+export type WaterfallVersion = {
+  __typename?: "WaterfallVersion";
+  inactiveVersions?: Maybe<Array<Version>>;
+  version?: Maybe<Version>;
 };
 
 export type Webhook = {
@@ -6099,7 +6153,7 @@ export type HostEventsQuery = {
     count: number;
     eventLogEntries: Array<{
       __typename?: "HostEventLogEntry";
-      eventType?: string | null;
+      eventType?: HostEventType | null;
       id: string;
       processedAt: Date;
       resourceId: string;
@@ -9415,7 +9469,7 @@ export type WaterfallQueryVariables = Exact<{
 
 export type WaterfallQuery = {
   __typename?: "Query";
-  waterfall?: {
+  waterfall: {
     __typename?: "Waterfall";
     buildVariants: Array<{
       __typename?: "WaterfallBuildVariant";
@@ -9436,11 +9490,21 @@ export type WaterfallQuery = {
       }>;
     }>;
     versions: Array<{
-      __typename?: "Version";
-      activated?: boolean | null;
-      author: string;
-      id: string;
-      revision: string;
+      __typename?: "WaterfallVersion";
+      inactiveVersions?: Array<{
+        __typename?: "Version";
+        activated?: boolean | null;
+        author: string;
+        id: string;
+        revision: string;
+      }> | null;
+      version?: {
+        __typename?: "Version";
+        activated?: boolean | null;
+        author: string;
+        id: string;
+        revision: string;
+      } | null;
     }>;
-  } | null;
+  };
 };

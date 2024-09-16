@@ -1,17 +1,26 @@
+import { useState } from "react";
 import { useSuspenseQuery } from "@apollo/client";
 import styled from "@emotion/styled";
 import { palette } from "@leafygreen-ui/palette";
+import { SearchInput } from "@leafygreen-ui/search-input";
 import { Link, useParams } from "react-router-dom";
 import { TaskStatus } from "@evg-ui/lib/types/task";
 import { getTaskRoute, slugs } from "constants/routes";
-import { WaterfallQuery, WaterfallQueryVariables } from "gql/generated/types";
+import {
+  WaterfallBuild,
+  WaterfallBuildVariant,
+  WaterfallQuery,
+  WaterfallQueryVariables,
+} from "gql/generated/types";
 import { WATERFALL } from "gql/queries";
+import { shortenGithash } from "utils/string";
 
 const { black, green, red, white } = palette;
 const LIMIT = 5;
 
 export const WaterfallGrid: React.FC = () => {
   const { [slugs.projectIdentifier]: projectIdentifier } = useParams();
+  const [taskFilter, setTaskFilter] = useState("");
 
   const { data } = useSuspenseQuery<WaterfallQuery, WaterfallQueryVariables>(
     WATERFALL,
@@ -27,55 +36,91 @@ export const WaterfallGrid: React.FC = () => {
     },
   );
 
-  console.log(data);
   return (
     <>
-      {/* @ts-expect-error */}
-      {data.waterfall.buildVariants.map(({ builds, displayName }) => (
-        <BuildVariant>
-          <Build>
-            <BuildVariantTitle>{displayName}</BuildVariantTitle>
-            {Object.entries(builds).map(([, { tasks }]) => (
-              <Version>
-                {tasks?.map(({ displayName: taskName, id, status }) => (
-                  <Square
-                    data-tooltip={taskName}
-                    status={status}
-                    to={getTaskRoute(id)}
-                  />
-                ))}
-              </Version>
-            ))}
-          </Build>
-        </BuildVariant>
+      <SearchInput
+        aria-label="Task filter"
+        onSubmit={(e) => {
+          const { value } = (
+            e.target as HTMLFormElement
+          )[0] as HTMLInputElement;
+          setTaskFilter(value);
+        }}
+        placeholder="Task filter"
+      />
+      <BuildVariant>
+        {data.waterfall.versions.map(({ version }) =>
+          version ? (
+            <div key={version.id}>{shortenGithash(version.revision)}</div>
+          ) : null,
+        )}
+      </BuildVariant>
+      {taskFilter}
+      {data?.waterfall?.buildVariants.map((b) => (
+        <BuildRow key={b.id} build={b} taskFilter={taskFilter} />
       ))}
     </>
   );
 };
 
-const BuildVariant = styled.div`
-  box-sizing: border-box;
-  display: grid;
-  gap: 12px;
-  grid-template-columns: 1fr;
-  grid-template-rows: auto;
-  grid-gap: 0;
-  width: 100%;
-`;
+const BuildRow: React.FC<{
+  build: WaterfallBuildVariant;
+  taskFilter: string;
+}> = ({ build, taskFilter }) => {
+  const { builds, displayName } = build;
+  return (
+    <BuildVariant>
+      <BuildVariantTitle>{displayName}</BuildVariantTitle>
+      {builds.map((b) => (
+        <BuildGrid key={b.id} build={b} taskFilter={taskFilter} />
+      ))}
+    </BuildVariant>
+  );
+};
 
-const Build = styled.div`
+const BuildGrid: React.FC<{ build: WaterfallBuild; taskFilter: string }> = ({
+  build,
+  taskFilter,
+}) => {
+  const tasks = taskFilter.length
+    ? build.tasks.filter(({ displayName }) => displayName.includes(taskFilter))
+    : build.tasks;
+
+  if (!tasks.length) {
+    return null;
+  }
+
+  return (
+    <Build>
+      {tasks.map(({ displayName, id, status }) => (
+        <Square
+          key={id}
+          data-tooltip={displayName}
+          status={status}
+          to={getTaskRoute(id)}
+        />
+      ))}
+    </Build>
+  );
+};
+
+const BuildVariant = styled.div`
   display: grid;
   grid-template-columns: repeat(${LIMIT + 1}, 1fr);
   grid-template-rows: subgrid;
   gap: 12px;
   padding: 12px;
+
+  :has(:only-child) {
+    display: none;
+  }
 `;
 
 const BuildVariantTitle = styled.div`
   word-break: break-word;
 `;
 
-const Version = styled.div``;
+const Build = styled.div``;
 
 const Square = styled(Link)<{ status: string }>`
   width: 15px;
