@@ -25,7 +25,9 @@ query Waterfall($options: WaterfallOptions!) {
       version {
         activated
         author
+        createTime
         id
+        message
         revision
       }
     }

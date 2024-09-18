@@ -13,7 +13,7 @@ import {
   WaterfallQueryVariables,
 } from "gql/generated/types";
 import { WATERFALL } from "gql/queries";
-import { shortenGithash } from "utils/string";
+import { VersionLabel } from "./VersionLabel";
 
 const { black, green, red, white } = palette;
 const LIMIT = 5;
@@ -36,6 +36,16 @@ export const WaterfallGrid: React.FC = () => {
     },
   );
 
+  const activeVersionIds = data.waterfall.versions.reduce(
+    (acc, { version }) => {
+      if (version) {
+        acc.push(version.id);
+      }
+      return acc;
+    },
+    [] as string[],
+  );
+
   return (
     <>
       <SearchInput
@@ -48,40 +58,52 @@ export const WaterfallGrid: React.FC = () => {
         }}
         placeholder="Task filter"
       />
-      <BuildVariant>
-        {data.waterfall.versions.map(({ version }) =>
-          version ? (
-            <div key={version.id}>{shortenGithash(version.revision)}</div>
-          ) : null,
-        )}
-      </BuildVariant>
-      {taskFilter}
-      {data?.waterfall?.buildVariants.map((b) => (
-        <BuildRow key={b.id} build={b} taskFilter={taskFilter} />
-      ))}
+      <Container>
+        <Row>
+          <div />
+          {data.waterfall.versions.map(({ version }) =>
+            version ? <VersionLabel key={version.id} {...version} /> : null,
+          )}
+        </Row>
+        {data.waterfall.buildVariants.map((b) => (
+          <BuildRow
+            key={b.id}
+            activeVersionIds={activeVersionIds}
+            build={b}
+            taskFilter={taskFilter}
+          />
+        ))}
+      </Container>
     </>
   );
 };
 
 const BuildRow: React.FC<{
+  activeVersionIds: string[];
   build: WaterfallBuildVariant;
   taskFilter: string;
-}> = ({ build, taskFilter }) => {
+}> = ({ activeVersionIds, build, taskFilter }) => {
   const { builds, displayName } = build;
+  let buildIndex = 0;
   return (
-    <BuildVariant>
+    <Row>
       <BuildVariantTitle>{displayName}</BuildVariantTitle>
-      {builds.map((b) => (
-        <BuildGrid key={b.id} build={b} taskFilter={taskFilter} />
-      ))}
-    </BuildVariant>
+      {activeVersionIds.map((id) => {
+        if (id === builds[buildIndex].version) {
+          const b = builds[buildIndex];
+          buildIndex += 1;
+          return <BuildGrid key={b.id} build={b} taskFilter={taskFilter} />;
+        }
+        return <Build />;
+      })}
+    </Row>
   );
 };
 
-const BuildGrid: React.FC<{ build: WaterfallBuild; taskFilter: string }> = ({
-  build,
-  taskFilter,
-}) => {
+const BuildGrid: React.FC<{
+  build: WaterfallBuild;
+  taskFilter: string;
+}> = ({ build, taskFilter }) => {
   const tasks = taskFilter.length
     ? build.tasks.filter(({ displayName }) => displayName.includes(taskFilter))
     : build.tasks;
@@ -104,14 +126,18 @@ const BuildGrid: React.FC<{ build: WaterfallBuild; taskFilter: string }> = ({
   );
 };
 
-const BuildVariant = styled.div`
+const Container = styled.div`
   display: grid;
-  grid-template-columns: repeat(${LIMIT + 1}, 1fr);
-  grid-template-rows: subgrid;
+  grid-template-columns: repeat(${LIMIT + 1}, minmax(0, 1fr));
   gap: 12px;
-  padding: 12px;
+`;
 
-  :has(:only-child) {
+const Row = styled.div`
+  display: grid;
+  grid-column: 1/-1;
+  grid-template-columns: subgrid;
+
+  > :only-child {
     display: none;
   }
 `;
