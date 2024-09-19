@@ -5855,7 +5855,17 @@ export type BuildVariantsWithChildrenQuery = {
           status: string;
         }> | null;
       }> | null;
+      generatedTaskCounts: Array<{
+        __typename?: "GeneratedTaskCountResults";
+        estimatedTasks: number;
+        taskId?: string | null;
+      }>;
     }> | null;
+    generatedTaskCounts: Array<{
+      __typename?: "GeneratedTaskCountResults";
+      estimatedTasks: number;
+      taskId?: string | null;
+    }>;
   };
 };
 
@@ -6400,21 +6410,6 @@ export type InstanceTypesQuery = {
   instanceTypes: Array<string>;
 };
 
-export type IsPatchConfiguredQueryVariables = Exact<{
-  id: Scalars["String"]["input"];
-}>;
-
-export type IsPatchConfiguredQuery = {
-  __typename?: "Query";
-  patch: {
-    __typename?: "Patch";
-    activated: boolean;
-    alias?: string | null;
-    id: string;
-    projectID: string;
-  };
-};
-
 export type CustomCreatedIssuesQueryVariables = Exact<{
   taskId: Scalars["String"]["input"];
   execution?: InputMaybe<Scalars["Int"]["input"]>;
@@ -6879,6 +6874,12 @@ export type ConfigurePatchQuery = {
         tasks: Array<string>;
       }>;
     }> | null;
+    generatedTaskCounts: Array<{
+      __typename?: "GeneratedTaskCountResults";
+      buildVariantName?: string | null;
+      estimatedTasks: number;
+      taskName?: string | null;
+    }>;
     patchTriggerAliases: Array<{
       __typename?: "PatchTriggerAlias";
       alias: string;
@@ -8875,6 +8876,7 @@ export type TaskQuery = {
     generatedBy?: string | null;
     generatedByName?: string | null;
     hostId?: string | null;
+    imageId: string;
     ingestTime?: Date | null;
     isPerfPluginEnabled: boolean;
     latestExecution: number;
@@ -8886,6 +8888,7 @@ export type TaskQuery = {
     resetWhenFinished: boolean;
     spawnHostLink?: string | null;
     startTime?: Date | null;
+    tags: Array<string>;
     timeTaken?: number | null;
     totalTestCount: number;
     buildVariant: string;
@@ -9048,6 +9051,11 @@ export type UndispatchedTasksQuery = {
   version: {
     __typename?: "Version";
     id: string;
+    generatedTaskCounts: Array<{
+      __typename?: "GeneratedTaskCountResults";
+      estimatedTasks: number;
+      taskId?: string | null;
+    }>;
     tasks: {
       __typename?: "VersionTasks";
       data: Array<{

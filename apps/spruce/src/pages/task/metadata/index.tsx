@@ -1,5 +1,11 @@
+import { useRef } from "react";
 import { ApolloError } from "@apollo/client";
 import styled from "@emotion/styled";
+import {
+  Chip,
+  Variant as ChipVariant,
+  TruncationLocation,
+} from "@leafygreen-ui/chip";
 import { palette } from "@leafygreen-ui/palette";
 import { InlineCode } from "@leafygreen-ui/typography";
 import { Link } from "react-router-dom";
@@ -17,6 +23,7 @@ import {
   getHoneycombTraceUrl,
   getHoneycombSystemMetricsUrl,
 } from "constants/externalResources";
+import { showImageVisibilityPage } from "constants/featureFlags";
 import {
   getDistroSettingsRoute,
   getTaskQueueRoute,
@@ -26,8 +33,9 @@ import {
   getVersionRoute,
   getProjectPatchesRoute,
   getPodRoute,
+  getImageRoute,
 } from "constants/routes";
-import { zIndex } from "constants/tokens";
+import { size, zIndex } from "constants/tokens";
 import { TaskQuery } from "gql/generated/types";
 import { useDateFormat } from "hooks";
 import { string } from "utils";
@@ -35,6 +43,7 @@ import { isFailedTaskStatus } from "utils/statuses";
 import { AbortMessage } from "./AbortMessage";
 import { DependsOn } from "./DependsOn";
 import ETATimer from "./ETATimer";
+import { ImageVisibilityGuideCue } from "./ImageVisibilityGuideCue";
 import RuntimeTimer from "./RuntimeTimer";
 import { Stepback, isInStepback } from "./Stepback";
 
@@ -70,6 +79,7 @@ export const Metadata: React.FC<Props> = ({ error, loading, task, taskId }) => {
     generatedBy,
     generatedByName,
     hostId,
+    imageId,
     ingestTime,
     minQueuePosition: taskQueuePosition,
     pod,
@@ -79,6 +89,7 @@ export const Metadata: React.FC<Props> = ({ error, loading, task, taskId }) => {
     spawnHostLink,
     startTime,
     status,
+    tags,
     timeTaken,
     versionMetadata,
   } = task || {};
@@ -102,6 +113,8 @@ export const Metadata: React.FC<Props> = ({ error, loading, task, taskId }) => {
   const { metadataLinks } = annotation ?? {};
 
   const stepback = isInStepback(task);
+
+  const imageVisibilityGuideCueTriggerRef = useRef<HTMLAnchorElement>(null);
 
   return (
     <>
@@ -353,10 +366,22 @@ export const Metadata: React.FC<Props> = ({ error, loading, task, taskId }) => {
 
       {!isDisplayTask && (
         <MetadataCard>
-          <MetadataTitle>Host Information</MetadataTitle>
-          {ami && (
-            <MetadataItem data-cy="task-metadata-ami">
-              <MetadataLabel>AMI:</MetadataLabel> {ami}
+          <MetadataTitle>Host Information</MetadataTitle>{" "}
+          {!isContainerTask && hostId && (
+            <MetadataItem>
+              <MetadataLabel>ID:</MetadataLabel>{" "}
+              <StyledLink
+                data-cy="task-host-link"
+                href={getHostRoute(hostId)}
+                onClick={() =>
+                  taskAnalytics.sendEvent({
+                    name: "Clicked metadata link",
+                    "link.type": "host link",
+                  })
+                }
+              >
+                {hostId}
+              </StyledLink>
             </MetadataItem>
           )}
           {!isContainerTask && distroId && (
@@ -376,21 +401,30 @@ export const Metadata: React.FC<Props> = ({ error, loading, task, taskId }) => {
               </StyledRouterLink>
             </MetadataItem>
           )}
-          {!isContainerTask && hostId && (
+          {showImageVisibilityPage && !isContainerTask && imageId && (
             <MetadataItem>
-              <MetadataLabel>ID:</MetadataLabel>{" "}
-              <StyledLink
-                data-cy="task-host-link"
-                href={getHostRoute(hostId)}
+              <ImageVisibilityGuideCue
+                refEl={imageVisibilityGuideCueTriggerRef}
+              />
+              <MetadataLabel>Image:</MetadataLabel>{" "}
+              <StyledRouterLink
+                ref={imageVisibilityGuideCueTriggerRef}
+                data-cy="task-image-link"
                 onClick={() =>
                   taskAnalytics.sendEvent({
                     name: "Clicked metadata link",
-                    "link.type": "host link",
+                    "link.type": "image link",
                   })
                 }
+                to={getImageRoute(imageId)}
               >
-                {hostId}
-              </StyledLink>
+                {imageId}
+              </StyledRouterLink>
+            </MetadataItem>
+          )}
+          {ami && (
+            <MetadataItem data-cy="task-metadata-ami">
+              <MetadataLabel>AMI:</MetadataLabel> {ami}
             </MetadataItem>
           )}
           {isContainerTask && (
@@ -446,6 +480,23 @@ export const Metadata: React.FC<Props> = ({ error, loading, task, taskId }) => {
               taskId={dep.taskId}
             />
           ))}
+        </MetadataCard>
+      ) : null}
+
+      {tags && tags.length > 0 ? (
+        <MetadataCard>
+          <MetadataTitle>Tags</MetadataTitle>
+          <TagsContainer>
+            {tags.map((t) => (
+              <Chip
+                key={`task-tag-${t}`}
+                chipCharacterLimit={30}
+                chipTruncationLocation={TruncationLocation.End}
+                label={t}
+                variant={ChipVariant.Gray}
+              />
+            ))}
+          </TagsContainer>
         </MetadataCard>
       ) : null}
     </>
@@ -518,6 +569,12 @@ const hostTaskStrandedMessage =
 const HoneycombLinkContainer = styled.span`
   display: flex;
   flex-direction: column;
+`;
+
+const TagsContainer = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  gap: ${size.xs};
 `;
 
 const OOMTrackerMessage = styled(MetadataItem)`
