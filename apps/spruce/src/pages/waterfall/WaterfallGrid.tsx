@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { memo, useState } from "react";
 import { useSuspenseQuery } from "@apollo/client";
 import styled from "@emotion/styled";
 import { palette } from "@leafygreen-ui/palette";
@@ -21,6 +21,7 @@ const LIMIT = 5;
 export const WaterfallGrid: React.FC = () => {
   const { [slugs.projectIdentifier]: projectIdentifier } = useParams();
   const [taskFilter, setTaskFilter] = useState("");
+  const [bvFilter, setBvFilter] = useState("");
 
   const { data } = useSuspenseQuery<WaterfallQuery, WaterfallQueryVariables>(
     WATERFALL,
@@ -49,6 +50,16 @@ export const WaterfallGrid: React.FC = () => {
   return (
     <>
       <SearchInput
+        aria-label="Build variant filter"
+        onSubmit={(e) => {
+          const { value } = (
+            e.target as HTMLFormElement
+          )[0] as HTMLInputElement;
+          setBvFilter(value);
+        }}
+        placeholder="Build variant filter"
+      />
+      <SearchInput
         aria-label="Task filter"
         onSubmit={(e) => {
           const { value } = (
@@ -65,14 +76,18 @@ export const WaterfallGrid: React.FC = () => {
             version ? <VersionLabel key={version.id} {...version} /> : null,
           )}
         </Row>
-        {data.waterfall.buildVariants.map((b) => (
-          <BuildRow
-            key={b.id}
-            activeVersionIds={activeVersionIds}
-            build={b}
-            taskFilter={taskFilter}
-          />
-        ))}
+        {data.waterfall.buildVariants.map((b) =>
+          !bvFilter ||
+          b.id.toLowerCase().includes(bvFilter.toLowerCase()) ||
+          b.displayName.toLowerCase().includes(bvFilter.toLowerCase()) ? (
+            <BuildRow
+              key={b.id}
+              activeVersionIds={activeVersionIds}
+              build={b}
+              taskFilter={taskFilter}
+            />
+          ) : null,
+        )}
       </Container>
     </>
   );
@@ -115,7 +130,7 @@ const BuildGrid: React.FC<{
   return (
     <Build>
       {tasks.map(({ displayName, id, status }) => (
-        <Square
+        <SquareMemo
           key={id}
           data-tooltip={displayName}
           status={status}
@@ -128,8 +143,8 @@ const BuildGrid: React.FC<{
 
 const Container = styled.div`
   display: grid;
-  grid-template-columns: repeat(${LIMIT + 1}, minmax(0, 1fr));
   gap: 12px;
+  grid-template-columns: repeat(${LIMIT + 1}, minmax(0, 1fr));
 `;
 
 const Row = styled.div`
@@ -201,3 +216,5 @@ background-image: url("/static/img/waterfall/X.svg");
     border-color: ${black} transparent transparent transparent;
   }
 `;
+
+const SquareMemo = memo(Square);
