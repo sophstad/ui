@@ -15,7 +15,7 @@ import {
 import { WATERFALL } from "gql/queries";
 import { VersionLabel } from "./VersionLabel";
 
-const { black, green, red, white } = palette;
+const { black, gray, green, red, white } = palette;
 const LIMIT = 5;
 
 export const WaterfallGrid: React.FC = () => {
@@ -124,7 +124,7 @@ const BuildGrid: React.FC<{
     : build.tasks;
 
   if (!tasks.length) {
-    return null;
+    return <Build />;
   }
 
   return (
@@ -143,7 +143,6 @@ const BuildGrid: React.FC<{
 
 const Container = styled.div`
   display: grid;
-  gap: 12px;
   grid-template-columns: repeat(${LIMIT + 1}, minmax(0, 1fr));
 `;
 
@@ -151,6 +150,15 @@ const Row = styled.div`
   display: grid;
   grid-column: 1/-1;
   grid-template-columns: subgrid;
+
+  line-offset: 2px;
+  line-thickness: 4px;
+  line-color: black;
+
+  > div {
+    padding: 8px;
+    margin: 8px 0;
+  }
 
   > :only-child {
     display: none;
@@ -161,7 +169,23 @@ const BuildVariantTitle = styled.div`
   word-break: break-word;
 `;
 
-const Build = styled.div``;
+const borderStyle = `1px solid ${gray.light2}`;
+
+const Build = styled.div`
+  border-top: ${borderStyle};
+  border-bottom: ${borderStyle};
+  margin: 2px;
+
+  &:nth-child(2) {
+    border-left: ${borderStyle};
+    border-radius: 8px 0 0 8px;
+  }
+
+  &:last-child {
+    border-right: ${borderStyle};
+    border-radius: 0 8px 8px 0;
+  }
+`;
 
 const Square = styled(Link)<{ status: string }>`
   width: 15px;
@@ -188,7 +212,7 @@ background-image: url("/static/img/waterfall/X.svg");
     transform: translate(-50%);
     z-index: 1;
 
-    width: fit-content;
+    width: max-content;
     max-width: 450px;
     overflow-wrap: break-word;
     padding: 10px;
