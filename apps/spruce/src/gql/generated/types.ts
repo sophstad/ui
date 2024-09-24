@@ -9521,6 +9521,7 @@ export type WaterfallQuery = {
         id: string;
         message: string;
         revision: string;
+        gitTags?: Array<{ __typename?: "GitTag"; tag: string }> | null;
       } | null;
     }>;
   };

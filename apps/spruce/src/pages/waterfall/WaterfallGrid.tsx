@@ -16,6 +16,7 @@ import { WATERFALL } from "gql/queries";
 import { VersionLabel } from "./VersionLabel";
 
 const { black, gray, green, red, white } = palette;
+
 const LIMIT = 5;
 
 export const WaterfallGrid: React.FC = () => {

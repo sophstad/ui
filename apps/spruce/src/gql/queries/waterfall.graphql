@@ -1,3 +1,5 @@
+#import "../fragments/upstreamProject.graphql"
+
 query Waterfall($options: WaterfallOptions!) {
   waterfall(options: $options) {
     buildVariants {
@@ -26,6 +28,9 @@ query Waterfall($options: WaterfallOptions!) {
         activated
         author
         createTime
+        gitTags {
+          tag
+        }
         id
         message
         revision
