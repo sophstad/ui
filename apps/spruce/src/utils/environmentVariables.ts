@@ -2,57 +2,51 @@
  * `getApiUrl()` - Get the API URL from the environment variables
  * @returns - The Evergreen API URL
  */
-export const getApiUrl: () => string = () =>
-  process.env.REACT_APP_API_URL || "";
+export const getApiUrl: () => string = () => import.meta.env.VITE_API_URL || "";
 
 /**
  * `getSentryDSN()` - Get the Sentry Data Source Name (SENTRY_DSN) from the environment variables
  * @returns - The application's DSN
  */
 export const getSentryDSN: () => string = () =>
-  // @ts-expect-error: FIXME. This comment was added by an automated script.
-  process.env.REACT_APP_SPRUCE_SENTRY_DSN;
+  import.meta.env.VITE_SPRUCE_SENTRY_DSN;
 
 /**
  * `getUiUrl()` - Get the backing evergreen URL from the environment variables
  * @returns - Returns the backing evergreen url
  */
-export const getUiUrl: () => string = () => process.env.REACT_APP_UI_URL || "";
+export const getUiUrl: () => string = () => import.meta.env.VITE_UI_URL || "";
 
 /**
  * `getSignalProcessingUrl()` - Get the TIPS Signal Processing URL from the environment variables
  * @returns - Returns the TIPS Signal Processing Iframe URL
  */
 export const getSignalProcessingUrl: () => string = () =>
-  process.env.REACT_APP_SIGNAL_PROCESSING_URL || "";
+  import.meta.env.VITE_SIGNAL_PROCESSING_URL || "";
 
 /**
  * `getSpruceURL()` - Get the SPRUCE URL from the environment variables
  * @returns - Returns the Spruce URL
  */
-export const getSpruceURL: () => string = () =>
-  // @ts-expect-error: FIXME. This comment was added by an automated script.
-  process.env.REACT_APP_SPRUCE_URL;
+export const getSpruceURL: () => string = () => import.meta.env.VITE_SPRUCE_URL;
 
 /**
  * `isDevelopmentBuild()` indicates if the current environment is a local development environment.
  * @returns `true` if the current environment is a local development environment.
  */
-export const isDevelopmentBuild: () => boolean = () =>
-  process.env.NODE_ENV === "development";
+export const isDevelopmentBuild: () => boolean = () => import.meta.env.DEV;
 
 /**
  * `isProductionBuild()` indicates if the current environment is a production bundle.
  * @returns `true` if the current environment is a production build.
  */
-export const isProductionBuild = (): boolean =>
-  process.env.NODE_ENV === "production";
+export const isProductionBuild = (): boolean => import.meta.env.PROD;
 
 /**
  * `isLocal()` indicates if the current build is a local build.
  * @returns `true` if the current build is a local build.
  */
-export const isLocal = () => getReleaseStage() === "local";
+export const isLocal = () => getReleaseStage() === "development";
 
 /**
  * `isBeta()` indicates if the current build is a build meant for a beta deployment.
@@ -82,34 +76,27 @@ export const isTest = () => process.env.NODE_ENV === "test";
  * `getGQLUrl()` - Get the GQL URL from the environment variables
  * @returns - Returns the graphql endpoint for the current environment.
  */
-export const getGQLUrl: () => string = () =>
-  process.env.REACT_APP_GQL_URL || "";
+export const getGQLUrl: () => string = () => import.meta.env.VITE_GQL_URL || "";
 
 /**
  * `getParsleyUrl()` - Get the Parsley URL from the environment variables
  * @returns - Returns the Parsley URL.
  */
 export const getParsleyUrl = (): string =>
-  process.env.REACT_APP_PARSLEY_URL || "";
-
-/**
- * `getAppVersion()` - Get the app release version from the environment variables
- * @returns - Returns the release version.
- */
-export const getAppVersion = () => process.env.REACT_APP_VERSION || "";
+  import.meta.env.VITE_PARSLEY_URL || "";
 
 /**
  * `getReleaseStage()` - Get the release stage from the environment variables
  * @returns - Returns the production release environment
  */
-export const getReleaseStage = () => process.env.REACT_APP_RELEASE_STAGE || "";
+export const getReleaseStage = () => import.meta.env.MODE || "";
 
 /**
  * `getHoneycombBaseURL()` - Get the base Honeycomb URL from the environment variables
  * @returns - Returns the base Honeycomb URL
  */
 export const getHoneycombBaseURL = () =>
-  process.env.REACT_APP_HONEYCOMB_BASE_URL || "";
+  import.meta.env.VITE_HONEYCOMB_BASE_URL || "";
 
 /**
  * `getLoginDomain()` - Get the login domain depending on the release stage
@@ -119,7 +106,6 @@ export const getHoneycombBaseURL = () =>
  * however in prod and staging and we want the login domain to be evergreen.com
  */
 export const getLoginDomain = (): string =>
-  // @ts-expect-error: FIXME. This comment was added by an automated script.
-  isDevelopmentBuild() || getReleaseStage() === "local"
-    ? process.env.REACT_APP_SPRUCE_URL
-    : process.env.REACT_APP_UI_URL;
+  isDevelopmentBuild() || isLocal()
+    ? import.meta.env.VITE_SPRUCE_URL
+    : import.meta.env.VITE_UI_URL;

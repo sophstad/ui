@@ -5,14 +5,12 @@ import react from "@vitejs/plugin-react";
 import { visualizer } from "rollup-plugin-visualizer";
 import { defineConfig } from "vite";
 import checker from "vite-plugin-checker";
-import envCompatible from "vite-plugin-env-compatible";
 import vitePluginImp from "vite-plugin-imp";
 import tsconfigPaths from "vite-tsconfig-paths";
 import dns from "dns";
 import * as fs from "fs";
 import { createRequire } from "node:module";
 import path from "path";
-import injectVariablesInHTML from "./config/injectVariablesInHTML";
 
 const require = createRequire(import.meta.url);
 
@@ -49,18 +47,6 @@ export default defineConfig({
     sourcemap: true,
     rollupOptions: {
       output: {
-        plugins: [
-          // Replace the variables in our HTML files.
-          injectVariablesInHTML({
-            files: "dist/index.html",
-            variables: [
-              "%APP_VERSION%",
-              "%GIT_SHA%",
-              "%REACT_APP_RELEASE_STAGE%",
-              "%NODE_ENV%",
-            ],
-          }),
-        ],
         manualChunks: {
           vendor: [
             "react",
@@ -85,10 +71,6 @@ export default defineConfig({
   },
   plugins: [
     tsconfigPaths(),
-    // Inject env variables
-    envCompatible({
-      prefix: "REACT_APP_",
-    }),
     // Use emotion jsx tag instead of React.JSX
     react({
       jsxImportSource: "@emotion/react",

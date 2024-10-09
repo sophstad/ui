@@ -16,8 +16,8 @@ import App from "./App";
 initializeErrorHandling();
 initializeHoneycomb({
   debug: isDevelopmentBuild(),
-  endpoint: process.env.REACT_APP_HONEYCOMB_ENDPOINT || "",
-  ingestKey: process.env.REACT_APP_HONEYCOMB_INGEST_KEY || "",
+  endpoint: import.meta.env.VITE_HONEYCOMB_ENDPOINT || "",
+  ingestKey: import.meta.env.VITE_HONEYCOMB_INGEST_KEY || "",
   backendURL: toEscapedRegex(getUiUrl() || ""),
   serviceName: "spruce",
   environment: getReleaseStage(),
