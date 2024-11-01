@@ -34,14 +34,6 @@ export const PaginationButtons: React.FC<PaginationButtonsProps> = ({
 
   const onNextClick = () => {
     sendEvent({ name: "Changed page", direction: "next" });
-    fetchMore({
-      variables: {
-        options: {
-          projectIdentifier,
-          maxOrder: nextPageOrder,
-        },
-      },
-    });
     setQueryParams({
       ...queryParams,
       [WaterfallFilterOptions.MaxOrder]: nextPageOrder,
@@ -53,14 +45,6 @@ export const PaginationButtons: React.FC<PaginationButtonsProps> = ({
     sendEvent({
       name: "Changed page",
       direction: "previous",
-    });
-    fetchMore({
-      variables: {
-        options: {
-          projectIdentifier,
-          minOrder: prevPageOrder,
-        },
-      },
     });
     setQueryParams({
       ...queryParams,
