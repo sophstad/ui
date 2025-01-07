@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState, useTransition } from "react";
 import { useSuspenseQuery } from "@apollo/client";
 import styled from "@emotion/styled";
 import { fromZonedTime } from "date-fns-tz";
@@ -15,9 +15,10 @@ import {
 import { WATERFALL } from "gql/queries";
 import { useUserTimeZone } from "hooks";
 import { useDimensions } from "hooks/useDimensions";
-import { useQueryParam } from "hooks/useQueryParam";
+import { useQueryParam, useQueryParams } from "hooks/useQueryParam";
 import { getObject, setObject } from "utils/localStorage";
 import { BuildRow } from "./BuildRow";
+import { FetchingMore } from "./FetchingMore";
 import { InactiveVersionsButton } from "./InactiveVersions";
 import {
   BuildVariantTitle,
@@ -69,6 +70,7 @@ export const WaterfallGrid: React.FC<WaterfallGridProps> = ({
     });
   }, [pins, projectIdentifier]);
 
+  const [limit, setLimit] = useState(VERSION_LIMIT);
   const [maxOrder] = useQueryParam<number>(WaterfallFilterOptions.MaxOrder, 0);
   const [minOrder] = useQueryParam<number>(WaterfallFilterOptions.MinOrder, 0);
   const [revision] = useQueryParam<string | null>(
@@ -85,7 +87,7 @@ export const WaterfallGrid: React.FC<WaterfallGridProps> = ({
       variables: {
         options: {
           projectIdentifier,
-          limit: VERSION_LIMIT,
+          limit,
           maxOrder,
           minOrder,
           revision,
@@ -109,10 +111,21 @@ export const WaterfallGrid: React.FC<WaterfallGridProps> = ({
   const { activeVersionIds, buildVariants, versions } = useFilters({
     buildVariants: data.waterfall.buildVariants,
     flattenedVersions: data.waterfall.flattenedVersions,
+    limit,
     pins,
   });
 
   const lastActiveVersionId = activeVersionIds[activeVersionIds.length - 1];
+
+  const [queryParams] = useQueryParams();
+  const [isPending, startTransition] = useTransition();
+  useEffect(() => {
+    if (activeVersionIds.length < 5) {
+      startTransition(() => {
+        setLimit((l) => l + 10);
+      });
+    }
+  }, [queryParams]);
 
   return (
     <Container ref={refEl}>
@@ -138,6 +151,7 @@ export const WaterfallGrid: React.FC<WaterfallGridProps> = ({
               </InactiveVersion>
             ),
           )}
+          {isPending && <FetchingMore />}
         </Versions>
       </Row>
       {buildVariants.map((b) => (

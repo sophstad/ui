@@ -2,12 +2,14 @@ import { useMemo } from "react";
 import { Unpacked } from "@evg-ui/lib/types/utils";
 import { WaterfallVersionFragment } from "gql/generated/types";
 import { useQueryParam } from "hooks/useQueryParam";
+import { VERSION_LIMIT } from "./styles";
 import { Build, BuildVariant, WaterfallFilterOptions } from "./types";
 import { groupInactiveVersions } from "./utils";
 
 type UseFiltersProps = {
   buildVariants: BuildVariant[];
   flattenedVersions: WaterfallVersionFragment[];
+  limit?: number;
   pins: string[];
 };
 
@@ -53,10 +55,6 @@ export const useFilters = ({
   );
 
   const filteredBuildVariants = useMemo(() => {
-    if (!hasFilters && !pins.length) {
-      return buildVariants;
-    }
-
     const bvs: BuildVariant[] = [];
 
     let pinIndex = 0;
@@ -70,9 +68,9 @@ export const useFilters = ({
       }
     };
 
-    const activeVersions = flattenedVersions.filter(
-      (v) => v.activated && matchesRequesters(v, requesters),
-    );
+    const activeVersions = flattenedVersions
+      .filter((v) => v.activated && matchesRequesters(v, requesters))
+      .slice(0, VERSION_LIMIT);
 
     buildVariants.forEach((bv) => {
       const passesBVFilter =
@@ -83,29 +81,25 @@ export const useFilters = ({
         return;
       }
 
-      if (requesters.length || taskFilterRegex.length || statuses.length) {
-        const activeBuilds: Build[] = [];
-        bv.builds.forEach((b) => {
-          if (activeVersions.find(({ id }) => id === b.version)) {
-            if (taskFilterRegex.length || statuses.length) {
-              const activeTasks = b.tasks.filter(
-                (t) =>
-                  matchesTasksFilter(t, taskFilterRegex) &&
-                  matchesStatuses(t, statuses),
-              );
-              if (activeTasks.length) {
-                activeBuilds.push({ ...b, tasks: activeTasks });
-              }
-            } else {
-              activeBuilds.push(b);
+      const activeBuilds: Build[] = [];
+      bv.builds.forEach((b) => {
+        if (activeVersions.find(({ id }) => id === b.version)) {
+          if (taskFilterRegex.length || statuses.length) {
+            const activeTasks = b.tasks.filter(
+              (t) =>
+                matchesTasksFilter(t, taskFilterRegex) &&
+                matchesStatuses(t, statuses),
+            );
+            if (activeTasks.length) {
+              activeBuilds.push({ ...b, tasks: activeTasks });
             }
+          } else {
+            activeBuilds.push(b);
           }
-        });
-        if (activeBuilds.length) {
-          pushVariant({ ...bv, builds: activeBuilds });
         }
-      } else {
-        pushVariant(bv);
+      });
+      if (activeBuilds.length) {
+        pushVariant({ ...bv, builds: activeBuilds });
       }
     });
     return bvs;
@@ -126,7 +120,11 @@ export const useFilters = ({
         bv.builds.some((build) => build.version === version.id),
       );
 
-    return groupInactiveVersions(flattenedVersions, hasActiveBuild);
+    return groupInactiveVersions(
+      flattenedVersions,
+      hasActiveBuild,
+      VERSION_LIMIT,
+    );
   }, [filteredBuildVariants, flattenedVersions]);
 
   const activeVersionIds = useMemo(

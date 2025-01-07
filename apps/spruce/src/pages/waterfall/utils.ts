@@ -4,8 +4,10 @@ import { WaterfallVersion } from "./types";
 export const groupInactiveVersions = (
   versions: WaterfallVersionFragment[],
   versionHasActiveBuild: (version: WaterfallVersionFragment) => boolean,
+  limit?: number,
 ) => {
   const filteredVersions: WaterfallVersion[] = [];
+  let activeVersionsCount = 0;
 
   const pushInactive = (v: WaterfallVersionFragment) => {
     if (!filteredVersions?.[filteredVersions.length - 1]?.inactiveVersions) {
@@ -15,6 +17,7 @@ export const groupInactiveVersions = (
   };
 
   const pushActive = (v: WaterfallVersionFragment) => {
+    activeVersionsCount += 1;
     filteredVersions.push({
       inactiveVersions: null,
       version: v,
@@ -22,6 +25,9 @@ export const groupInactiveVersions = (
   };
 
   versions.forEach((version) => {
+    if (limit && activeVersionsCount >= limit) {
+      return;
+    }
     if (version.activated && versionHasActiveBuild(version)) {
       pushActive(version);
     } else {
