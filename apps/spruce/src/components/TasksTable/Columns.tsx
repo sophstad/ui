@@ -2,9 +2,9 @@ import { LGColumnDef } from "@leafygreen-ui/table";
 import Tooltip from "@leafygreen-ui/tooltip";
 import pluralize from "pluralize";
 import TaskStatusBadge from "@evg-ui/lib/components/Badge/TaskStatusBadge";
+import { StyledRouterLink } from "@evg-ui/lib/components/styles";
 import { zIndex } from "@evg-ui/lib/constants/tokens";
 import { TaskStatus } from "@evg-ui/lib/types/task";
-import { StyledRouterLink } from "components/styles";
 import TaskStatusBadgeWithLink from "components/TaskStatusBadgeWithLink";
 import { TreeDataEntry } from "components/TreeSelect";
 import { getVariantHistoryRoute } from "constants/routes";
@@ -53,7 +53,7 @@ export const getColumnsTemplate = ({
     size: 300,
   },
   {
-    accessorKey: "status",
+    accessorKey: "displayStatus",
     id: TaskSortCategory.Status,
     header: "Task Status",
     cell: ({
@@ -103,7 +103,7 @@ export const getColumnsTemplate = ({
   },
   {
     id: TaskSortCategory.BaseStatus,
-    accessorKey: "baseTask.status",
+    accessorKey: "baseTask.displayStatus",
     header: `${isPatch ? "Base" : "Previous"} Status`,
     cell: ({
       getValue,

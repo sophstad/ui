@@ -3,12 +3,12 @@ import styled from "@emotion/styled";
 import { palette } from "@leafygreen-ui/palette";
 import Tooltip from "@leafygreen-ui/tooltip";
 import { Disclaimer } from "@leafygreen-ui/typography";
+import { StyledRouterLink } from "@evg-ui/lib/components/styles";
 import { size, zIndex, fontSize } from "@evg-ui/lib/constants/tokens";
 import { Unpacked } from "@evg-ui/lib/types/utils";
 import { useProjectHealthAnalytics } from "analytics/projectHealth/useProjectHealthAnalytics";
 import { DisplayModal } from "components/DisplayModal";
 import Icon from "components/Icon";
-import { StyledRouterLink } from "components/styles";
 import { getVersionRoute } from "constants/routes";
 import { useSpruceConfig, useDateFormat } from "hooks";
 import { CommitRolledUpVersions } from "types/commits";
@@ -46,7 +46,6 @@ export const InactiveCommitButton: React.FC<InactiveCommitsProps> = ({
     returnedCommits = [
       ...rolledUpVersions
         .slice(0, 1)
-        // @ts-expect-error: FIXME. This comment was added by an automated script.
         .map((v) => <CommitCopy key={v.id} isTooltip v={v} />),
       <HiddenCommitsWrapper
         key="hidden_commits"
@@ -63,11 +62,9 @@ export const InactiveCommitButton: React.FC<InactiveCommitsProps> = ({
       </HiddenCommitsWrapper>,
       ...rolledUpVersions
         .slice(-2)
-        // @ts-expect-error: FIXME. This comment was added by an automated script.
         .map((v) => <CommitCopy key={v.id} isTooltip v={v} />),
     ];
   } else {
-    // @ts-expect-error: FIXME. This comment was added by an automated script.
     returnedCommits = rolledUpVersions.map((v) => (
       <CommitCopy key={v.id} isTooltip v={v} />
     ));
@@ -81,7 +78,6 @@ export const InactiveCommitButton: React.FC<InactiveCommitsProps> = ({
         setOpen={setShowModal}
         title={`${versionCount} ${tooltipType} Commits`}
       >
-        {/* @ts-expect-error: FIXME. This comment was added by an automated script. */}
         {rolledUpVersions?.map((v) => (
           <CommitCopy key={v.id} isTooltip={false} v={v} />
         ))}
@@ -139,6 +135,7 @@ const CommitCopy: React.FC<CommitCopyProps> = ({ isTooltip, v }) => {
   const message = isTooltip
     ? trimStringFromMiddle(v.message, maxCommitMessageLength)
     : v.message;
+
   return (
     <CommitText key={v.revision} data-cy="commit-text" tooltip={isTooltip}>
       <CommitTitleText>

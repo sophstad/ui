@@ -2,7 +2,7 @@ import { useMemo } from "react";
 import { Unpacked } from "@evg-ui/lib/types/utils";
 import { WaterfallVersionFragment } from "gql/generated/types";
 import { useQueryParam } from "hooks/useQueryParam";
-import { VERSION_LIMIT } from "./styles";
+import { VERSION_LIMIT } from "./constants";
 import { Build, BuildVariant, WaterfallFilterOptions } from "./types";
 import { groupInactiveVersions } from "./utils";
 
@@ -173,7 +173,9 @@ const matchesStatuses = (
 ) =>
   statuses.length
     ? statuses.some((s) =>
-        task.displayStatus ? task.displayStatus === s : task.status === s,
+        task.displayStatusCache
+          ? task.displayStatusCache === s
+          : task.status === s,
       )
     : true;
 

@@ -4,9 +4,10 @@ import Tooltip from "@leafygreen-ui/tooltip";
 import { Skeleton } from "antd";
 import { Link } from "react-router-dom";
 import ConditionalWrapper from "@evg-ui/lib/components/ConditionalWrapper";
+import { StyledRouterLink } from "@evg-ui/lib/components/styles";
 import { size } from "@evg-ui/lib/constants/tokens";
 import { TaskStatus } from "@evg-ui/lib/types/task";
-import { inactiveElementStyle, StyledRouterLink } from "components/styles";
+import { inactiveElementStyle } from "components/styles";
 import { getTaskRoute } from "constants/routes";
 import { COLUMN_LABEL_WIDTH, ROW_LABEL_WIDTH } from "../constants";
 import { HistoryTableIcon } from "../HistoryTableIcon";
@@ -17,7 +18,7 @@ const statusIconSize = 20;
 interface TaskCellProps {
   task: {
     id: string;
-    status: string;
+    displayStatus: string;
   };
   inactive?: boolean;
   failingTests?: string[];
@@ -37,7 +38,7 @@ const TaskCell: React.FC<TaskCellProps> = ({
   <Cell aria-disabled={inactive} data-cy="task-cell" inactive={inactive}>
     <Link
       onClick={() => {
-        onClick({ taskStatus: task.status });
+        onClick({ taskStatus: task.displayStatus });
       }}
       to={getTaskRoute(task.id)}
     >
@@ -46,7 +47,7 @@ const TaskCell: React.FC<TaskCellProps> = ({
         inactive={inactive}
         label={label}
         loadingTestResults={loading}
-        status={task.status as TaskStatus}
+        status={task.displayStatus as TaskStatus}
       />
     </Link>
   </Cell>

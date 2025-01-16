@@ -3,12 +3,12 @@ import styled from "@emotion/styled";
 import IconButton from "@leafygreen-ui/icon-button";
 import { palette } from "@leafygreen-ui/palette";
 import { Link } from "react-router-dom";
+import { StyledLink } from "@evg-ui/lib/components/styles";
 import { taskStatusToCopy } from "@evg-ui/lib/constants/task";
 import { size } from "@evg-ui/lib/constants/tokens";
 import { TaskStatus } from "@evg-ui/lib/types/task";
 import { useWaterfallAnalytics } from "analytics";
 import Icon from "components/Icon";
-import { StyledLink } from "components/styles";
 import { getTaskRoute, getVariantHistoryRoute } from "constants/routes";
 import {
   BuildVariantTitle,
@@ -118,18 +118,21 @@ const BuildGrid: React.FC<{
       );
     }}
   >
-    {build.tasks.map(({ displayName, displayStatus, execution, id }) => {
-      const taskStatus = displayStatus as TaskStatus;
-      return (
-        <SquareMemo
-          key={id}
-          data-tooltip={`${displayName} - ${taskStatusToCopy[taskStatus]}`}
-          isRightmostBuild={isRightmostBuild}
-          status={taskStatus}
-          to={getTaskRoute(id, { execution })}
-        />
-      );
-    })}
+    {build.tasks.map(
+      ({ displayName, displayStatusCache, execution, id, status }) => {
+        // Use status as backup for tasks created before displayStatusCache was introduced
+        const taskStatus = (displayStatusCache || status) as TaskStatus;
+        return (
+          <SquareMemo
+            key={id}
+            data-tooltip={`${displayName} - ${taskStatusToCopy[taskStatus]}`}
+            isRightmostBuild={isRightmostBuild}
+            status={taskStatus}
+            to={getTaskRoute(id, { execution })}
+          />
+        );
+      },
+    )}
   </BuildContainer>
 );
 

@@ -2784,6 +2784,7 @@ export type Task = {
   activatedTime?: Maybe<Scalars["Time"]["output"]>;
   ami?: Maybe<Scalars["String"]["output"]>;
   annotation?: Maybe<Annotation>;
+  /** This is a base task's display status. */
   baseStatus?: Maybe<Scalars["String"]["output"]>;
   baseTask?: Maybe<Task>;
   blocked: Scalars["Boolean"]["output"];
@@ -2806,6 +2807,7 @@ export type Task = {
   dispatchTime?: Maybe<Scalars["Time"]["output"]>;
   displayName: Scalars["String"]["output"];
   displayOnly?: Maybe<Scalars["Boolean"]["output"]>;
+  /** This is a task's display status and is what is commonly used on the UI. */
   displayStatus: Scalars["String"]["output"];
   displayTask?: Maybe<Task>;
   distroId: Scalars["String"]["output"];
@@ -2843,11 +2845,7 @@ export type Task = {
   scheduledTime?: Maybe<Scalars["Time"]["output"]>;
   spawnHostLink?: Maybe<Scalars["String"]["output"]>;
   startTime?: Maybe<Scalars["Time"]["output"]>;
-  /**
-   * This is a task's display status and is what is commonly used on the UI.
-   * In future releases this will be migrated to represent the original status of the task
-   * @deprecated use displayStatus instead. Status will be migrated to reflect the original status
-   */
+  /** This is a task's original status. It is the status stored in the database, and is distinct from the displayStatus. */
   status: Scalars["String"]["output"];
   stepbackInfo?: Maybe<StepbackInfo>;
   tags: Array<Scalars["String"]["output"]>;
@@ -3499,7 +3497,7 @@ export type WaterfallPagination = {
 export type WaterfallTask = {
   __typename?: "WaterfallTask";
   displayName: Scalars["String"]["output"];
-  displayStatus: Scalars["String"]["output"];
+  displayStatusCache: Scalars["String"]["output"];
   execution: Scalars["Int"]["output"];
   id: Scalars["String"]["output"];
   status: Scalars["String"]["output"];
@@ -3577,10 +3575,10 @@ export type WorkstationSetupCommandInput = {
 export type BaseTaskFragment = {
   __typename?: "Task";
   displayName: string;
+  displayStatus: string;
   execution: number;
   id: string;
   patchNumber?: number | null;
-  status: string;
   versionMetadata: {
     __typename?: "Version";
     id: string;
@@ -3619,10 +3617,10 @@ export type LogkeeperTaskQuery = {
     task: {
       __typename?: "Task";
       displayName: string;
+      displayStatus: string;
       execution: number;
       id: string;
       patchNumber?: number | null;
-      status: string;
       tests: {
         __typename?: "TaskTestResult";
         testResults: Array<{
@@ -3655,10 +3653,10 @@ export type TaskQuery = {
   task?: {
     __typename?: "Task";
     displayName: string;
+    displayStatus: string;
     execution: number;
     id: string;
     patchNumber?: number | null;
-    status: string;
     details?: {
       __typename?: "TaskEndDetail";
       description?: string | null;

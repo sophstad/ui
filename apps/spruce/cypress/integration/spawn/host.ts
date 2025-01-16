@@ -144,7 +144,6 @@ describe("Navigating to Spawn Host page", () => {
         "Load data for dist on ubuntu1604",
       );
       cy.dataCy("spawn-host-modal").should("contain.text", label2);
-      cy.dataCy("spawn-host-modal").should("contain.text", label3);
     });
 
     it("Unchecking 'Load data for dist' hides nested checkbox selections and checking shows them.", () => {
@@ -155,13 +154,11 @@ describe("Navigating to Spawn Host page", () => {
       cy.dataCy("load-data-checkbox").should("be.checked");
       cy.contains(label1).should("be.visible");
       cy.contains(label2).should("be.visible");
-      cy.contains(label3).should("be.visible");
 
       cy.dataCy("load-data-checkbox").click({ force: true });
       cy.dataCy("load-data-checkbox").should("not.be.checked");
       cy.contains(label1).should("not.exist");
       cy.contains(label2).should("not.exist");
-      cy.contains(label3).should("not.exist");
     });
 
     it("Visiting the spawn host page with a task and distro supplied in the url should populate the distro input", () => {
@@ -241,11 +238,10 @@ describe("Navigating to Spawn Host page", () => {
       );
     });
     const label1 = "Use project-specific setup script defined at /path";
-    const label2 = "Load from task sync";
-    const label3 = "Also start any hosts this task started (if applicable)";
+    const label2 = "Also start any hosts this task started (if applicable)";
   });
 
-  it("Allows editing a modal with sleep schedule enabled", () => {
+  it("Allows editing a modal with sleep schedule enabled and validates dates", () => {
     cy.dataCy("edit-host-button").eq(2).click();
     cy.dataCy("edit-spawn-host-modal").should("be.visible");
 
@@ -261,12 +257,13 @@ describe("Navigating to Spawn Host page", () => {
       cy.wrap($currentDateCell)
         .siblings()
         .then(($siblings) => {
-          // Find the index of the current date cell among its siblings
-          const currentIndex = $siblings.index($currentDateCell);
+          const currentDay = Number($currentDateCell.text());
+          // Get the next date cell based on the next index
+          const nextIndex = $siblings
+            .toArray()
+            .findIndex((el) => Number(el.textContent) === currentDay + 1);
 
-          // Get the next date cell based on the current index
-          const $nextCell = $siblings.eq(currentIndex + 1);
-
+          const $nextCell = $siblings.eq(nextIndex);
           // If the next cell exists and is not disabled, click on it
           if ($nextCell && $nextCell.attr("aria-disabled") === "false") {
             cy.wrap($nextCell).click();
@@ -284,20 +281,20 @@ describe("Navigating to Spawn Host page", () => {
 
     // LG Date Picker does not respond well to .clear()
     cy.getInputByLabel("Temporary Sleep Schedule Exemption").type(
-      "{backspace}{backspace}{backspace}",
+      "{backspace}{backspace}{backspace}{backspace}{backspace}",
     );
 
-    cy.getInputByLabel("Temporary Sleep Schedule Exemption").type("20240115");
+    // Select a date in the past
+    cy.getInputByLabel("Temporary Sleep Schedule Exemption").type("20250101");
     cy.get("body").click();
     cy.contains("button", "Save").should("have.attr", "aria-disabled", "true");
 
     cy.getInputByLabel("Temporary Sleep Schedule Exemption").type(
-      "{backspace}{backspace}{backspace}",
+      "{backspace}{backspace}{backspace}{backspace}{backspace}",
     );
 
-    cy.getInputByLabel("Temporary Sleep Schedule Exemption").type(
-      "{backspace}{backspace}{backspace}20600115",
-    );
+    // Select a date too far in the future
+    cy.getInputByLabel("Temporary Sleep Schedule Exemption").type("20600115");
     cy.contains("button", "Save").should("have.attr", "aria-disabled", "true");
   });
 });

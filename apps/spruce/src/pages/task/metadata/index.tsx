@@ -9,6 +9,7 @@ import {
 import { palette } from "@leafygreen-ui/palette";
 import { InlineCode } from "@leafygreen-ui/typography";
 import { Link } from "react-router-dom";
+import { StyledLink, StyledRouterLink } from "@evg-ui/lib/components/styles";
 import { size, zIndex } from "@evg-ui/lib/constants/tokens";
 import { TaskStatus } from "@evg-ui/lib/types/task";
 import { useTaskAnalytics } from "analytics";
@@ -19,7 +20,6 @@ import {
   MetadataTitle,
   MetadataLabel,
 } from "components/MetadataCard";
-import { StyledLink, StyledRouterLink } from "components/styles";
 import {
   getHoneycombTraceUrl,
   getHoneycombSystemMetricsUrl,
@@ -69,6 +69,7 @@ export const Metadata: React.FC<Props> = ({ error, loading, task, taskId }) => {
     buildVariantDisplayName,
     dependsOn,
     details,
+    displayStatus,
     displayTask,
     distroId,
     estimatedStart,
@@ -87,7 +88,6 @@ export const Metadata: React.FC<Props> = ({ error, loading, task, taskId }) => {
     resetWhenFinished,
     spawnHostLink,
     startTime,
-    status,
     tags,
     timeTaken,
     versionMetadata,
@@ -186,10 +186,12 @@ export const Metadata: React.FC<Props> = ({ error, loading, task, taskId }) => {
             </span>
           </MetadataItem>
         ) : null}
-        {status === TaskStatus.Started && startTime && expectedDuration ? (
+        {displayStatus === TaskStatus.Started &&
+        startTime &&
+        expectedDuration ? (
           <ETATimer expectedDuration={expectedDuration} startTime={startTime} />
         ) : null}
-        {status === TaskStatus.Started && startTime && (
+        {displayStatus === TaskStatus.Started && startTime && (
           <RuntimeTimer startTime={startTime} />
         )}
         {startTime && (
