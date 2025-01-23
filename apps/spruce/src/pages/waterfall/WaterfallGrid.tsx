@@ -82,17 +82,21 @@ export const WaterfallGrid: React.FC<WaterfallGridProps> = ({
 
   const timezone = useUserTimeZone() ?? utcTimeZone;
 
+  const [queryRequesters, setQueryRequesters] = useState<string[]>([]);
+  const [queryBvs, setQueryBvs] = useState<string[]>([]);
   const { data } = useSuspenseQuery<WaterfallQuery, WaterfallQueryVariables>(
     WATERFALL,
     {
       variables: {
         options: {
           projectIdentifier,
+          date: date ? fromZonedTime(date, timezone) : undefined,
           limit,
           maxOrder,
           minOrder,
+          requesters: queryRequesters,
           revision,
-          date: date ? fromZonedTime(date, timezone) : undefined,
+          variants: queryBvs,
         },
       },
       // @ts-expect-error pollInterval isn't officially supported by useSuspenseQuery, but it works so let's use it anyway.
@@ -117,13 +121,32 @@ export const WaterfallGrid: React.FC<WaterfallGridProps> = ({
   });
 
   const lastActiveVersionId = activeVersionIds[activeVersionIds.length - 1];
+  const [requesters] = useQueryParam<string[]>(
+    WaterfallFilterOptions.Requesters,
+    [],
+  );
+
+  const [bvs] = useQueryParam<string[]>(
+    WaterfallFilterOptions.BuildVariant,
+    [],
+  );
 
   const [queryParams] = useQueryParams();
   const [isPending, startTransition] = useTransition();
   useEffect(() => {
-    if (activeVersionIds.length < 5) {
+    if (activeVersionIds.length <= 1) {
+      if (requesters.length) {
+        startTransition(() => {
+          setQueryRequesters(requesters);
+        });
+      } else if (bvs.length) {
+        startTransition(() => {
+          setQueryBvs(bvs);
+        });
+      }
+    } else if (activeVersionIds.length < 5) {
       startTransition(() => {
-        setLimit((l) => l + 10);
+        setLimit(15);
       });
     }
   }, [queryParams]);

@@ -35,15 +35,6 @@ export const useFilters = ({
 
   const [taskFilter] = useQueryParam<string[]>(WaterfallFilterOptions.Task, []);
 
-  const hasFilters = useMemo(
-    () =>
-      requesters.length ||
-      statuses.length ||
-      buildVariantFilter.length ||
-      taskFilter.length,
-    [buildVariantFilter, requesters, statuses, taskFilter],
-  );
-
   const buildVariantFilterRegex: RegExp[] = useMemo(
     () => makeFilterRegex(buildVariantFilter),
     [buildVariantFilter],
@@ -68,14 +59,16 @@ export const useFilters = ({
       }
     };
 
-    const activeVersions = flattenedVersions
-      .filter((v) => v.activated && matchesRequesters(v, requesters))
-      .slice(0, VERSION_LIMIT);
+    const activeVersions = flattenedVersions.filter(
+      (v) => v.activated && matchesRequesters(v, requesters),
+    );
 
     buildVariants.forEach((bv) => {
       const passesBVFilter =
         !buildVariantFilterRegex.length ||
-        buildVariantFilterRegex.some((r) => bv.displayName.match(r));
+        buildVariantFilterRegex.some(
+          (r) => bv.displayName.match(r) || bv.id.match(r),
+        );
 
       if (!passesBVFilter) {
         return;
@@ -107,7 +100,6 @@ export const useFilters = ({
     buildVariantFilterRegex,
     buildVariants,
     flattenedVersions,
-    hasFilters,
     pins,
     requesters,
     statuses,
