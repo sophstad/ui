@@ -82,8 +82,11 @@ export const WaterfallGrid: React.FC<WaterfallGridProps> = ({
 
   const timezone = useUserTimeZone() ?? utcTimeZone;
 
-  const [queryRequesters, setQueryRequesters] = useState<string[]>([]);
-  const [queryBvs, setQueryBvs] = useState<string[]>([]);
+  const [serverFilters, setServerFilters] = useState<{
+    requesters: string[];
+    variants: string[];
+  }>({ requesters: [], variants: [] });
+
   const { data } = useSuspenseQuery<WaterfallQuery, WaterfallQueryVariables>(
     WATERFALL,
     {
@@ -94,9 +97,9 @@ export const WaterfallGrid: React.FC<WaterfallGridProps> = ({
           limit,
           maxOrder,
           minOrder,
-          requesters: queryRequesters,
+          requesters: serverFilters.requesters,
           revision,
-          variants: queryBvs,
+          variants: serverFilters.variants,
         },
       },
       // @ts-expect-error pollInterval isn't officially supported by useSuspenseQuery, but it works so let's use it anyway.
@@ -121,12 +124,12 @@ export const WaterfallGrid: React.FC<WaterfallGridProps> = ({
   });
 
   const lastActiveVersionId = activeVersionIds[activeVersionIds.length - 1];
+
   const [requesters] = useQueryParam<string[]>(
     WaterfallFilterOptions.Requesters,
     [],
   );
-
-  const [bvs] = useQueryParam<string[]>(
+  const [variants] = useQueryParam<string[]>(
     WaterfallFilterOptions.BuildVariant,
     [],
   );
@@ -134,16 +137,21 @@ export const WaterfallGrid: React.FC<WaterfallGridProps> = ({
   const [queryParams] = useQueryParams();
   const [isPending, startTransition] = useTransition();
   useEffect(() => {
-    if (activeVersionIds.length <= 1) {
-      if (requesters.length) {
-        startTransition(() => {
-          setQueryRequesters(requesters);
+    if (!Object.keys(queryParams).length) {
+      startTransition(() => {
+        setLimit(5);
+        setServerFilters({
+          requesters: [],
+          variants: [],
         });
-      } else if (bvs.length) {
-        startTransition(() => {
-          setQueryBvs(bvs);
+      });
+    } else if (activeVersionIds.length <= 1) {
+      startTransition(() => {
+        setServerFilters({
+          requesters,
+          variants,
         });
-      }
+      });
     } else if (activeVersionIds.length < 5) {
       startTransition(() => {
         setLimit(15);
