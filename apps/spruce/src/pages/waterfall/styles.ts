@@ -18,8 +18,6 @@ export const gridGroupCss = css`
   display: flex;
   gap: ${size.s};
   flex-grow: 1;
-  padding-left: ${size.xs};
-  padding-right: ${size.xs};
 `;
 
 export const BuildVariantTitle = styled.div`
@@ -28,6 +26,7 @@ export const BuildVariantTitle = styled.div`
   flex-grow: 0;
   flex-shrink: 0;
   gap: ${size.xxs};
+  height: min-content;
   width: ${BUILD_VARIANT_WIDTH}px;
 `;
 
