@@ -47,10 +47,10 @@ export const getFormSchema = (
       githubTriggerAliasField: GithubTriggerAliasField,
     },
     schema: {
-      type: "object" as "object",
+      type: "object" as const,
       properties: {
         github: {
-          type: "object" as "object",
+          type: "object" as const,
           title: "GitHub",
           properties: {
             githubWebhooksEnabled: {
@@ -87,11 +87,11 @@ export const getFormSchema = (
               ),
             },
             oldestAllowedMergeBase: {
-              type: "string" as "string",
+              type: "string" as const,
               title: "Oldest Allowed Merge Base",
             },
             prTesting: {
-              type: "object" as "object",
+              type: "object" as const,
               title: "GitHub Patch Definitions",
               ...overrideRadioBox(
                 "githubPrAliases",
@@ -104,10 +104,10 @@ export const getFormSchema = (
               ),
             },
             githubTriggerAliases: {
-              type: "array" as "array",
+              type: "array" as const,
               title: "GitHub Trigger Aliases",
               items: {
-                type: "object" as "object",
+                type: "object" as const,
               },
             },
             githubChecksEnabledTitle: {
@@ -133,8 +133,9 @@ export const getFormSchema = (
             gitTagVersionsTitle: {
               type: "null",
               title: "Trigger Versions With Git Tags",
-              description:
-                "If an authorized user pushes a tag that matches a specific regex, then a version will be created from this alias. Note that project admins are not authorized by default; they must explicitly be given this permission.",
+              description: `If an authorized user pushes a tag that matches a specific regex, then a version will be created from this alias. 
+                Note that project admins are not authorized by default; they must explicitly be given this permission. 
+                ${projectType === ProjectType.Repo ? "This setting will not be applied to untracked branches." : ""}`,
             },
             gitTagVersionsEnabled: {
               type: ["boolean", "null"],
@@ -152,9 +153,9 @@ export const getFormSchema = (
                 "gitTagAuthorizedUsers",
                 ["Override Repo Users", "Default to Repo Users"],
                 {
-                  type: "array" as "array",
+                  type: "array" as const,
                   items: {
-                    type: "string" as "string",
+                    type: "string" as const,
                     title: "Username",
                     default: "",
                     minLength: 1,
@@ -171,9 +172,9 @@ export const getFormSchema = (
                 "gitTagAuthorizedTeams",
                 ["Override Repo Teams", "Default to Repo Teams"],
                 {
-                  type: "array" as "array",
+                  type: "array" as const,
                   items: {
-                    type: "string" as "string",
+                    type: "string" as const,
                     title: "Team",
                     default: "",
                     minLength: 1,
@@ -194,8 +195,12 @@ export const getFormSchema = (
           },
         },
         mergeQueue: {
-          type: "object" as "object",
+          type: "object" as const,
           title: "Merge Queue",
+          ...(projectType === ProjectType.Repo && {
+            description:
+              "If enabled, these settings can only apply to one branch project that also has this feature enabled. They do not apply to untracked branches.",
+          }),
           properties: {
             enabled: {
               type: ["boolean", "null"],
@@ -222,7 +227,7 @@ export const getFormSchema = (
                       enum: [true],
                     },
                     patchDefinitions: {
-                      type: "object" as "object",
+                      type: "object" as const,
                       title: "Merge Queue Patch Definitions",
                       ...overrideRadioBox(
                         "mergeQueueAliases",
@@ -351,7 +356,7 @@ export const getFormSchema = (
         },
         githubChecksEnabledTitle: {
           "ui:sectionTitle": true,
-          "ui:description": GitHubChecksAliasesDescription,
+          "ui:description": GitHubChecksAliasesDescription(projectType),
         },
         githubChecksEnabled: {
           "ui:data-cy": "github-checks-enabled-radio-box",
@@ -592,7 +597,7 @@ const GitTagAliasesDescription = (
   </>
 );
 
-const GitHubChecksAliasesDescription = (
+const GitHubChecksAliasesDescription = (projectType: ProjectType) => (
   <>
     Commits will send their status as a Github Check (the check will pass/fail
     based only on the tasks matching the tags/regexes definitions). These
@@ -602,5 +607,7 @@ const GitHubChecksAliasesDescription = (
     </StyledLink>{" "}
     in this project&rsquo;s config YAML instead if Version Control is enabled
     and no aliases are defined on the project or repo page.
+    {projectType === ProjectType.Repo &&
+      "If enabled, these settings can only apply to one branch project that also has this feature enabled. They do not apply to untracked branches."}
   </>
 );

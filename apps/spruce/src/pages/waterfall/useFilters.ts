@@ -1,15 +1,13 @@
 import { useMemo } from "react";
 import { Unpacked } from "@evg-ui/lib/types/utils";
-import { WaterfallVersionFragment } from "gql/generated/types";
 import { useQueryParam } from "hooks/useQueryParam";
 import { VERSION_LIMIT } from "./constants";
-import { Build, BuildVariant, WaterfallFilterOptions } from "./types";
+import { Build, BuildVariant, Version, WaterfallFilterOptions } from "./types";
 import { groupInactiveVersions } from "./utils";
 
 type UseFiltersProps = {
   buildVariants: BuildVariant[];
-  flattenedVersions: WaterfallVersionFragment[];
-  limit?: number;
+  flattenedVersions: Version[];
   pins: string[];
 };
 
@@ -107,7 +105,7 @@ export const useFilters = ({
   ]);
 
   const groupedVersions = useMemo(() => {
-    const hasActiveBuild = (version: WaterfallVersionFragment) =>
+    const hasActiveBuild = (version: Version) =>
       filteredBuildVariants.some((bv) =>
         bv.builds.some((build) => build.version === version.id),
       );
@@ -143,10 +141,7 @@ export const useFilters = ({
  * @param requesters - list of applied requester filters
  * @returns - true if no filters are applied, or if the version matches applied filters
  */
-const matchesRequesters = (
-  version: WaterfallVersionFragment,
-  requesters: string[],
-) => {
+const matchesRequesters = (version: Version, requesters: string[]) => {
   if (!requesters.length) {
     return true;
   }

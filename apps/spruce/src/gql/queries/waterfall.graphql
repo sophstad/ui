@@ -1,23 +1,5 @@
-#import "../fragments/upstreamProject.graphql"
-
 query Waterfall($options: WaterfallOptions!) {
   waterfall(options: $options) {
-    buildVariants {
-      builds {
-        id
-        tasks {
-          displayName
-          displayStatusCache
-          execution
-          id
-          status
-        }
-        version
-      }
-      displayName
-      id
-      version
-    }
     flattenedVersions {
       activated
       author
@@ -31,17 +13,23 @@ query Waterfall($options: WaterfallOptions!) {
       order
       requester
       revision
-      taskStatusStats(options: {}) {
-        counts {
-          count
+      waterfallBuilds {
+        buildVariant
+        displayName
+        id
+        tasks {
+          displayName
+          displayStatusCache
+          execution
+          id
           status
         }
       }
-      ...UpstreamProject
     }
     pagination {
       hasNextPage
       hasPrevPage
+      mostRecentVersionOrder
       nextPageOrder
       prevPageOrder
     }

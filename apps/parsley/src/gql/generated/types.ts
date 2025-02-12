@@ -1731,10 +1731,11 @@ export type Patches = {
  * Based on the information in PatchesInput, we return a list of Patches for either an individual user or a project.
  */
 export type PatchesInput = {
-  includeCommitQueue?: InputMaybe<Scalars["Boolean"]["input"]>;
   includeHidden?: InputMaybe<Scalars["Boolean"]["input"]>;
   limit?: Scalars["Int"]["input"];
+  /** @deprecated onlyCommitQueue is deprecated. Use onlyMergeQueue instead. */
   onlyCommitQueue?: InputMaybe<Scalars["Boolean"]["input"]>;
+  onlyMergeQueue?: InputMaybe<Scalars["Boolean"]["input"]>;
   page?: Scalars["Int"]["input"];
   patchName?: Scalars["String"]["input"];
   requesters?: InputMaybe<Array<Scalars["String"]["input"]>>;
@@ -3348,6 +3349,7 @@ export type Version = {
   upstreamProject?: Maybe<UpstreamProject>;
   versionTiming?: Maybe<VersionTiming>;
   warnings: Array<Scalars["String"]["output"]>;
+  waterfallBuilds?: Maybe<Array<WaterfallBuild>>;
 };
 
 /** Version models a commit within a project. */
@@ -3428,7 +3430,7 @@ export type Waterfall = {
 
 export type WaterfallBuild = {
   __typename?: "WaterfallBuild";
-  activated?: Maybe<Scalars["Boolean"]["output"]>;
+  buildVariant: Scalars["String"]["output"];
   displayName: Scalars["String"]["output"];
   id: Scalars["String"]["output"];
   tasks: Array<WaterfallTask>;
@@ -3459,6 +3461,7 @@ export type WaterfallPagination = {
   __typename?: "WaterfallPagination";
   hasNextPage: Scalars["Boolean"]["output"];
   hasPrevPage: Scalars["Boolean"]["output"];
+  mostRecentVersionOrder: Scalars["Int"]["output"];
   nextPageOrder: Scalars["Int"]["output"];
   prevPageOrder: Scalars["Int"]["output"];
 };

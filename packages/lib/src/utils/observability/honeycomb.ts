@@ -3,8 +3,9 @@ import {
   getWebAutoInstrumentations,
   InstrumentationConfigMap,
 } from "@opentelemetry/auto-instrumentations-web";
+import ReactRouterSpanProcessor from "./ReactRouterSpanProcessor";
+import { RouteConfig } from "./ReactRouterSpanProcessor/types";
 import { detectGraphqlQuery } from "./utils";
-
 /**
  * Configuration object for the Honeycomb SDK.
  */
@@ -21,6 +22,10 @@ interface HoneycombConfig {
   ingestKey: string;
   /** The environment we are running in */
   environment: string;
+  /** A config representing all routes the app can have */
+  routeConfig: RouteConfig;
+  /** A version number indicating which release this is */
+  appVersion: string;
 }
 
 /**
@@ -32,13 +37,17 @@ interface HoneycombConfig {
  * @param config.serviceName - The name of the service.
  * @param config.endpoint - The endpoint for the Honeycomb SDK to send traces to if we are not using the default.
  * @param config.environment - The environment we are running in.
+ * @param config.routeConfig - A config representing all routes the app can have.
+ * @param config.appVersion - A version number indicating which release this is.
  */
 const initializeHoneycomb = ({
+  appVersion,
   backendURL,
   debug,
   endpoint,
   environment,
   ingestKey,
+  routeConfig,
   serviceName,
 }: HoneycombConfig) => {
   if (debug && (!ingestKey || !endpoint)) {
@@ -82,20 +91,23 @@ const initializeHoneycomb = ({
           propagateTraceHeaderCorsUrls: [new RegExp(backendURL || "")],
         };
       }
+
       const honeycombSdk = new HoneycombWebSDK({
         debug,
         endpoint,
         instrumentations: [
           getWebAutoInstrumentations(webAutoInstrumentationConfig),
         ],
-        // Add user.id as an attribute to all traces.
+        // Add attributes to all traces.
         resourceAttributes: {
           "user.id": userId,
           environment,
+          app_version: appVersion,
         },
         localVisualizations: debug,
         serviceName,
         apiKey: ingestKey,
+        spanProcessor: new ReactRouterSpanProcessor(routeConfig),
       });
       honeycombSdk.start();
     } catch (e) {

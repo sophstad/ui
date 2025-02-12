@@ -3,6 +3,8 @@ import { useSuspenseQuery } from "@apollo/client";
 import styled from "@emotion/styled";
 import { fromZonedTime } from "date-fns-tz";
 import { size, transitionDuration } from "@evg-ui/lib/constants/tokens";
+import { useWaterfallAnalytics } from "analytics";
+import { WalkthroughGuideCueRef } from "components/WalkthroughGuideCue";
 import {
   DEFAULT_POLL_INTERVAL,
   WATERFALL_PINNED_VARIANTS_KEY,
@@ -12,10 +14,9 @@ import {
   WaterfallPagination,
   WaterfallQuery,
   WaterfallQueryVariables,
-  WaterfallVersionFragment,
 } from "gql/generated/types";
 import { WATERFALL } from "gql/queries";
-import { useUserTimeZone } from "hooks";
+import { useAdminBetaFeatures, useUserTimeZone } from "hooks";
 import { useDimensions } from "hooks/useDimensions";
 import { useQueryParam, useQueryParams } from "hooks/useQueryParam";
 import { getObject, setObject } from "utils/localStorage";
@@ -24,39 +25,50 @@ import { BuildVariantProvider } from "./BuildVariantContext";
 import { VERSION_LIMIT } from "./constants";
 import { FetchingMore } from "./FetchingMore";
 import { InactiveVersionsButton } from "./InactiveVersions";
+import { OnboardingTutorial } from "./OnboardingTutorial";
 import {
   BuildVariantTitle,
   gridGroupCss,
   InactiveVersion,
   Row,
 } from "./styles";
-import { WaterfallFilterOptions } from "./types";
+import { WaterfallFilterOptions, Version } from "./types";
 import { useFilters } from "./useFilters";
 import { useWaterfallTrace } from "./useWaterfallTrace";
+import { groupBuildVariants } from "./utils";
 import { VersionLabel, VersionLabelView } from "./VersionLabel";
 
 type WaterfallGridProps = {
   atTop: boolean;
   projectIdentifier: string;
   setPagination: (pagination: WaterfallPagination) => void;
+  guideCueRef: React.RefObject<WalkthroughGuideCueRef>;
 };
 
 export const WaterfallGrid: React.FC<WaterfallGridProps> = ({
   atTop,
+  guideCueRef,
   projectIdentifier,
   setPagination,
 }) => {
   useWaterfallTrace();
+  const { adminBetaSettings } = useAdminBetaFeatures();
+  const { sendEvent } = useWaterfallAnalytics();
 
   const [pins, setPins] = useState<string[]>(
     getObject(WATERFALL_PINNED_VARIANTS_KEY)?.[projectIdentifier] ?? [],
   );
 
   const handlePinBV = useCallback(
-    (buildVariant: string) => () => {
+    (buildVariant: string, wasPinned: boolean) => () => {
+      sendEvent({
+        name: "Clicked pin build variant",
+        action: wasPinned ? "unpinned" : "pinned",
+        variant: buildVariant,
+      });
       setPins((prev: string[]) => {
-        const bvIndex = prev.indexOf(buildVariant);
-        if (bvIndex > -1) {
+        if (wasPinned) {
+          const bvIndex = prev.indexOf(buildVariant);
           const removed = [...prev];
           removed.splice(bvIndex, 1);
           return removed;
@@ -118,13 +130,19 @@ export const WaterfallGrid: React.FC<WaterfallGridProps> = ({
   const refEl = useRef<HTMLDivElement>(null);
   const { height } = useDimensions<HTMLDivElement>(refEl);
 
+  const groupedBuildVariants = groupBuildVariants(
+    data.waterfall.flattenedVersions,
+  );
+
   const { activeVersionIds, buildVariants, versions } = useFilters({
-    buildVariants: data.waterfall.buildVariants,
-    flattenedVersions: data.waterfall.flattenedVersions,
-    limit,
+    buildVariants: groupedBuildVariants,
+    flattenedVersions: data.waterfall.flattenedVersions.map(
+      ({ waterfallBuilds, ...restOfVersion }) => restOfVersion,
+    ),
     pins,
   });
 
+  const firstActiveVersionId = activeVersionIds[0];
   const lastActiveVersionId = activeVersionIds[activeVersionIds.length - 1];
 
   const [requesters] = useQueryParam<string[]>(
@@ -161,7 +179,7 @@ export const WaterfallGrid: React.FC<WaterfallGridProps> = ({
     }
   }, [queryParams]);
 
-  const isHighlighted = (v: WaterfallVersionFragment, i: number) =>
+  const isHighlighted = (v: Version, i: number) =>
     (revision !== null && v.revision.includes(revision)) || (!!date && i === 0);
 
   return (
@@ -174,6 +192,7 @@ export const WaterfallGrid: React.FC<WaterfallGridProps> = ({
               return (
                 <VersionLabel
                   highlighted={isHighlighted(version, versionIndex)}
+                  isFirstVersion={version.id === firstActiveVersionId}
                   view={VersionLabelView.Waterfall}
                   {...version}
                   key={version.id}
@@ -201,18 +220,25 @@ export const WaterfallGrid: React.FC<WaterfallGridProps> = ({
         </Versions>
       </StickyHeader>
       <BuildVariantProvider>
-        {buildVariants.map((b) => (
-          <BuildRow
-            key={b.id}
-            build={b}
-            handlePinClick={handlePinBV(b.id)}
-            lastActiveVersionId={lastActiveVersionId}
-            pinned={pins.includes(b.id)}
-            projectIdentifier={projectIdentifier}
-            versions={versions}
-          />
-        ))}
+        {buildVariants.map((b, i) => {
+          const isPinned = pins.includes(b.id);
+          return (
+            <BuildRow
+              key={b.id}
+              build={b}
+              handlePinClick={handlePinBV(b.id, isPinned)}
+              isFirstBuild={i === 0}
+              lastActiveVersionId={lastActiveVersionId}
+              pinned={isPinned}
+              projectIdentifier={projectIdentifier}
+              versions={versions}
+            />
+          );
+        })}
       </BuildVariantProvider>
+      {adminBetaSettings?.spruceWaterfallEnabled && (
+        <OnboardingTutorial guideCueRef={guideCueRef} />
+      )}
     </Container>
   );
 };
