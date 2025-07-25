@@ -5,12 +5,12 @@ import { palette } from "@leafygreen-ui/palette";
 import { Skeleton, Size as SkeletonSize } from "@leafygreen-ui/skeleton-loader";
 import Icon from "@evg-ui/lib/components/Icon";
 import { size } from "@evg-ui/lib/constants/tokens";
+import { useQueryParams } from "@evg-ui/lib/hooks";
 import { TaskStatus } from "@evg-ui/lib/types/task";
 import { useTaskHistoryAnalytics } from "analytics";
 import { TaskBox as BaseTaskBox, CollapsedBox } from "components/TaskBox";
 import { TaskHistoryDirection } from "gql/generated/types";
 import { useUserTimeZone } from "hooks";
-import { useQueryParams } from "hooks/useQueryParam";
 import { walkthroughTimelineProps } from "../constants";
 import { useTaskHistoryContext } from "../context";
 import { GroupedTask, TaskHistoryOptions, TaskHistoryTask } from "../types";
@@ -38,8 +38,14 @@ const TaskTimeline = forwardRef<HTMLDivElement, TimelineProps>(
     const timezone = useUserTimeZone();
     const { sendEvent } = useTaskHistoryAnalytics();
 
-    const { currentTask, hoveredTask, selectedTask, setSelectedTask } =
-      useTaskHistoryContext();
+    const {
+      baseTaskId,
+      currentTask,
+      hoveredTask,
+      isPatch,
+      selectedTask,
+      setSelectedTask,
+    } = useTaskHistoryContext();
 
     const {
       mostRecentTaskOrder,
@@ -118,7 +124,12 @@ const TaskTimeline = forwardRef<HTMLDivElement, TimelineProps>(
                         taskId={task.id}
                       />
                       <CurrentTaskBadge
-                        isCurrentTask={currentTask.id === task.id}
+                        isCurrentTask={
+                          isPatch
+                            ? baseTaskId === task.id
+                            : currentTask.id === task.id
+                        }
+                        isPatch={isPatch}
                       />
                     </TaskBoxWrapper>
                   );

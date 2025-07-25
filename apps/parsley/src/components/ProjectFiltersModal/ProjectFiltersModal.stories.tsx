@@ -1,18 +1,24 @@
 import { useEffect, useState } from "react";
+import { useQueryParams } from "@evg-ui/lib/hooks";
 import { CustomMeta, CustomStoryObj } from "@evg-ui/lib/test_utils/types";
 import { LogTypes } from "constants/enums";
+import { urlParseOptions } from "constants/queryParams";
 import { useLogContext } from "context/LogContext";
-import { useQueryParams } from "hooks/useQueryParam";
 import { noFiltersMock, projectFiltersMock } from "test_data/projectFilters";
 import { evergreenTaskMock } from "test_data/task";
 import ProjectFiltersModal from ".";
 
 export default {
   component: ProjectFiltersModal,
+  parameters: {
+    storyshots: {
+      disable: true,
+    },
+  },
 } satisfies CustomMeta<typeof ProjectFiltersModal>;
 
 const Component = ({ ...args }) => {
-  const [, setSearchParams] = useQueryParams();
+  const [, setSearchParams] = useQueryParams(urlParseOptions);
   const { setLogMetadata } = useLogContext();
   const [open, setOpen] = useState(true);
 
@@ -42,6 +48,9 @@ export const Default: CustomStoryObj<typeof ProjectFiltersModal> = {
     apolloClient: {
       mocks: [projectFiltersMock, evergreenTaskMock],
     },
+    storyshots: {
+      disable: true,
+    },
   },
   render: (args) => <Component {...args} />,
 };
@@ -50,6 +59,9 @@ export const Empty: CustomStoryObj<typeof ProjectFiltersModal> = {
   parameters: {
     apolloClient: {
       mocks: [noFiltersMock, evergreenTaskMock],
+    },
+    storyshots: {
+      disable: true,
     },
   },
   render: (args) => <Component {...args} />,

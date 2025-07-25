@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef } from "react";
 import { useQuery } from "@apollo/client";
+import { useLocation } from "react-router-dom";
 import {
   ColumnFiltering,
   ColumnFiltersState,
@@ -7,16 +8,17 @@ import {
   RowSorting,
   SortingState,
   useLeafyGreenTable,
-} from "@leafygreen-ui/table";
-import { useLocation } from "react-router-dom";
+  BaseTable,
+  TableWrapper,
+  onChangeHandler,
+  TableControl,
+} from "@evg-ui/lib/components/Table";
+import { ALL_VALUE } from "@evg-ui/lib/components/TreeSelect";
+import { PaginationQueryParams } from "@evg-ui/lib/constants/pagination";
+import { useQueryParams } from "@evg-ui/lib/hooks";
 import { useTaskAnalytics } from "analytics";
-import { BaseTable } from "components/Table/BaseTable";
-import TableControl from "components/Table/TableControl";
-import TableWrapper from "components/Table/TableWrapper";
-import { onChangeHandler } from "components/Table/utils";
-import { ALL_VALUE } from "components/TreeSelect";
 import { DEFAULT_POLL_INTERVAL } from "constants/index";
-import { PaginationQueryParams, TableQueryParams } from "constants/queryParams";
+import { TableQueryParams } from "constants/queryParams";
 import {
   TaskTestsQuery,
   TaskTestsQueryVariables,
@@ -28,7 +30,6 @@ import {
 } from "gql/generated/types";
 import { TASK_TESTS } from "gql/queries";
 import { useTableSort, usePolling } from "hooks";
-import { useQueryParams } from "hooks/useQueryParam";
 import {
   RequiredQueryParams,
   mapFilterParamToId,

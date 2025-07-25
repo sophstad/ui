@@ -5,11 +5,13 @@ import { Subtitle } from "@leafygreen-ui/typography";
 import Cookies from "js-cookie";
 import { size, transitionDuration } from "@evg-ui/lib/constants/tokens";
 import { useToastContext } from "@evg-ui/lib/context/toast";
+import { useQueryParam, useQueryParams } from "@evg-ui/lib/hooks";
 import { toEscapedRegex } from "@evg-ui/lib/utils/string";
 import { SQUARE_WITH_BORDER } from "components/TaskBox";
 import { WalkthroughGuideCueRef } from "components/WalkthroughGuideCue";
 import { TASK_HISTORY_INACTIVE_COMMITS_VIEW } from "constants/cookies";
 import { DEFAULT_POLL_INTERVAL } from "constants/index";
+import { isMainlineRequester, Requester } from "constants/requesters";
 import {
   TaskHistoryDirection,
   TaskHistoryQuery,
@@ -20,7 +22,6 @@ import { TASK_HISTORY } from "gql/queries";
 import { useUserTimeZone } from "hooks";
 import { useDimensions } from "hooks/useDimensions";
 import useIntersectionObserver from "hooks/useIntersectionObserver";
-import { useQueryParam, useQueryParams } from "hooks/useQueryParam";
 import { validateRegexp } from "utils/validators";
 import CommitDetailsList from "./CommitDetailsList";
 import { ACTIVATED_TASKS_LIMIT } from "./constants";
@@ -40,9 +41,10 @@ import {
 
 interface TaskHistoryProps {
   task: NonNullable<TaskQuery["task"]>;
+  baseTaskId: string;
 }
 
-const TaskHistory: React.FC<TaskHistoryProps> = ({ task }) => {
+const TaskHistory: React.FC<TaskHistoryProps> = ({ baseTaskId, task }) => {
   const timelineRef = useRef<HTMLDivElement>(null);
   const { width: timelineWidth } = useDimensions<HTMLDivElement>(timelineRef);
 
@@ -62,8 +64,9 @@ const TaskHistory: React.FC<TaskHistoryProps> = ({ task }) => {
   );
   const shouldCollapse = viewOption === ViewOptions.Collapsed;
 
-  const { buildVariant, displayName: taskName, project } = task;
+  const { buildVariant, displayName: taskName, project, requester } = task;
   const { identifier: projectIdentifier = "" } = project ?? {};
+  const isPatch = !isMainlineRequester(requester as Requester);
 
   const [queryParams, setQueryParams] = useQueryParams();
   const [failingTest] = useQueryParam<string>(
@@ -73,7 +76,7 @@ const TaskHistory: React.FC<TaskHistoryProps> = ({ task }) => {
 
   const [cursorId] = useQueryParam<string>(
     TaskHistoryOptions.CursorID,
-    task.id,
+    isPatch ? baseTaskId : task.id,
   );
   const [direction] = useQueryParam<TaskHistoryDirection>(
     TaskHistoryOptions.Direction,
@@ -164,7 +167,11 @@ const TaskHistory: React.FC<TaskHistoryProps> = ({ task }) => {
   }, [direction, setQueryParams, prevPageCursor, queryParams]);
 
   return (
-    <TaskHistoryContextProvider task={task}>
+    <TaskHistoryContextProvider
+      baseTaskId={isPatch ? baseTaskId : ""}
+      isPatch={isPatch}
+      task={task}
+    >
       <Container data-cy="task-history">
         <div ref={headerScrollRef} data-header-observer />
         <StickyHeader showShadow={showShadow}>

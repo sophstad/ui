@@ -1,10 +1,10 @@
 import { useEffect, useMemo } from "react";
 import { useQuery } from "@apollo/client";
 import { useLocation } from "react-router-dom";
+import { PaginationQueryParams } from "@evg-ui/lib/constants/pagination";
 import { useToastContext } from "@evg-ui/lib/context/toast";
 import { useVersionAnalytics } from "analytics";
 import { DEFAULT_POLL_INTERVAL } from "constants/index";
-import { PaginationQueryParams } from "constants/queryParams";
 import {
   VersionTasksQuery,
   VersionTasksQueryVariables,
@@ -60,6 +60,8 @@ const Tasks: React.FC<Props> = ({ setActiveTaskIds, taskCount, versionId }) => {
       [PaginationQueryParams.Page]: undefined,
       // @ts-expect-error: FIXME. This comment was added by an automated script.
       [PatchTasksQueryParams.Duration]: undefined,
+      // @ts-expect-error: FIXME. This comment was added by an automated script.
+      [PatchTasksQueryParams.IncludeNeverActivatedTasks]: undefined,
       [PatchTasksQueryParams.Sorts]: defaultSortMethod,
     });
     versionAnalytics.sendEvent({

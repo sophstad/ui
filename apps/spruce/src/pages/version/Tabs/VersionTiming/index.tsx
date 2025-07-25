@@ -3,12 +3,14 @@ import { useQuery } from "@apollo/client";
 import styled from "@emotion/styled";
 import { Body, BodyProps, H2 } from "@leafygreen-ui/typography";
 import { useLocation } from "react-router-dom";
+import { TableControl } from "@evg-ui/lib/components/Table";
+import { PaginationQueryParams } from "@evg-ui/lib/constants/pagination";
 import { fontSize, size } from "@evg-ui/lib/constants/tokens";
 import { useToastContext } from "@evg-ui/lib/context/toast";
+import { useQueryParams } from "@evg-ui/lib/hooks";
 import { useVersionAnalytics } from "analytics";
-import TableControl from "components/Table/TableControl";
 import { DEFAULT_POLL_INTERVAL } from "constants/index";
-import { PaginationQueryParams, TableQueryParams } from "constants/queryParams";
+import { TableQueryParams } from "constants/queryParams";
 import {
   SortDirection,
   TaskSortCategory,
@@ -17,7 +19,6 @@ import {
 } from "gql/generated/types";
 import { VERSION_TASK_DURATIONS } from "gql/queries";
 import { usePolling } from "hooks";
-import { useQueryParams } from "hooks/useQueryParam";
 import { PatchTasksQueryParams } from "types/task";
 import { useQueryVariables } from "../useQueryVariables";
 import {
@@ -123,7 +124,7 @@ const VersionTiming: React.FC<Props> = ({ taskCount, versionId }) => {
         label={isVariantTimingView ? "tasks" : "variants"}
         limit={isVariantTimingView ? limit || 0 : chartData.length - 1}
         onClear={clearQueryParams}
-        onPageSizeChange={(l) => {
+        onPageSizeChange={(l: number) => {
           versionAnalytics.sendEvent({
             name: "Changed page size",
             "page.size": l,

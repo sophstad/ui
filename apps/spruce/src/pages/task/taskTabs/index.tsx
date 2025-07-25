@@ -3,11 +3,11 @@ import { useQuery } from "@apollo/client";
 import { Variant } from "@leafygreen-ui/badge";
 import { Tab } from "@leafygreen-ui/tabs";
 import { useParams, useNavigate } from "react-router-dom";
+import { useQueryParams } from "@evg-ui/lib/hooks";
 import { useTaskAnalytics } from "analytics";
 import { TrendChartsPlugin } from "components/PerfPlugin";
 import { StyledTabs } from "components/styles/StyledTabs";
 import { TabLabelWithBadge } from "components/TabLabelWithBadge";
-import { isMainlineRequester, Requester } from "constants/requesters";
 import { getTaskRoute, GetTaskRouteOptions, slugs } from "constants/routes";
 import {
   TaskQuery,
@@ -15,7 +15,6 @@ import {
   TaskTestCountQueryVariables,
 } from "gql/generated/types";
 import { TASK_TEST_COUNT } from "gql/queries";
-import { useQueryParams } from "hooks/useQueryParam";
 import { useTabShortcut } from "hooks/useTabShortcut";
 import { TaskTab } from "types/task";
 import BuildBaron, { useBuildBaronVariables } from "./buildBaronAndAnnotations";
@@ -40,6 +39,7 @@ const useTabConfig = (
   const { failedTestCount } = taskTestCountData || {};
   const {
     annotation,
+    baseTask,
     canModifyAnnotation,
     displayStatus,
     execution,
@@ -48,9 +48,9 @@ const useTabConfig = (
     id,
     isPerfPluginEnabled,
     logs: logLinks,
-    requester,
     versionMetadata,
   } = task;
+  const baseTaskId = baseTask?.id || "";
   const { fileCount } = files ?? {};
 
   const { showBuildBaron } = useBuildBaronVariables({
@@ -70,7 +70,7 @@ const useTabConfig = (
     [TaskTab.Files]: true,
     [TaskTab.Annotations]: showBuildBaron,
     [TaskTab.TrendCharts]: isPerfPluginEnabled,
-    [TaskTab.History]: isMainlineRequester(requester as Requester),
+    [TaskTab.History]: true,
   };
 
   const tabMap: Record<TaskTab, JSX.Element> = {
@@ -163,7 +163,7 @@ const useTabConfig = (
         name="History"
         {...walkthroughHistoryTabProps}
       >
-        <TaskHistory task={task} />
+        <TaskHistory baseTaskId={baseTaskId} task={task} />
       </Tab>
     ),
   };
@@ -262,8 +262,8 @@ const TaskTabs: React.FC<TaskTabProps> = ({ isDisplayTask, task }) => {
   return (
     <StyledTabs
       aria-label="Task Page Tabs"
-      selected={tabIndex}
-      setSelected={handleTabChange}
+      onValueChange={handleTabChange}
+      value={tabIndex}
     >
       {activeTabs.map((tab) => tabMap[tab])}
     </StyledTabs>

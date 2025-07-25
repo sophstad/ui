@@ -4,19 +4,19 @@ import {
   LeafyGreenTable,
   ColumnFiltersState,
   SortingState,
-} from "@leafygreen-ui/table";
+  BaseTable,
+  TableWrapper,
+  onChangeHandler,
+  TableControl,
+  TablePlaceholder,
+} from "@evg-ui/lib/components/Table";
+import { useQueryParams } from "@evg-ui/lib/hooks";
 import { useVersionAnalytics } from "analytics";
-import { BaseTable } from "components/Table/BaseTable";
-import TableControl from "components/Table/TableControl";
-import { TablePlaceholder } from "components/Table/TablePlaceholder";
-import TableWrapper from "components/Table/TableWrapper";
-import { onChangeHandler } from "components/Table/utils";
 import { getColumnsTemplate } from "components/TasksTable/Columns";
 import { TaskTableInfo } from "components/TasksTable/types";
 import { TableQueryParams } from "constants/queryParams";
 import { TaskSortCategory, SortDirection } from "gql/generated/types";
 import { useTaskStatuses, useTableSort } from "hooks";
-import { useQueryParams } from "hooks/useQueryParam";
 import { PatchTasksQueryParams } from "types/task";
 import { parseSortString } from "utils/queryString";
 import {
@@ -121,6 +121,7 @@ export const VersionTasksTable: React.FC<VersionTasksTableProps> = ({
         // Handle bug in sorting order (https://github.com/TanStack/table/issues/4289)
         sortDescFirst: false,
       },
+      getRowId: (originalRow) => originalRow.id,
       isMultiSortEvent: () => true, // Override default requirement for shift-click to multisort.
       state: {
         columnFilters,
@@ -150,7 +151,7 @@ export const VersionTasksTable: React.FC<VersionTasksTableProps> = ({
             setSorting(defaultSorting);
             clearQueryParams();
           }}
-          onPageSizeChange={(size) =>
+          onPageSizeChange={(size: number) =>
             sendEvent({ name: "Changed page size", "page.size": size })
           }
           page={page}

@@ -22,7 +22,7 @@
       <a
         aria-disabled="false"
         aria-label="GitHub Commit Link"
-        class="leafygreen-ui-tcjr3n"
+        class="leafygreen-ui-1u7amgm"
         data-cy="github-link"
         href="https://github.com/evergreen-ci/spruce/commit/aef363719d0287e92cd83749a827bae"
         tabindex="0"
@@ -68,7 +68,8 @@
         class="leafygreen-ui-h5xdir"
         data-cy="this-task-badge"
       >
-        This Task
+        This
+         Task
       </div>
       <span>
         Apr 3, 2025, 10:22 AM

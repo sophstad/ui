@@ -14,6 +14,7 @@ import Accordion, {
 import Icon from "@evg-ui/lib/components/Icon";
 import { size } from "@evg-ui/lib/constants/tokens";
 import { useToastContext } from "@evg-ui/lib/context/toast";
+import { useQueryParam } from "@evg-ui/lib/hooks";
 import { TaskStatus } from "@evg-ui/lib/types/task";
 import { shortenGithash } from "@evg-ui/lib/utils/string";
 import { useTaskHistoryAnalytics } from "analytics";
@@ -29,7 +30,6 @@ import {
 } from "gql/generated/types";
 import { RESTART_TASK, SCHEDULE_TASKS } from "gql/mutations";
 import { useDateFormat } from "hooks";
-import { useQueryParam } from "hooks/useQueryParam";
 import { RequiredQueryParams, TaskTab } from "types/task";
 import { isProduction } from "utils/environmentVariables";
 import {
@@ -55,8 +55,10 @@ const CommitDetailsCard = forwardRef<HTMLDivElement, CommitDetailsCardProps>(
     const getDateCopy = useDateFormat();
 
     const {
+      baseTaskId,
       currentTask,
       expandedTasksMap,
+      isPatch,
       selectedTask,
       setExpandedTasksMap,
       setHoveredTask,
@@ -80,7 +82,9 @@ const CommitDetailsCard = forwardRef<HTMLDivElement, CommitDetailsCardProps>(
 
     const owner = currentTask.project?.owner ?? "";
     const repo = currentTask.project?.repo ?? "";
-    const isCurrentTask = taskId === currentTask.id;
+    const isCurrentTask = isPatch
+      ? taskId === baseTaskId
+      : taskId === currentTask.id;
     const isSelectedTask = taskId === selectedTask;
 
     const createDate = new Date(createTime ?? "");
@@ -222,7 +226,7 @@ const CommitDetailsCard = forwardRef<HTMLDivElement, CommitDetailsCardProps>(
           )}
           {isCurrentTask && (
             <Badge data-cy="this-task-badge" variant={BadgeVariant.Blue}>
-              This Task
+              {isPatch ? "Base" : "This"} Task
             </Badge>
           )}
           <span>{dateCopy}</span>

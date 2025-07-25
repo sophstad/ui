@@ -8,15 +8,16 @@ import { Size } from "@leafygreen-ui/tokens";
 import { Subtitle } from "@leafygreen-ui/typography";
 import Cookies from "js-cookie";
 import { size } from "@evg-ui/lib/constants/tokens";
+import { useQueryParams } from "@evg-ui/lib/hooks";
 import { useTaskHistoryAnalytics } from "analytics";
 import { DateFilter } from "components/DateFilter";
 import { TASK_HISTORY_INACTIVE_COMMITS_VIEW } from "constants/cookies";
-import { useQueryParams } from "hooks/useQueryParam";
 import {
   walkthroughDateFilterProps,
   walkthroughJumpButtonProps,
   walkthroughInactiveViewProps,
 } from "../constants";
+import { useTaskHistoryContext } from "../context";
 import { TaskHistoryOptions, ViewOptions } from "../types";
 
 interface ControlsProps {
@@ -30,6 +31,7 @@ export const Controls: React.FC<ControlsProps> = ({
   setViewOption,
   viewOption,
 }) => {
+  const { isPatch } = useTaskHistoryContext();
   const [queryParams, setQueryParams] = useQueryParams();
   const { sendEvent } = useTaskHistoryAnalytics();
 
@@ -72,7 +74,7 @@ export const Controls: React.FC<ControlsProps> = ({
           size={Size.XSmall}
           {...walkthroughJumpButtonProps}
         >
-          Jump to this task
+          Jump to {isPatch ? "base task" : "this task"}
         </Button>
       </LeftContainer>
       <SegmentedControl

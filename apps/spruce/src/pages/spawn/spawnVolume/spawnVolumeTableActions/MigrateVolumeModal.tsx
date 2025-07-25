@@ -4,6 +4,7 @@ import { Body } from "@leafygreen-ui/typography";
 import { useToastContext } from "@evg-ui/lib/context/toast";
 import { useSpawnAnalytics } from "analytics";
 import { ConfirmationModal } from "components/ConfirmationModal";
+import { getEnabledHoursCount, getHostUptimeWarnings } from "components/Spawn";
 import {
   formToGql,
   getFormSchema,
@@ -16,6 +17,7 @@ import {
   MigrateVolumeMutationVariables,
 } from "gql/generated/types";
 import { MIGRATE_VOLUME } from "gql/mutations";
+import { useUserTimeZone } from "hooks";
 import { AZToRegion } from "pages/spawn/utils";
 import { TableVolume } from "types/spawn";
 import { initialState, Page, reducer } from "./migrateVolumeReducer";
@@ -41,9 +43,11 @@ export const MigrateVolumeModal: React.FC<MigrateVolumeModalProps> = ({
   const { sendEvent } = useSpawnAnalytics();
 
   const { formSchemaInput, loading: loadingFormData } = useLoadFormSchemaData({
-    // @ts-expect-error: FIXME. This comment was added by an automated script.
-    host: volume.host,
+    host: volume.host ?? { noExpiration: false },
   });
+  const timeZone =
+    useUserTimeZone() || Intl.DateTimeFormat().resolvedOptions().timeZone;
+
   const [migrateVolumeMutation, { loading: loadingMigration }] = useMutation<
     MigrateVolumeMutation,
     MigrateVolumeMutationVariables
@@ -73,17 +77,33 @@ export const MigrateVolumeModal: React.FC<MigrateVolumeModalProps> = ({
     [distros, form?.requiredSection?.distro],
   );
 
+  const hostUptimeWarnings = useMemo(() => {
+    const { enabledHoursCount, enabledWeekdaysCount } = getEnabledHoursCount(
+      form?.expirationDetails?.hostUptime,
+    );
+    const warnings = getHostUptimeWarnings({
+      enabledHoursCount,
+      enabledWeekdaysCount,
+      runContinuously:
+        form?.expirationDetails?.hostUptime?.sleepSchedule?.timeSelection
+          ?.runContinuously ?? false,
+    });
+    return { enabledHoursCount, warnings };
+  }, [form?.expirationDetails?.hostUptime]);
+
   const { schema, uiSchema } = getFormSchema({
     ...formSchemaInput,
-    // @ts-expect-error: FIXME. This comment was added by an automated script.
+    availableRegions: selectedDistro?.availableRegions ?? [],
+    hostUptimeWarnings,
     distros,
     isMigration: true,
     isVirtualWorkstation: !!selectedDistro?.isVirtualWorkStation,
     userAwsRegion: AZToRegion(volume.availabilityZone),
+    timeZone,
   });
+
   useVirtualWorkstationDefaultExpiration({
-    // @ts-expect-error: FIXME. This comment was added by an automated script.
-    isVirtualWorkstation: selectedDistro?.isVirtualWorkStation,
+    isVirtualWorkstation: selectedDistro?.isVirtualWorkStation ?? false,
     disableExpirationCheckbox: formSchemaInput.disableExpirationCheckbox,
     formState: form,
     setFormState: (formState) =>
@@ -100,7 +120,6 @@ export const MigrateVolumeModal: React.FC<MigrateVolumeModalProps> = ({
     const mutationInput = formToGql({
       isVirtualWorkStation: !!selectedDistro?.isVirtualWorkStation,
       formData: form,
-      // @ts-expect-error: FIXME. This comment was added by an automated script.
       myPublicKeys: formSchemaInput.myPublicKeys,
       migrateVolumeId: volume.id,
     });
@@ -113,7 +132,6 @@ export const MigrateVolumeModal: React.FC<MigrateVolumeModalProps> = ({
     });
     migrateVolumeMutation({
       variables: {
-        // @ts-expect-error: FIXME. This comment was added by an automated script.
         spawnHostInput: mutationInput,
         volumeId: volume.id,
       },

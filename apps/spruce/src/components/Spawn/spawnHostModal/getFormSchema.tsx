@@ -20,10 +20,11 @@ import { validateTask } from "./utils";
 import { DistroDropdown } from "./Widgets/DistroDropdown";
 
 interface Props {
-  awsRegions: string[];
+  availableRegions: string[];
   disableExpirationCheckbox: boolean;
   distroIdQueryParam?: string;
   distros: {
+    availableRegions: string[];
     adminOnly: boolean;
     isVirtualWorkStation: boolean;
     name?: string;
@@ -36,7 +37,6 @@ interface Props {
   isVirtualWorkstation: boolean;
   myPublicKeys: MyPublicKeysQuery["myPublicKeys"];
   noExpirationCheckboxTooltip: string;
-  permanentlyExempt: boolean;
   spawnTaskData?: SpawnTaskQuery["task"];
   timeZone: string;
   useSetupScript?: boolean;
@@ -46,7 +46,7 @@ interface Props {
 }
 
 export const getFormSchema = ({
-  awsRegions,
+  availableRegions,
   disableExpirationCheckbox,
   distroIdQueryParam,
   distros,
@@ -55,7 +55,6 @@ export const getFormSchema = ({
   isVirtualWorkstation,
   myPublicKeys,
   noExpirationCheckboxTooltip,
-  permanentlyExempt,
   spawnTaskData,
   timeZone,
   useProjectSetupScript = false,
@@ -81,7 +80,7 @@ export const getFormSchema = ({
     hostUptimeWarnings,
     isEditModal: false,
     noExpirationCheckboxTooltip,
-    permanentlyExempt,
+    permanentlyExempt: false,
     timeZone,
   });
   const publicKeys = getPublicKeySchema({ myPublicKeys });
@@ -106,9 +105,12 @@ export const getFormSchema = ({
             region: {
               type: "string" as const,
               title: "Region",
-              default: userAwsRegion || (awsRegions?.length && awsRegions[0]),
+              default:
+                userAwsRegion && availableRegions.includes(userAwsRegion)
+                  ? userAwsRegion
+                  : availableRegions[0],
               oneOf: [
-                ...(awsRegions?.map((r) => ({
+                ...(availableRegions.map((r) => ({
                   type: "string" as const,
                   title: r,
                   enum: [r],
@@ -348,7 +350,7 @@ export const getFormSchema = ({
         },
         region: {
           "ui:data-cy": "region-select",
-          "ui:disabled": isMigration,
+          "ui:disabled": isMigration || availableRegions.length === 0,
           "ui:elementWrapperCSS": dropdownWrapperClassName,
           "ui:placeholder": "Select a region",
           "ui:allowDeselect": false,

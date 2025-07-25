@@ -1,10 +1,10 @@
+import usePagination from "@evg-ui/lib/src/hooks/usePagination";
 import { TableQueryParams } from "constants/queryParams";
 import {
   VersionTasksQueryVariables,
   SortOrder,
   TaskSortCategory,
 } from "gql/generated/types";
-import usePagination from "hooks/usePagination";
 import { PatchTasksQueryParams } from "types/task";
 import { queryString, array } from "utils";
 
@@ -23,6 +23,8 @@ export const useQueryVariables = (
     [PatchTasksQueryParams.TaskName]: taskName,
     [PatchTasksQueryParams.Statuses]: statuses,
     [PatchTasksQueryParams.BaseStatuses]: baseStatuses,
+    [PatchTasksQueryParams.IncludeNeverActivatedTasks]:
+      includeNeverActivatedTasks,
   } = queryParams;
 
   const sortsToApply: SortOrder[] = sorts
@@ -33,6 +35,8 @@ export const useQueryVariables = (
       })
     : [];
 
+  const isIncludeNeverActivatedTasksDefined =
+    includeNeverActivatedTasks !== undefined;
   return {
     versionId,
     taskFilterOptions: {
@@ -43,6 +47,9 @@ export const useQueryVariables = (
       sorts: sortsToApply,
       limit,
       page,
+      includeNeverActivatedTasks: isIncludeNeverActivatedTasksDefined
+        ? includeNeverActivatedTasks === "true"
+        : undefined,
     },
   };
 };

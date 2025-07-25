@@ -21,8 +21,8 @@
         data-lgid="lg-select"
       >
         <button
-          aria-controls="select-126-menu"
-          aria-describedby="select-126-description"
+          aria-controls="select-117-menu"
+          aria-describedby="select-117-description"
           aria-disabled="false"
           aria-expanded="false"
           aria-invalid="false"
@@ -31,7 +31,7 @@
           data-cy="tuple-select-select"
           data-lgid="lg-button"
           data-testid="leafygreen-ui-select-menubutton"
-          id="select-127"
+          id="select-118"
           type="button"
           value="build_variant"
         >
@@ -114,7 +114,7 @@
             class="leafygreen-ui-11ydt2g"
             data-lgid="lg-form_field-feedback"
             data-testid="lg-form_field-feedback"
-            id="lg-form_field-feedback-130"
+            id="lg-form_field-feedback-121"
           />
         </div>
         <div
@@ -123,7 +123,7 @@
           <button
             aria-disabled="false"
             aria-label="Select plus button"
-            class="leafygreen-ui-tcjr3n"
+            class="leafygreen-ui-1u7amgm"
             tabindex="0"
           >
             <div
@@ -141,7 +141,7 @@
               >
                 <path
                   clip-rule="evenodd"
-                  d="M7.5 2a1 1 0 0 0-1 1v3.5H3a1 1 0 0 0-1 1v1a1 1 0 0 0 1 1h3.5V13a1 1 0 0 0 1 1h1a1 1 0 0 0 1-1V9.5H13a1 1 0 0 0 1-1v-1a1 1 0 0 0-1-1H9.5V3a1 1 0 0 0-1-1h-1Z"
+                  d="M7.5 2a1 1 0 0 0-1 1v3.5H3a1 1 0 0 0-1 1v1a1 1 0 0 0 1 1h3.5V13a1 1 0 0 0 1 1h1a1 1 0 0 0 1-1V9.5H13a1 1 0 0 0 1-1v-1a1 1 0 0 0-1-1H9.5V3a1 1 0 0 0-1-1z"
                   fill="currentColor"
                   fill-rule="evenodd"
                 />
