@@ -3,7 +3,6 @@ import { fixupPluginRules } from "@eslint/compat";
 import eslint from "@eslint/js";
 import graphqlPlugin from "@graphql-eslint/eslint-plugin";
 import disableConflictsPlugin from "eslint-config-prettier";
-import cypressPlugin from "eslint-plugin-cypress/flat";
 import importPlugin from "eslint-plugin-import";
 import jsdocPlugin from "eslint-plugin-jsdoc";
 import jsxA11yPlugin from "eslint-plugin-jsx-a11y";
@@ -297,21 +296,6 @@ const storyBookConfig = {
   },
 };
 
-// Cypress ESLint (eslint-plugin-cypress) settings.
-const cypressConfig = {
-  ...cypressPlugin.configs.recommended,
-  name: "cypress/rules",
-  files: ["cypress/**/*.ts"],
-  languageOptions: {
-    parserOptions: {
-      project: "./apps/*/cypress/tsconfig.json",
-    },
-  },
-  rules: {
-    ...cypressPlugin.configs.recommended.rules,
-  },
-};
-
 // GraphQL ESLint (@graphql-eslint/eslint-plugin) settings.
 const graphQLConfig = {
   name: "@graphql-eslint/rules",
@@ -442,7 +426,6 @@ export default tseslint.config(
   jsDocConfig,
   storybookPlugin.configs["flat/recommended"],
   storyBookConfig,
-  cypressConfig,
   graphQLConfig,
   importConfig,
   disableConflictingPrettierRules,

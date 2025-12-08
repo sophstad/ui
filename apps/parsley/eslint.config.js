@@ -1,4 +1,5 @@
 import { fixupPluginRules } from "@eslint/compat";
+import playwrightPlugin from "eslint-plugin-playwright";
 import * as sortKeysPlugin from "eslint-plugin-sort-keys-plus";
 import tseslint from "typescript-eslint";
 import baseConfig, { ERROR, errorIfStrict } from "@evg-ui/eslint-config";
@@ -28,6 +29,19 @@ export default tseslint.config(
         "asc",
         { allowLineSeparatedGroups: true, natural: true },
       ],
+    },
+  },
+  // Playwright ESLint (eslint-plugin-playwright) settings.
+  {
+    name: "playwright/rules",
+    files: ["playwright/**/*.ts"],
+    plugins: {
+      playwright: playwrightPlugin,
+    },
+    rules: {
+      ...playwrightPlugin.configs.recommended.rules,
+      // Disable no-await-in-loop for Playwright tests since sequential execution is often necessary
+      "no-await-in-loop": "off",
     },
   },
 );

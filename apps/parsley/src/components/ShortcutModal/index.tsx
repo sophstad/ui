@@ -53,7 +53,7 @@ const ShortcutModal: React.FC<ShortcutModalProps> = ({ open, setOpen }) => {
   const modalRef = useRef<HTMLDivElement>(null);
 
   useKeyboardShortcut(
-    { charKey: CharKey.QuestionMark, modifierKeys: [ModifierKey.Shift] },
+    { charKey: CharKey.ForwardSlash, modifierKeys: [ModifierKey.Shift] },
     () => {
       setOpen(!open);
     },
