@@ -6,6 +6,7 @@ describe("decodeStream", () => {
     const { result } = await decodeStream(stream);
     expect(result).toStrictEqual(["Hello", "World"]);
   });
+
   it("should ensure partial lines in chunks are not split and are returned as a single line", async () => {
     const readableStream = createReadableStream([
       "Hello W",
@@ -41,6 +42,12 @@ describe("decodeStream", () => {
     const { result, trimmedLines } = await decodeStream(readableStream, 5);
     expect(trimmedLines).toBe(true);
     expect(result).toStrictEqual(["One", "This …", "New"]);
+  });
+
+  it("should handle trailing newlines correctly", async () => {
+    const readableStream = createReadableStream(["Line 1\nLine 2\n"]);
+    const { result } = await decodeStream(readableStream);
+    expect(result).toStrictEqual(["Line 1", "Line 2"]);
   });
 });
 

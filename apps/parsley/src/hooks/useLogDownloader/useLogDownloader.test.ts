@@ -24,27 +24,32 @@ describe("useLogDownloader", () => {
     vi.clearAllMocks();
   });
 
-  it("gets a good response from the log source and returns the array of log lines", async () => {
+  it("gets a good response from the log source and calls onComplete with log lines", async () => {
     const readableStream = createReadableStream([textMessage]);
 
     const response = new Response(readableStream, { status: 200 });
 
     mockFetch.mockResolvedValue(response);
 
+    const onComplete = vi.fn();
+
     // RenderFakeToastContext is a mock of the ToastContext
     RenderFakeToastContext();
     const { result } = renderHook(() =>
-      useLogDownloader({ logType: LogTypes.LOGKEEPER_LOGS, url: API_URL }),
+      useLogDownloader({
+        logType: LogTypes.LOGKEEPER_LOGS,
+        onComplete,
+        url: API_URL,
+      }),
     );
     expect(result.current.isLoading).toBe(true);
     await waitFor(() => {
       expect(result.current.isLoading).toBe(false);
     });
-    expect(result.current.data).toStrictEqual([
-      "Fetched a multiline log file",
-      "Some more lines",
-      "And some more",
-    ]);
+    expect(onComplete).toHaveBeenCalledWith(
+      ["Fetched a multiline log file", "Some more lines", "And some more"],
+      false,
+    );
   });
   it("gets a bad response from the api and returns an error", async () => {
     const mockFetchPromise = vi
@@ -52,16 +57,23 @@ describe("useLogDownloader", () => {
       .mockRejectedValue(new Error("Something went wrong"));
     vi.spyOn(global, "fetch").mockImplementation(mockFetchPromise);
 
+    const onComplete = vi.fn();
+
     // RenderFakeToastContext is a mock of the ToastContext
     RenderFakeToastContext();
     const { result } = renderHook(() =>
-      useLogDownloader({ logType: LogTypes.EVERGREEN_TASK_LOGS, url: API_URL }),
+      useLogDownloader({
+        logType: LogTypes.EVERGREEN_TASK_LOGS,
+        onComplete,
+        url: API_URL,
+      }),
     );
     expect(result.current.isLoading).toBe(true);
     await waitFor(() => {
       expect(result.current.isLoading).toBe(false);
     });
     expect(result.current.error).toBe("Something went wrong");
+    expect(onComplete).not.toHaveBeenCalled();
   });
   it("should update the progress bar as the log is downloaded", async () => {
     const readableStream = createReadableStream(["chunk1", "chunk2"]);
@@ -70,10 +82,16 @@ describe("useLogDownloader", () => {
 
     mockFetch.mockResolvedValue(response);
 
+    const onComplete = vi.fn();
+
     // RenderFakeToastContext is a mock of the ToastContext
     RenderFakeToastContext();
     const { result } = renderHook(() =>
-      useLogDownloader({ logType: LogTypes.LOGKEEPER_LOGS, url: API_URL }),
+      useLogDownloader({
+        logType: LogTypes.LOGKEEPER_LOGS,
+        onComplete,
+        url: API_URL,
+      }),
     );
     expect(result.current.isLoading).toBe(true);
     expect(result.current.fileSize).toBe(0);
@@ -89,16 +107,22 @@ describe("useLogDownloader", () => {
 
     mockFetch.mockResolvedValue(response);
 
+    const onComplete = vi.fn();
+
     // RenderFakeToastContext is a mock of the ToastContext
     RenderFakeToastContext();
     const { result } = renderHook(() =>
-      useLogDownloader({ logType: LogTypes.LOGKEEPER_LOGS, url: API_URL }),
+      useLogDownloader({
+        logType: LogTypes.LOGKEEPER_LOGS,
+        onComplete,
+        url: API_URL,
+      }),
     );
     expect(result.current.isLoading).toBe(true);
     await waitFor(() => {
       expect(result.current.isLoading).toBe(false);
     });
-    expect(result.current.data).toStrictEqual(["chunk1", "chunk2"]);
+    expect(onComplete).toHaveBeenCalledWith(["chunk1", "chunk2"], false);
   });
 
   it("should throw a FILE_TOO_LARGE error if the file is too large and only download the file partially", async () => {
@@ -108,12 +132,15 @@ describe("useLogDownloader", () => {
 
     mockFetch.mockResolvedValue(response);
 
+    const onComplete = vi.fn();
+
     // RenderFakeToastContext is a mock of the ToastContext
     const { dispatchToast } = RenderFakeToastContext();
     const { result } = renderHook(() =>
       useLogDownloader({
         downloadSizeLimit: 5,
         logType: LogTypes.LOGKEEPER_LOGS,
+        onComplete,
         url: API_URL,
       }),
     );
@@ -121,7 +148,7 @@ describe("useLogDownloader", () => {
     await waitFor(() => {
       expect(result.current.isLoading).toBe(false);
     });
-    expect(result.current.data).toStrictEqual(["chunk1"]);
+    expect(onComplete).toHaveBeenCalledWith(["chunk1"], false);
     expect(dispatchToast.warning).toHaveBeenCalledWith(
       LOG_FILE_DOWNLOAD_TOO_LARGE_WARNING,
       true,
@@ -137,18 +164,25 @@ describe("useLogDownloader", () => {
 
     mockFetch.mockResolvedValue(response);
 
+    const onComplete = vi.fn();
+
     // RenderFakeToastContext is a mock of the ToastContext
     const { dispatchToast } = RenderFakeToastContext();
     const { result } = renderHook(() =>
-      useLogDownloader({ logType: LogTypes.LOGKEEPER_LOGS, url: API_URL }),
+      useLogDownloader({
+        logType: LogTypes.LOGKEEPER_LOGS,
+        onComplete,
+        url: API_URL,
+      }),
     );
     expect(result.current.isLoading).toBe(true);
     await waitFor(() => {
       expect(result.current.isLoading).toBe(false);
     });
-    expect(result.current.data).toStrictEqual([
-      `${"a".repeat(LOG_LINE_SIZE_LIMIT)}…`,
-    ]);
+    expect(onComplete).toHaveBeenCalledWith(
+      [`${"a".repeat(LOG_LINE_SIZE_LIMIT)}…`],
+      true,
+    );
     expect(dispatchToast.warning).toHaveBeenCalledWith(
       LOG_LINE_TOO_LARGE_WARNING,
       true,

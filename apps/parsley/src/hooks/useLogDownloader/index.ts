@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useToastContext } from "@evg-ui/lib/context/toast";
 import { leaveBreadcrumb, reportError } from "@evg-ui/lib/utils/errorReporting";
 import { SentryBreadcrumbTypes } from "@evg-ui/lib/utils/sentry/types";
@@ -14,10 +14,11 @@ import { isProduction } from "utils/environmentVariables";
 import { fetchLogFile } from "utils/fetchLogFile";
 import { getBytesAsString } from "utils/string";
 
-type UseLogDownloader = {
+type UseLogDownloaderOptions = {
   downloadSizeLimit?: number;
   logType: LogTypes;
   url: string;
+  onComplete?: (logs: string[], trimmedLines: boolean) => void;
 };
 
 /**
@@ -28,23 +29,27 @@ type UseLogDownloader = {
  * @param props.url - the url to fetch
  * @param props.logType - the type of log file to download
  * @param props.downloadSizeLimit - the maximum size of the log file to download
+ * @param props.onComplete - callback invoked with the downloaded logs (avoids storing in state)
  * @returns an object with the following properties:
  * - isLoading: a boolean that is true while the log is being downloaded
- * - data: the log file as an array of strings
  * - error: an error message if the download fails
  * - fileSize: the size of the log file in bytes
  */
 const useLogDownloader = ({
   downloadSizeLimit = LOG_FILE_SIZE_LIMIT,
   logType,
+  onComplete,
   url,
-}: UseLogDownloader) => {
-  const [data, setData] = useState<string[] | undefined>();
+}: UseLogDownloaderOptions) => {
   const [error, setError] = useState<string | undefined>();
   const [fileSize, setFileSize, getFileSize] = useStateRef<number>(0);
   const [isLoading, setIsLoading] = useState(false);
   const { sendEvent } = useLogDownloadAnalytics();
   const dispatchToast = useToastContext();
+
+  // Use a ref to store the callback to avoid re-triggering the effect when callback changes
+  const onCompleteRef = useRef(onComplete);
+  onCompleteRef.current = onComplete;
 
   useEffect(() => {
     leaveBreadcrumb("useLogDownloader", { url }, SentryBreadcrumbTypes.HTTP);
@@ -87,7 +92,8 @@ const useLogDownloader = ({
           if (logs[logs.length - 1] === "") {
             logs.pop();
           }
-          setData(logs);
+          onCompleteRef.current?.(logs, trimmedLines);
+
           if (trimmedLines) {
             sendEvent({
               downloaded: getFileSize(),
@@ -155,7 +161,8 @@ const useLogDownloader = ({
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [url]);
-  return { data, error, fileSize, isLoading };
+
+  return { error, fileSize, isLoading };
 };
 
 export { useLogDownloader };

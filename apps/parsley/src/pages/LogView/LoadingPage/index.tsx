@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useCallback, useEffect } from "react";
 import styled from "@emotion/styled";
 import { Body, BodyProps } from "@leafygreen-ui/typography";
 import { useParams } from "react-router-dom";
@@ -53,73 +53,74 @@ const LoadingPage: React.FC<LoadingPageProps> = ({ logType }) => {
     taskID,
     testID,
   });
-  const { data: logkeeperMetadata, isLoading: isLoadingLogkeeperMetadata } =
-    useFetch<LogkeeperMetadata>(
-      getResmokeLogURL(buildID || "", { metadata: true, testID }),
-      {
-        skip: logType !== LogTypes.LOGKEEPER_LOGS || buildID === undefined,
-      },
-    );
+  const { data: logkeeperMetadata } = useFetch<LogkeeperMetadata>(
+    getResmokeLogURL(buildID || "", { metadata: true, testID }),
+    {
+      skip: logType !== LogTypes.LOGKEEPER_LOGS || buildID === undefined,
+    },
+  );
+
+  const handleLogComplete = useCallback(
+    (logs: string[]) => {
+      requestAnimationFrame(() => {
+        leaveBreadcrumb(
+          "ingest-log-lines",
+          { logType },
+          SentryBreadcrumbTypes.UI,
+        );
+        setLogMetadata({
+          buildID,
+          execution: execution || String(logkeeperMetadata?.execution || 0),
+          fileName,
+          groupID,
+          htmlLogURL,
+          jobLogsURL,
+          logType,
+          origin,
+          rawLogURL,
+          renderingType,
+          taskID: taskID || logkeeperMetadata?.task_id,
+          testID,
+        });
+        ingestLines(logs, renderingType, failingCommand);
+      });
+    },
+    [
+      buildID,
+      execution,
+      failingCommand,
+      fileName,
+      groupID,
+      htmlLogURL,
+      ingestLines,
+      jobLogsURL,
+      logkeeperMetadata?.execution,
+      logkeeperMetadata?.task_id,
+      logType,
+      origin,
+      rawLogURL,
+      renderingType,
+      setLogMetadata,
+      taskID,
+      testID,
+    ],
+  );
 
   const {
-    data,
     error,
     fileSize,
     isLoading: isLoadingLog,
   } = useLogDownloader({
     logType,
+    onComplete: handleLogComplete,
     url: downloadURL,
   });
 
   useEffect(() => {
-    if (data && !isLoadingLogkeeperMetadata) {
-      leaveBreadcrumb(
-        "ingest-log-lines",
-        { logType },
-        SentryBreadcrumbTypes.UI,
-      );
-      setLogMetadata({
-        buildID,
-        execution: execution || String(logkeeperMetadata?.execution || 0),
-        fileName,
-        groupID,
-        htmlLogURL,
-        jobLogsURL,
-        logType,
-        origin,
-        rawLogURL,
-        renderingType,
-        taskID: taskID || logkeeperMetadata?.task_id,
-        testID,
-      });
-      ingestLines(data, renderingType, failingCommand);
-    }
     if (error) {
       dispatchToast.error(error);
     }
-  }, [
-    buildID,
-    data,
-    dispatchToast,
-    error,
-    execution,
-    fileName,
-    groupID,
-    htmlLogURL,
-    ingestLines,
-    isLoadingLogkeeperMetadata,
-    jobLogsURL,
-    logkeeperMetadata?.execution,
-    logkeeperMetadata?.task_id,
-    logType,
-    origin,
-    rawLogURL,
-    renderingType,
-    setLogMetadata,
-    taskID,
-    testID,
-    failingCommand,
-  ]);
+  }, [error, dispatchToast]);
 
   if (isLoadingLog || isLoadingEvergreen) {
     return (

@@ -43,12 +43,20 @@ vi.mock("hooks/useFetch", () => ({
 }));
 
 vi.mock("hooks", () => ({
-  useLogDownloader: () => ({
-    data: TEST_LOG_LINES,
-    error: "",
-    fileSize: 1024,
-    isLoading: false,
-  }),
+  useLogDownloader: ({
+    onComplete,
+  }: {
+    onComplete?: (logs: string[], trimmedLines: boolean) => void;
+  }) => {
+    setTimeout(() => {
+      onComplete?.(TEST_LOG_LINES, false);
+    }, 0);
+    return {
+      error: "",
+      fileSize: 1024,
+      isLoading: false,
+    };
+  },
 }));
 
 vi.mock("./useResolveLogURLAndRenderingType", () => ({
@@ -120,6 +128,5 @@ describe("LoadingPage", () => {
       LogRenderingTypes.Default,
       undefined,
     );
-    expect(TEST_LOG_LINES).toEqual(["line 1", "line 2", "line 3"]);
   });
 });
