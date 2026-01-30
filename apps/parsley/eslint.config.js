@@ -1,10 +1,10 @@
 import { fixupPluginRules } from "@eslint/compat";
+import { defineConfig } from "eslint/config";
 import playwrightPlugin from "eslint-plugin-playwright";
 import * as sortKeysPlugin from "eslint-plugin-sort-keys-plus";
-import tseslint from "typescript-eslint";
 import baseConfig, { ERROR, errorIfStrict } from "@evg-ui/eslint-config";
 
-export default tseslint.config(
+export default defineConfig(
   ...baseConfig,
   // ESLint (@eslint/js) overrides for Parsley.
   {

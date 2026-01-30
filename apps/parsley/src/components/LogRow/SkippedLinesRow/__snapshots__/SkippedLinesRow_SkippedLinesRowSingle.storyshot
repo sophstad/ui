@@ -16,7 +16,7 @@
       >
         <button
           aria-disabled="false"
-          class="lg-ui-button-0000 leafygreen-ui-168frnw"
+          class="lg-ui-button-0000 leafygreen-ui-ys0yem"
           data-lgid="lg-button"
           type="button"
         >
@@ -27,6 +27,7 @@
             class="leafygreen-ui-b15bbd"
           >
             <svg
+              alt=""
               aria-hidden="true"
               class="leafygreen-ui-xpf1b6"
               height="16"
@@ -46,7 +47,7 @@
         </button>
         <button
           aria-disabled="false"
-          class="lg-ui-button-0000 leafygreen-ui-168frnw"
+          class="lg-ui-button-0000 leafygreen-ui-ys0yem"
           data-lgid="lg-button"
           type="button"
         >
@@ -57,6 +58,7 @@
             class="leafygreen-ui-b15bbd"
           >
             <svg
+              alt=""
               aria-hidden="true"
               class="leafygreen-ui-xpf1b6"
               fill="none"
@@ -77,7 +79,7 @@
         </button>
         <button
           aria-disabled="false"
-          class="lg-ui-button-0000 leafygreen-ui-168frnw"
+          class="lg-ui-button-0000 leafygreen-ui-ys0yem"
           data-lgid="lg-button"
           type="button"
         >
@@ -88,6 +90,7 @@
             class="leafygreen-ui-b15bbd"
           >
             <svg
+              alt=""
               aria-hidden="true"
               class="leafygreen-ui-xpf1b6"
               fill="none"

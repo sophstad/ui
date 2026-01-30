@@ -177,6 +177,7 @@ export type AdminSettings = {
   githubOrgs?: Maybe<Array<Scalars["String"]["output"]>>;
   githubPRCreatorOrg?: Maybe<Scalars["String"]["output"]>;
   githubWebhookSecret?: Maybe<Scalars["String"]["output"]>;
+  graphite?: Maybe<GraphiteConfig>;
   hostInit?: Maybe<HostInitConfig>;
   hostJasper?: Maybe<HostJasperConfig>;
   jira?: Maybe<JiraConfig>;
@@ -196,6 +197,7 @@ export type AdminSettings = {
   releaseMode?: Maybe<ReleaseModeConfig>;
   repotracker?: Maybe<RepotrackerConfig>;
   runtimeEnvironments?: Maybe<RuntimeEnvironmentConfig>;
+  sage?: Maybe<SageConfig>;
   scheduler?: Maybe<SchedulerConfig>;
   serviceFlags?: Maybe<ServiceFlags>;
   shutdownWaitSeconds?: Maybe<Scalars["Int"]["output"]>;
@@ -232,6 +234,7 @@ export type AdminSettingsInput = {
   githubOrgs?: InputMaybe<Array<Scalars["String"]["input"]>>;
   githubPRCreatorOrg?: InputMaybe<Scalars["String"]["input"]>;
   githubWebhookSecret?: InputMaybe<Scalars["String"]["input"]>;
+  graphite?: InputMaybe<GraphiteConfigInput>;
   hostInit?: InputMaybe<HostInitConfigInput>;
   hostJasper?: InputMaybe<HostJasperConfigInput>;
   jira?: InputMaybe<JiraConfigInput>;
@@ -251,6 +254,7 @@ export type AdminSettingsInput = {
   releaseMode?: InputMaybe<ReleaseModeConfigInput>;
   repotracker?: InputMaybe<RepotrackerConfigInput>;
   runtimeEnvironments?: InputMaybe<RuntimeEnvironmentConfigInput>;
+  sage?: InputMaybe<SageConfigInput>;
   scheduler?: InputMaybe<SchedulerConfigInput>;
   serviceFlags?: InputMaybe<ServiceFlagsInput>;
   shutdownWaitSeconds?: InputMaybe<Scalars["Int"]["input"]>;
@@ -691,16 +695,25 @@ export type CopyProjectInput = {
   projectIdToCopy: Scalars["String"]["input"];
 };
 
+/** Cost represents the cost breakdown for a task or version. */
+export type Cost = {
+  __typename?: "Cost";
+  adjustedEC2Cost?: Maybe<Scalars["Float"]["output"]>;
+  onDemandEC2Cost?: Maybe<Scalars["Float"]["output"]>;
+};
+
 export type CostConfig = {
   __typename?: "CostConfig";
   financeFormula?: Maybe<Scalars["Float"]["output"]>;
   onDemandDiscount?: Maybe<Scalars["Float"]["output"]>;
+  s3Cost?: Maybe<S3CostConfig>;
   savingsPlanDiscount?: Maybe<Scalars["Float"]["output"]>;
 };
 
 export type CostConfigInput = {
   financeFormula?: InputMaybe<Scalars["Float"]["input"]>;
   onDemandDiscount?: InputMaybe<Scalars["Float"]["input"]>;
+  s3Cost?: InputMaybe<S3CostConfigInput>;
   savingsPlanDiscount?: InputMaybe<Scalars["Float"]["input"]>;
 };
 
@@ -739,6 +752,13 @@ export type CursorParams = {
   includeCursor: Scalars["Boolean"]["input"];
 };
 
+/** CursorSettings represents the status of a user's Cursor API key stored in Sage. */
+export type CursorSettings = {
+  __typename?: "CursorSettings";
+  keyConfigured: Scalars["Boolean"]["output"];
+  keyLastFour?: Maybe<Scalars["String"]["output"]>;
+};
+
 /** DeactivateStepbackTaskInput is the input to the deactivateStepbackTask mutation. */
 export type DeactivateStepbackTaskInput = {
   buildVariantName: Scalars["String"]["input"];
@@ -750,6 +770,12 @@ export type DeactivateStepbackTaskInput = {
 export type DefaultSectionToRepoInput = {
   projectId: Scalars["String"]["input"];
   section: ProjectSettingsSection;
+};
+
+/** DeleteCursorAPIKeyPayload is the response from deleting a Cursor API key. */
+export type DeleteCursorApiKeyPayload = {
+  __typename?: "DeleteCursorAPIKeyPayload";
+  success: Scalars["Boolean"]["output"];
 };
 
 /** DeleteDistroInput is the input to the deleteDistro mutation. */
@@ -1270,6 +1296,17 @@ export type GithubUser = {
 
 export type GithubUserInput = {
   lastKnownAs?: InputMaybe<Scalars["String"]["input"]>;
+};
+
+export type GraphiteConfig = {
+  __typename?: "GraphiteConfig";
+  ciOptimizationToken?: Maybe<Scalars["String"]["output"]>;
+  serverUrl?: Maybe<Scalars["String"]["output"]>;
+};
+
+export type GraphiteConfigInput = {
+  ciOptimizationToken?: InputMaybe<Scalars["String"]["input"]>;
+  serverUrl?: InputMaybe<Scalars["String"]["input"]>;
 };
 
 export type GroupedBuildVariant = {
@@ -1963,6 +2000,7 @@ export type Mutation = {
   createPublicKey: Array<PublicKey>;
   deactivateStepbackTask: Scalars["Boolean"]["output"];
   defaultSectionToRepo?: Maybe<Scalars["String"]["output"]>;
+  deleteCursorAPIKey: DeleteCursorApiKeyPayload;
   deleteDistro: DeleteDistroPayload;
   deleteGithubAppCredentials?: Maybe<DeleteGithubAppCredentialsPayload>;
   deleteProject: Scalars["Boolean"]["output"];
@@ -1996,6 +2034,7 @@ export type Mutation = {
   scheduleTasks: Array<Task>;
   scheduleUndispatchedBaseTasks?: Maybe<Array<Task>>;
   setAnnotationMetadataLinks: Scalars["Boolean"]["output"];
+  setCursorAPIKey: SetCursorApiKeyPayload;
   setLastRevision: SetLastRevisionPayload;
   /** setPatchVisibility takes a list of patch ids and a boolean to set the visibility on the my patches queries */
   setPatchVisibility: Array<Patch>;
@@ -2222,6 +2261,10 @@ export type MutationSetAnnotationMetadataLinksArgs = {
   execution: Scalars["Int"]["input"];
   metadataLinks: Array<MetadataLinkInput>;
   taskId: Scalars["String"]["input"];
+};
+
+export type MutationSetCursorApiKeyArgs = {
+  apiKey: Scalars["String"]["input"];
 };
 
 export type MutationSetLastRevisionArgs = {
@@ -2529,6 +2572,7 @@ export type Patch = {
   taskStatuses: Array<Scalars["String"]["output"]>;
   tasks: Array<Scalars["String"]["output"]>;
   time?: Maybe<PatchTime>;
+  user: User;
   variants: Array<Scalars["String"]["output"]>;
   variantsTasks: Array<VariantTask>;
   versionFull?: Maybe<Version>;
@@ -2600,6 +2644,7 @@ export type Patches = {
  * Based on the information in PatchesInput, we return a list of Patches for either an individual user or a project.
  */
 export type PatchesInput = {
+  countLimit?: InputMaybe<Scalars["Int"]["input"]>;
   includeHidden?: InputMaybe<Scalars["Boolean"]["input"]>;
   limit?: Scalars["Int"]["input"];
   onlyMergeQueue?: InputMaybe<Scalars["Boolean"]["input"]>;
@@ -2797,6 +2842,7 @@ export type Project = {
   commitQueue: CommitQueueParams;
   containerSizeDefinitions?: Maybe<Array<ContainerResources>>;
   deactivatePrevious?: Maybe<Scalars["Boolean"]["output"]>;
+  debugSpawnHostsDisabled?: Maybe<Scalars["Boolean"]["output"]>;
   disabledStatsCache?: Maybe<Scalars["Boolean"]["output"]>;
   dispatchingDisabled?: Maybe<Scalars["Boolean"]["output"]>;
   displayName: Scalars["String"]["output"];
@@ -2952,6 +2998,7 @@ export type ProjectInput = {
   commitQueue?: InputMaybe<CommitQueueParamsInput>;
   containerSizeDefinitions?: InputMaybe<Array<ContainerResourcesInput>>;
   deactivatePrevious?: InputMaybe<Scalars["Boolean"]["input"]>;
+  debugSpawnHostsDisabled?: InputMaybe<Scalars["Boolean"]["input"]>;
   disabledStatsCache?: InputMaybe<Scalars["Boolean"]["input"]>;
   dispatchingDisabled?: InputMaybe<Scalars["Boolean"]["input"]>;
   displayName?: InputMaybe<Scalars["String"]["input"]>;
@@ -3129,6 +3176,7 @@ export type Query = {
   buildBaron: BuildBaron;
   buildVariantsForTaskName?: Maybe<Array<BuildVariantTuple>>;
   clientConfig?: Maybe<ClientConfig>;
+  cursorSettings?: Maybe<CursorSettings>;
   distro?: Maybe<Distro>;
   distroEvents: DistroEventsPayload;
   distroTaskQueue: Array<TaskQueueItem>;
@@ -3372,6 +3420,7 @@ export type RepoRef = {
   commitQueue: RepoCommitQueueParams;
   containerSizeDefinitions?: Maybe<Array<ContainerResources>>;
   deactivatePrevious: Scalars["Boolean"]["output"];
+  debugSpawnHostsDisabled: Scalars["Boolean"]["output"];
   disabledStatsCache: Scalars["Boolean"]["output"];
   dispatchingDisabled: Scalars["Boolean"]["output"];
   displayName: Scalars["String"]["output"];
@@ -3418,6 +3467,7 @@ export type RepoRefInput = {
   commitQueue?: InputMaybe<CommitQueueParamsInput>;
   containerSizeDefinitions?: InputMaybe<Array<ContainerResourcesInput>>;
   deactivatePrevious?: InputMaybe<Scalars["Boolean"]["input"]>;
+  debugSpawnHostsDisabled?: InputMaybe<Scalars["Boolean"]["input"]>;
   disabledStatsCache?: InputMaybe<Scalars["Boolean"]["input"]>;
   dispatchingDisabled?: InputMaybe<Scalars["Boolean"]["input"]>;
   displayName?: InputMaybe<Scalars["String"]["input"]>;
@@ -3570,6 +3620,17 @@ export type RuntimeEnvironmentConfigInput = {
   baseUrl: Scalars["String"]["input"];
 };
 
+export type S3CostConfig = {
+  __typename?: "S3CostConfig";
+  storage?: Maybe<S3StorageCostConfig>;
+  upload?: Maybe<S3UploadCostConfig>;
+};
+
+export type S3CostConfigInput = {
+  storage?: InputMaybe<S3StorageCostConfigInput>;
+  upload?: InputMaybe<S3UploadCostConfigInput>;
+};
+
 export type S3Credentials = {
   __typename?: "S3Credentials";
   bucket?: Maybe<Scalars["String"]["output"]>;
@@ -3581,6 +3642,26 @@ export type S3CredentialsInput = {
   bucket?: InputMaybe<Scalars["String"]["input"]>;
   key?: InputMaybe<Scalars["String"]["input"]>;
   secret?: InputMaybe<Scalars["String"]["input"]>;
+};
+
+export type S3StorageCostConfig = {
+  __typename?: "S3StorageCostConfig";
+  iAStorageCostDiscount?: Maybe<Scalars["Float"]["output"]>;
+  standardStorageCostDiscount?: Maybe<Scalars["Float"]["output"]>;
+};
+
+export type S3StorageCostConfigInput = {
+  iAStorageCostDiscount?: InputMaybe<Scalars["Float"]["input"]>;
+  standardStorageCostDiscount?: InputMaybe<Scalars["Float"]["input"]>;
+};
+
+export type S3UploadCostConfig = {
+  __typename?: "S3UploadCostConfig";
+  uploadCostDiscount?: Maybe<Scalars["Float"]["output"]>;
+};
+
+export type S3UploadCostConfigInput = {
+  uploadCostDiscount?: InputMaybe<Scalars["Float"]["input"]>;
 };
 
 export type SesConfig = {
@@ -3612,6 +3693,15 @@ export type SshKeyPair = {
 export type SshKeyPairInput = {
   name?: InputMaybe<Scalars["String"]["input"]>;
   secretARN?: InputMaybe<Scalars["String"]["input"]>;
+};
+
+export type SageConfig = {
+  __typename?: "SageConfig";
+  baseUrl?: Maybe<Scalars["String"]["output"]>;
+};
+
+export type SageConfigInput = {
+  baseUrl?: InputMaybe<Scalars["String"]["input"]>;
 };
 
 export type SaveAdminSettingsInput = {
@@ -3713,6 +3803,7 @@ export type ServiceFlags = {
   checkBlockedTasksDisabled?: Maybe<Scalars["Boolean"]["output"]>;
   cliUpdatesDisabled?: Maybe<Scalars["Boolean"]["output"]>;
   cloudCleanupDisabled?: Maybe<Scalars["Boolean"]["output"]>;
+  debugSpawnHostDisabled?: Maybe<Scalars["Boolean"]["output"]>;
   degradedModeDisabled?: Maybe<Scalars["Boolean"]["output"]>;
   elasticIPsDisabled?: Maybe<Scalars["Boolean"]["output"]>;
   emailNotificationsDisabled?: Maybe<Scalars["Boolean"]["output"]>;
@@ -3724,12 +3815,12 @@ export type ServiceFlags = {
   jiraNotificationsDisabled?: Maybe<Scalars["Boolean"]["output"]>;
   jwtTokenForCLIDisabled?: Maybe<Scalars["Boolean"]["output"]>;
   largeParserProjectsDisabled?: Maybe<Scalars["Boolean"]["output"]>;
-  legacyUIAdminPageDisabled?: Maybe<Scalars["Boolean"]["output"]>;
   monitorDisabled?: Maybe<Scalars["Boolean"]["output"]>;
   podAllocatorDisabled?: Maybe<Scalars["Boolean"]["output"]>;
   podInitDisabled?: Maybe<Scalars["Boolean"]["output"]>;
   releaseModeDisabled?: Maybe<Scalars["Boolean"]["output"]>;
   repotrackerDisabled?: Maybe<Scalars["Boolean"]["output"]>;
+  s3LifecycleSyncDisabled?: Maybe<Scalars["Boolean"]["output"]>;
   schedulerDisabled?: Maybe<Scalars["Boolean"]["output"]>;
   slackNotificationsDisabled?: Maybe<Scalars["Boolean"]["output"]>;
   sleepScheduleDisabled?: Maybe<Scalars["Boolean"]["output"]>;
@@ -3739,6 +3830,7 @@ export type ServiceFlags = {
   taskLoggingDisabled?: Maybe<Scalars["Boolean"]["output"]>;
   taskReliabilityDisabled?: Maybe<Scalars["Boolean"]["output"]>;
   unrecognizedPodCleanupDisabled?: Maybe<Scalars["Boolean"]["output"]>;
+  useGitForGitHubFilesDisabled?: Maybe<Scalars["Boolean"]["output"]>;
   webhookNotificationsDisabled?: Maybe<Scalars["Boolean"]["output"]>;
 };
 
@@ -3752,6 +3844,7 @@ export type ServiceFlagsInput = {
   checkBlockedTasksDisabled?: InputMaybe<Scalars["Boolean"]["input"]>;
   cliUpdatesDisabled?: InputMaybe<Scalars["Boolean"]["input"]>;
   cloudCleanupDisabled?: InputMaybe<Scalars["Boolean"]["input"]>;
+  debugSpawnHostDisabled?: InputMaybe<Scalars["Boolean"]["input"]>;
   degradedModeDisabled?: InputMaybe<Scalars["Boolean"]["input"]>;
   elasticIPsDisabled?: InputMaybe<Scalars["Boolean"]["input"]>;
   emailNotificationsDisabled?: InputMaybe<Scalars["Boolean"]["input"]>;
@@ -3763,12 +3856,12 @@ export type ServiceFlagsInput = {
   jiraNotificationsDisabled?: InputMaybe<Scalars["Boolean"]["input"]>;
   jwtTokenForCLIDisabled?: InputMaybe<Scalars["Boolean"]["input"]>;
   largeParserProjectsDisabled?: InputMaybe<Scalars["Boolean"]["input"]>;
-  legacyUIAdminPageDisabled?: InputMaybe<Scalars["Boolean"]["input"]>;
   monitorDisabled?: InputMaybe<Scalars["Boolean"]["input"]>;
   podAllocatorDisabled?: InputMaybe<Scalars["Boolean"]["input"]>;
   podInitDisabled?: InputMaybe<Scalars["Boolean"]["input"]>;
   releaseModeDisabled?: InputMaybe<Scalars["Boolean"]["input"]>;
   repotrackerDisabled?: InputMaybe<Scalars["Boolean"]["input"]>;
+  s3LifecycleSyncDisabled?: InputMaybe<Scalars["Boolean"]["input"]>;
   schedulerDisabled?: InputMaybe<Scalars["Boolean"]["input"]>;
   slackNotificationsDisabled?: InputMaybe<Scalars["Boolean"]["input"]>;
   sleepScheduleDisabled?: InputMaybe<Scalars["Boolean"]["input"]>;
@@ -3778,7 +3871,15 @@ export type ServiceFlagsInput = {
   taskLoggingDisabled?: InputMaybe<Scalars["Boolean"]["input"]>;
   taskReliabilityDisabled?: InputMaybe<Scalars["Boolean"]["input"]>;
   unrecognizedPodCleanupDisabled?: InputMaybe<Scalars["Boolean"]["input"]>;
+  useGitForGitHubFilesDisabled?: InputMaybe<Scalars["Boolean"]["input"]>;
   webhookNotificationsDisabled?: InputMaybe<Scalars["Boolean"]["input"]>;
+};
+
+/** SetCursorAPIKeyPayload is the response from setting a Cursor API key. */
+export type SetCursorApiKeyPayload = {
+  __typename?: "SetCursorAPIKeyPayload";
+  keyLastFour?: Maybe<Scalars["String"]["output"]>;
+  success: Scalars["Boolean"]["output"];
 };
 
 /**
@@ -3913,6 +4014,7 @@ export type SpawnHostInput = {
   distroId: Scalars["String"]["input"];
   expiration?: InputMaybe<Scalars["Time"]["input"]>;
   homeVolumeSize?: InputMaybe<Scalars["Int"]["input"]>;
+  isDebug?: InputMaybe<Scalars["Boolean"]["input"]>;
   isVirtualWorkStation: Scalars["Boolean"]["input"];
   noExpiration: Scalars["Boolean"]["input"];
   publicKey: PublicKeyInput;
@@ -3984,6 +4086,7 @@ export type SpruceConfig = {
   jira?: Maybe<JiraConfig>;
   providers?: Maybe<CloudProviderConfig>;
   secretFields: Array<Scalars["String"]["output"]>;
+  serviceFlags: UserServiceFlags;
   singleTaskDistro?: Maybe<SingleTaskDistroConfig>;
   slack?: Maybe<SlackConfig>;
   spawnHost: SpawnHostConfig;
@@ -4116,6 +4219,7 @@ export type Task = {
   patch?: Maybe<Patch>;
   patchNumber?: Maybe<Scalars["Int"]["output"]>;
   pod?: Maybe<Pod>;
+  predictedTaskCost?: Maybe<Cost>;
   priority?: Maybe<Scalars["Int"]["output"]>;
   project?: Maybe<Project>;
   projectId: Scalars["String"]["output"];
@@ -4132,7 +4236,7 @@ export type Task = {
   /** taskLogs returns the tail 100 lines of the task's logs. */
   stepbackInfo?: Maybe<StepbackInfo>;
   tags: Array<Scalars["String"]["output"]>;
-  taskCost?: Maybe<TaskCost>;
+  taskCost?: Maybe<Cost>;
   taskGroup?: Maybe<Scalars["String"]["output"]>;
   taskGroupMaxHosts?: Maybe<Scalars["Int"]["output"]>;
   taskLogs: TaskLogs;
@@ -4166,13 +4270,6 @@ export type TaskContainerCreationOpts = {
   memoryMB: Scalars["Int"]["output"];
   os: Scalars["String"]["output"];
   workingDir: Scalars["String"]["output"];
-};
-
-/** TaskCost represents the cost breakdown for a task. */
-export type TaskCost = {
-  __typename?: "TaskCost";
-  adjustedCost?: Maybe<Scalars["Float"]["output"]>;
-  onDemandCost?: Maybe<Scalars["Float"]["output"]>;
 };
 
 /** TaskCountOptions defines the parameters that are used when counting tasks from a Version. */
@@ -4689,14 +4786,14 @@ export type UseSpruceOptionsInput = {
  */
 export type User = {
   __typename?: "User";
-  betaFeatures: BetaFeatures;
-  displayName: Scalars["String"]["output"];
-  emailAddress: Scalars["String"]["output"];
-  parsleyFilters: Array<ParsleyFilter>;
-  parsleySettings: ParsleySettings;
-  patches: Patches;
-  permissions: Permissions;
-  settings: UserSettings;
+  betaFeatures?: Maybe<BetaFeatures>;
+  displayName?: Maybe<Scalars["String"]["output"]>;
+  emailAddress?: Maybe<Scalars["String"]["output"]>;
+  parsleyFilters?: Maybe<Array<ParsleyFilter>>;
+  parsleySettings?: Maybe<ParsleySettings>;
+  patches?: Maybe<Patches>;
+  permissions?: Maybe<Permissions>;
+  settings?: Maybe<UserSettings>;
   subscriptions?: Maybe<Array<GeneralSubscription>>;
   userId: Scalars["String"]["output"];
 };
@@ -4723,6 +4820,11 @@ export type UserConfig = {
   oauth_issuer: Scalars["String"]["output"];
   ui_server_host: Scalars["String"]["output"];
   user: Scalars["String"]["output"];
+};
+
+export type UserServiceFlags = {
+  __typename?: "UserServiceFlags";
+  jwtTokenForCLIDisabled?: Maybe<Scalars["Boolean"]["output"]>;
 };
 
 /**
@@ -4796,6 +4898,7 @@ export type Version = {
   order: Scalars["Int"]["output"];
   parameters: Array<Parameter>;
   patch?: Maybe<Patch>;
+  predictedCost?: Maybe<Cost>;
   previousVersion?: Maybe<Version>;
   project: Scalars["String"]["output"];
   projectIdentifier: Scalars["String"]["output"];
@@ -4810,6 +4913,7 @@ export type Version = {
   taskStatuses: Array<Scalars["String"]["output"]>;
   tasks: VersionTasks;
   upstreamProject?: Maybe<UpstreamProject>;
+  user: User;
   versionTiming?: Maybe<VersionTiming>;
   warnings: Array<Scalars["String"]["output"]>;
   waterfallBuilds?: Maybe<Array<WaterfallBuild>>;
@@ -4919,6 +5023,7 @@ export type WaterfallOptions = {
   maxOrder?: InputMaybe<Scalars["Int"]["input"]>;
   /** Return versions with an order greater than minOrder. Used for paginating backward. */
   minOrder?: InputMaybe<Scalars["Int"]["input"]>;
+  omitInactiveBuilds?: InputMaybe<Scalars["Boolean"]["input"]>;
   projectIdentifier: Scalars["String"]["input"];
   requesters?: InputMaybe<Array<Scalars["String"]["input"]>>;
   revision?: InputMaybe<Scalars["String"]["input"]>;
@@ -5388,6 +5493,7 @@ export type ProjectGeneralSettingsFragment = {
   batchTime: number;
   branch: string;
   deactivatePrevious?: boolean | null;
+  debugSpawnHostsDisabled?: boolean | null;
   disabledStatsCache?: boolean | null;
   dispatchingDisabled?: boolean | null;
   displayName: string;
@@ -5409,6 +5515,7 @@ export type RepoGeneralSettingsFragment = {
   id: string;
   batchTime: number;
   deactivatePrevious: boolean;
+  debugSpawnHostsDisabled: boolean;
   disabledStatsCache: boolean;
   dispatchingDisabled: boolean;
   displayName: string;
@@ -5537,6 +5644,7 @@ export type ProjectSettingsFieldsFragment = {
     batchTime: number;
     branch: string;
     deactivatePrevious?: boolean | null;
+    debugSpawnHostsDisabled?: boolean | null;
     disabledStatsCache?: boolean | null;
     dispatchingDisabled?: boolean | null;
     displayName: string;
@@ -5750,6 +5858,7 @@ export type RepoSettingsFieldsFragment = {
     restricted: boolean;
     batchTime: number;
     deactivatePrevious: boolean;
+    debugSpawnHostsDisabled: boolean;
     disabledStatsCache: boolean;
     dispatchingDisabled: boolean;
     owner: string;
@@ -6211,6 +6320,7 @@ export type ProjectEventSettingsFragment = {
     batchTime: number;
     branch: string;
     deactivatePrevious?: boolean | null;
+    debugSpawnHostsDisabled?: boolean | null;
     disabledStatsCache?: boolean | null;
     dispatchingDisabled?: boolean | null;
     displayName: string;
@@ -6680,6 +6790,18 @@ export type DefaultSectionToRepoMutation = {
   defaultSectionToRepo?: string | null;
 };
 
+export type DeleteCursorApiKeyMutationVariables = Exact<{
+  [key: string]: never;
+}>;
+
+export type DeleteCursorApiKeyMutation = {
+  __typename?: "Mutation";
+  deleteCursorAPIKey: {
+    __typename?: "DeleteCursorAPIKeyPayload";
+    success: boolean;
+  };
+};
+
 export type DeleteDistroMutationVariables = Exact<{
   distroId: Scalars["String"]["input"];
 }>;
@@ -7042,6 +7164,24 @@ export type SaveAdminSettingsMutation = {
       httpListenAddr?: string | null;
       url?: string | null;
     } | null;
+    cost?: {
+      __typename?: "CostConfig";
+      financeFormula?: number | null;
+      onDemandDiscount?: number | null;
+      savingsPlanDiscount?: number | null;
+      s3Cost?: {
+        __typename?: "S3CostConfig";
+        storage?: {
+          __typename?: "S3StorageCostConfig";
+          iAStorageCostDiscount?: number | null;
+          standardStorageCostDiscount?: number | null;
+        } | null;
+        upload?: {
+          __typename?: "S3UploadCostConfig";
+          uploadCostDiscount?: number | null;
+        } | null;
+      } | null;
+    } | null;
     hostInit?: {
       __typename?: "HostInitConfig";
       cloudStatusBatchSize?: number | null;
@@ -7065,6 +7205,7 @@ export type SaveAdminSettingsMutation = {
       maxRepoRevisionsToSearch?: number | null;
       numNewRepoRevisionsToFetch?: number | null;
     } | null;
+    sage?: { __typename?: "SageConfig"; baseUrl?: string | null } | null;
     scheduler?: {
       __typename?: "SchedulerConfig";
       acceptableHostIdleTimeSeconds?: number | null;
@@ -7097,6 +7238,7 @@ export type SaveAdminSettingsMutation = {
       checkBlockedTasksDisabled?: boolean | null;
       cliUpdatesDisabled?: boolean | null;
       cloudCleanupDisabled?: boolean | null;
+      debugSpawnHostDisabled?: boolean | null;
       degradedModeDisabled?: boolean | null;
       elasticIPsDisabled?: boolean | null;
       emailNotificationsDisabled?: boolean | null;
@@ -7108,12 +7250,12 @@ export type SaveAdminSettingsMutation = {
       jiraNotificationsDisabled?: boolean | null;
       jwtTokenForCLIDisabled?: boolean | null;
       largeParserProjectsDisabled?: boolean | null;
-      legacyUIAdminPageDisabled?: boolean | null;
       monitorDisabled?: boolean | null;
       podAllocatorDisabled?: boolean | null;
       podInitDisabled?: boolean | null;
       releaseModeDisabled?: boolean | null;
       repotrackerDisabled?: boolean | null;
+      s3LifecycleSyncDisabled?: boolean | null;
       schedulerDisabled?: boolean | null;
       slackNotificationsDisabled?: boolean | null;
       sleepScheduleDisabled?: boolean | null;
@@ -7123,6 +7265,7 @@ export type SaveAdminSettingsMutation = {
       taskLoggingDisabled?: boolean | null;
       taskReliabilityDisabled?: boolean | null;
       unrecognizedPodCleanupDisabled?: boolean | null;
+      useGitForGitHubFilesDisabled?: boolean | null;
       webhookNotificationsDisabled?: boolean | null;
     } | null;
     taskLimits?: {
@@ -7283,6 +7426,19 @@ export type ScheduleUndispatchedBaseTasksMutation = {
     displayStatus: string;
     execution: number;
   }> | null;
+};
+
+export type SetCursorApiKeyMutationVariables = Exact<{
+  apiKey: Scalars["String"]["input"];
+}>;
+
+export type SetCursorApiKeyMutation = {
+  __typename?: "Mutation";
+  setCursorAPIKey: {
+    __typename?: "SetCursorAPIKeyPayload";
+    keyLastFour?: string | null;
+    success: boolean;
+  };
 };
 
 export type SetLastRevisionMutationVariables = Exact<{
@@ -7659,11 +7815,28 @@ export type AdminSettingsQuery = {
       financeFormula?: number | null;
       onDemandDiscount?: number | null;
       savingsPlanDiscount?: number | null;
+      s3Cost?: {
+        __typename?: "S3CostConfig";
+        storage?: {
+          __typename?: "S3StorageCostConfig";
+          iAStorageCostDiscount?: number | null;
+          standardStorageCostDiscount?: number | null;
+        } | null;
+        upload?: {
+          __typename?: "S3UploadCostConfig";
+          uploadCostDiscount?: number | null;
+        } | null;
+      } | null;
     } | null;
     fws?: { __typename?: "FWSConfig"; url: string } | null;
     githubCheckRun?: {
       __typename?: "GitHubCheckRunConfig";
       checkRunLimit?: number | null;
+    } | null;
+    graphite?: {
+      __typename?: "GraphiteConfig";
+      ciOptimizationToken?: string | null;
+      serverUrl?: string | null;
     } | null;
     hostInit?: {
       __typename?: "HostInitConfig";
@@ -7834,6 +8007,7 @@ export type AdminSettingsQuery = {
       apiKey?: string | null;
       baseUrl: string;
     } | null;
+    sage?: { __typename?: "SageConfig"; baseUrl?: string | null } | null;
     scheduler?: {
       __typename?: "SchedulerConfig";
       acceptableHostIdleTimeSeconds?: number | null;
@@ -7866,6 +8040,7 @@ export type AdminSettingsQuery = {
       checkBlockedTasksDisabled?: boolean | null;
       cliUpdatesDisabled?: boolean | null;
       cloudCleanupDisabled?: boolean | null;
+      debugSpawnHostDisabled?: boolean | null;
       degradedModeDisabled?: boolean | null;
       elasticIPsDisabled?: boolean | null;
       emailNotificationsDisabled?: boolean | null;
@@ -7877,12 +8052,12 @@ export type AdminSettingsQuery = {
       jiraNotificationsDisabled?: boolean | null;
       jwtTokenForCLIDisabled?: boolean | null;
       largeParserProjectsDisabled?: boolean | null;
-      legacyUIAdminPageDisabled?: boolean | null;
       monitorDisabled?: boolean | null;
       podAllocatorDisabled?: boolean | null;
       podInitDisabled?: boolean | null;
       releaseModeDisabled?: boolean | null;
       repotrackerDisabled?: boolean | null;
+      s3LifecycleSyncDisabled?: boolean | null;
       schedulerDisabled?: boolean | null;
       slackNotificationsDisabled?: boolean | null;
       sleepScheduleDisabled?: boolean | null;
@@ -7892,6 +8067,7 @@ export type AdminSettingsQuery = {
       taskLoggingDisabled?: boolean | null;
       taskReliabilityDisabled?: boolean | null;
       unrecognizedPodCleanupDisabled?: boolean | null;
+      useGitForGitHubFilesDisabled?: boolean | null;
       webhookNotificationsDisabled?: boolean | null;
     } | null;
     singleTaskDistro?: {
@@ -8091,6 +8267,7 @@ export type BaseVersionAndTaskQuery = {
       id: string;
       displayStatus: string;
       execution: number;
+      order: number;
     } | null;
     versionMetadata: {
       __typename?: "Version";
@@ -8286,6 +8463,17 @@ export type CreatedTicketsQuery = {
       status: { __typename?: "JiraStatus"; id: string; name: string };
     };
   }>;
+};
+
+export type CursorSettingsQueryVariables = Exact<{ [key: string]: never }>;
+
+export type CursorSettingsQuery = {
+  __typename?: "Query";
+  cursorSettings?: {
+    __typename?: "CursorSettings";
+    keyConfigured: boolean;
+    keyLastFour?: string | null;
+  } | null;
 };
 
 export type DistroEventsQueryVariables = Exact<{
@@ -9126,7 +9314,11 @@ export type OtherUserQueryVariables = Exact<{
 export type OtherUserQuery = {
   __typename?: "Query";
   currentUser: { __typename?: "User"; userId: string };
-  otherUser: { __typename?: "User"; displayName: string; userId: string };
+  otherUser: {
+    __typename?: "User";
+    displayName?: string | null;
+    userId: string;
+  };
 };
 
 export type PatchConfigureGeneratedTaskCountsQueryVariables = Exact<{
@@ -9378,6 +9570,7 @@ export type ProjectEventLogsQuery = {
           batchTime: number;
           branch: string;
           deactivatePrevious?: boolean | null;
+          debugSpawnHostsDisabled?: boolean | null;
           disabledStatsCache?: boolean | null;
           dispatchingDisabled?: boolean | null;
           displayName: string;
@@ -9598,6 +9791,7 @@ export type ProjectEventLogsQuery = {
           batchTime: number;
           branch: string;
           deactivatePrevious?: boolean | null;
+          debugSpawnHostsDisabled?: boolean | null;
           disabledStatsCache?: boolean | null;
           dispatchingDisabled?: boolean | null;
           displayName: string;
@@ -9876,6 +10070,7 @@ export type ProjectSettingsQuery = {
       batchTime: number;
       branch: string;
       deactivatePrevious?: boolean | null;
+      debugSpawnHostsDisabled?: boolean | null;
       disabledStatsCache?: boolean | null;
       dispatchingDisabled?: boolean | null;
       displayName: string;
@@ -10152,6 +10347,7 @@ export type RepoEventLogsQuery = {
           batchTime: number;
           branch: string;
           deactivatePrevious?: boolean | null;
+          debugSpawnHostsDisabled?: boolean | null;
           disabledStatsCache?: boolean | null;
           dispatchingDisabled?: boolean | null;
           displayName: string;
@@ -10372,6 +10568,7 @@ export type RepoEventLogsQuery = {
           batchTime: number;
           branch: string;
           deactivatePrevious?: boolean | null;
+          debugSpawnHostsDisabled?: boolean | null;
           disabledStatsCache?: boolean | null;
           dispatchingDisabled?: boolean | null;
           displayName: string;
@@ -10597,6 +10794,7 @@ export type RepoSettingsQuery = {
       restricted: boolean;
       batchTime: number;
       deactivatePrevious: boolean;
+      debugSpawnHostsDisabled: boolean;
       disabledStatsCache: boolean;
       dispatchingDisabled: boolean;
       owner: string;
@@ -10885,6 +11083,10 @@ export type SpruceConfigQuery = {
         } | null;
       } | null;
     } | null;
+    serviceFlags: {
+      __typename?: "UserServiceFlags";
+      jwtTokenForCLIDisabled?: boolean | null;
+    };
     slack?: { __typename?: "SlackConfig"; name?: string | null } | null;
     spawnHost: {
       __typename?: "SpawnHostConfig";
@@ -10961,6 +11163,8 @@ export type TaskEventLogsQuery = {
         __typename?: "TaskEventLogEntry";
         id: string;
         eventType?: string | null;
+        resourceId: string;
+        resourceType: string;
         timestamp?: Date | null;
         data: {
           __typename?: "TaskEventLogData";
@@ -11026,11 +11230,13 @@ export type TaskHistoryQuery = {
       activated: boolean;
       canRestart: boolean;
       canSchedule: boolean;
-      createTime?: Date | null;
+      canSetPriority: boolean;
       displayStatus: string;
       execution: number;
+      ingestTime?: Date | null;
       latestExecution: number;
       order: number;
+      priority?: number | null;
       revision?: string | null;
       tests: {
         __typename?: "TaskTestResult";
@@ -11553,7 +11759,7 @@ export type UserDistroSettingsPermissionsQuery = {
   user: {
     __typename?: "User";
     userId: string;
-    permissions: {
+    permissions?: {
       __typename?: "Permissions";
       canCreateDistro: boolean;
       distroPermissions: {
@@ -11561,7 +11767,7 @@ export type UserDistroSettingsPermissionsQuery = {
         admin: boolean;
         edit: boolean;
       };
-    };
+    } | null;
   };
 };
 
@@ -11575,7 +11781,7 @@ export type UserPatchesQuery = {
   user: {
     __typename?: "User";
     userId: string;
-    patches: {
+    patches?: {
       __typename?: "Patches";
       filteredPatchCount: number;
       patches: Array<{
@@ -11611,7 +11817,7 @@ export type UserPatchesQuery = {
           } | null;
         } | null;
       }>;
-    };
+    } | null;
   };
 };
 
@@ -11624,11 +11830,11 @@ export type UserProjectSettingsPermissionsQuery = {
   user: {
     __typename?: "User";
     userId: string;
-    permissions: {
+    permissions?: {
       __typename?: "Permissions";
       canCreateProject: boolean;
       projectPermissions: { __typename?: "ProjectPermissions"; edit: boolean };
-    };
+    } | null;
   };
 };
 
@@ -11641,10 +11847,10 @@ export type UserRepoSettingsPermissionsQuery = {
   user: {
     __typename?: "User";
     userId: string;
-    permissions: {
+    permissions?: {
       __typename?: "Permissions";
       repoPermissions: { __typename?: "RepoPermissions"; edit: boolean };
-    };
+    } | null;
   };
 };
 
@@ -11655,7 +11861,7 @@ export type UserSettingsQuery = {
   user: {
     __typename?: "User";
     userId: string;
-    settings: {
+    settings?: {
       __typename?: "UserSettings";
       dateFormat?: string | null;
       region?: string | null;
@@ -11675,7 +11881,7 @@ export type UserSettingsQuery = {
         spawnHostExpiration?: string | null;
         spawnHostOutcome?: string | null;
       } | null;
-    };
+    } | null;
   };
 };
 
@@ -11686,7 +11892,7 @@ export type UserSubscriptionsQuery = {
   user: {
     __typename?: "User";
     userId: string;
-    settings: {
+    settings?: {
       __typename?: "UserSettings";
       notifications?: {
         __typename?: "Notifications";
@@ -11696,7 +11902,7 @@ export type UserSubscriptionsQuery = {
         spawnHostExpirationId?: string | null;
         spawnHostOutcomeId?: string | null;
       } | null;
-    };
+    } | null;
     subscriptions?: Array<{
       __typename?: "GeneralSubscription";
       id: string;
@@ -11730,10 +11936,13 @@ export type UserQuery = {
   __typename?: "Query";
   user: {
     __typename?: "User";
-    displayName: string;
-    emailAddress: string;
+    displayName?: string | null;
+    emailAddress?: string | null;
     userId: string;
-    permissions: { __typename?: "Permissions"; canEditAdminSettings: boolean };
+    permissions?: {
+      __typename?: "Permissions";
+      canEditAdminSettings: boolean;
+    } | null;
   };
 };
 

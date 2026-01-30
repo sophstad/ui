@@ -1,4 +1,4 @@
-import { useQuery } from "@apollo/client";
+import { useQuery } from "@apollo/client/react";
 import styled from "@emotion/styled";
 import { Link } from "react-router-dom";
 import Icon from "@evg-ui/lib/components/Icon";
@@ -332,6 +332,16 @@ const AdminSettingsPage: React.FC = () => {
               </SideNavItem>
               <SideNavItem
                 as={Link}
+                data-cy="navitem-admin-graphite"
+                to={getAdminSettingsRoute(
+                  AdminSettingsTabRoutes.General,
+                  "graphite",
+                )}
+              >
+                Graphite
+              </SideNavItem>
+              <SideNavItem
+                as={Link}
                 data-cy="navitem-admin-cedar"
                 to={getAdminSettingsRoute(
                   AdminSettingsTabRoutes.General,
@@ -339,6 +349,16 @@ const AdminSettingsPage: React.FC = () => {
                 )}
               >
                 Cedar
+              </SideNavItem>
+              <SideNavItem
+                as={Link}
+                data-cy="navitem-admin-sage"
+                to={getAdminSettingsRoute(
+                  AdminSettingsTabRoutes.General,
+                  "sage",
+                )}
+              >
+                Sage
               </SideNavItem>
             </SideNavGroup>
             <SideNavGroup header="Background Processing">

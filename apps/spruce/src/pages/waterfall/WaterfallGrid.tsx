@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState, useTransition } from "react";
-import { useSuspenseQuery } from "@apollo/client";
+import { useSuspenseQuery } from "@apollo/client/react";
 import styled from "@emotion/styled";
 import { size, transitionDuration } from "@evg-ui/lib/constants/tokens";
 import { useQueryParam, useQueryParams } from "@evg-ui/lib/hooks";
@@ -24,6 +24,7 @@ import { getObject, setObject } from "utils/localStorage";
 import { BuildRow } from "./BuildRow";
 import { BuildVariantProvider } from "./BuildVariantContext";
 import { VERSION_LIMIT } from "./constants";
+import { EmptyState } from "./EmptyState";
 import { FetchMoreLoader } from "./FetchMoreLoader";
 import { InactiveVersionsButton } from "./InactiveVersions";
 import { OnboardingTutorial } from "./OnboardingTutorial";
@@ -118,29 +119,31 @@ export const WaterfallGrid: React.FC<WaterfallGridProps> = ({
   const [serverFilters, setServerFilters] =
     useState<ServerFilters>(resetFilterState);
 
-  const { data } = useSuspenseQuery<WaterfallQuery, WaterfallQueryVariables>(
-    WATERFALL,
-    {
-      variables: {
-        options: {
-          projectIdentifier,
-          limit: VERSION_LIMIT,
-          maxOrder,
-          minOrder,
-          revision,
-          date: utcDate,
-          ...serverFilters,
-        },
+  const { data, dataState } = useSuspenseQuery<
+    WaterfallQuery,
+    WaterfallQueryVariables
+  >(WATERFALL, {
+    variables: {
+      options: {
+        projectIdentifier,
+        limit: VERSION_LIMIT,
+        maxOrder,
+        minOrder,
+        revision,
+        date: utcDate,
+        ...serverFilters,
       },
-      // @ts-expect-error pollInterval isn't officially supported by useSuspenseQuery, but it works so let's use it anyway.
-      pollInterval: DEFAULT_POLL_INTERVAL,
-      nextFetchPolicy: "cache-and-network",
     },
-  );
+    // @ts-expect-error pollInterval isn't officially supported by useSuspenseQuery, but it works so let's use it anyway.
+    pollInterval: DEFAULT_POLL_INTERVAL,
+    nextFetchPolicy: "cache-and-network",
+  });
+  // TODO DEVPROD-26717: This can be removed if the invalid arguments are fixed in useSuspenseQuery.
+  const dataIsComplete = dataState === "complete";
 
   // Erase any order query params if we've reached the first page.
   useEffect(() => {
-    if (minOrder > 0) {
+    if (dataIsComplete && minOrder > 0) {
       const { flattenedVersions, pagination } = data.waterfall;
       const activeVersions = pagination.activeVersionIds;
       const isMostRecentCommitOnPage =
@@ -154,18 +157,22 @@ export const WaterfallGrid: React.FC<WaterfallGridProps> = ({
         });
       }
     }
-  }, [data.waterfall, minOrder, queryParams, setQueryParams]);
+  }, [dataIsComplete, data?.waterfall, minOrder, queryParams, setQueryParams]);
 
   useEffect(() => {
-    setPagination(data.waterfall.pagination);
-  }, [setPagination, data.waterfall.pagination]);
+    if (dataIsComplete) {
+      setPagination(data.waterfall.pagination);
+    }
+  }, [setPagination, dataIsComplete, data?.waterfall?.pagination]);
 
   const refEl = useRef<HTMLDivElement>(null);
   const { height } = useDimensions<HTMLDivElement>(refEl);
 
   const { activeVersionIds, buildVariants, versions } = useFilters({
-    activeVersionIds: data.waterfall.pagination.activeVersionIds,
-    flattenedVersions: data.waterfall.flattenedVersions,
+    activeVersionIds: dataIsComplete
+      ? data.waterfall.pagination.activeVersionIds
+      : [],
+    flattenedVersions: dataIsComplete ? data.waterfall.flattenedVersions : [],
     pins,
   });
 
@@ -203,6 +210,10 @@ export const WaterfallGrid: React.FC<WaterfallGridProps> = ({
 
   const isHighlighted = (v: Version, i: number) =>
     (revision !== null && v.revision.includes(revision)) || (!!date && i === 0);
+
+  if (activeVersionIds.length === 0) {
+    return <EmptyState />;
+  }
 
   return (
     <Container ref={refEl}>

@@ -10,7 +10,6 @@ interface SearchState {
   searchIndex?: number;
   searchRange?: number;
   hasSearch: boolean;
-  caseSensitive: boolean;
 }
 
 interface LogMetadata {
@@ -37,6 +36,7 @@ interface Preferences {
   wrap: boolean;
   zebraStriping: boolean;
   highlightFilters: boolean;
+  stickyHeaders: boolean;
   setCaseSensitive: (caseSensitive: boolean) => void;
   setExpandableRows: (expandableRows: boolean) => void;
   setFilterLogic: (filterLogic: FilterLogic) => void;
@@ -45,6 +45,7 @@ interface Preferences {
   setPrettyPrint: (prettyPrint: boolean) => void;
   setZebraStriping: (zebraStriping: boolean) => void;
   setHighlightFilters: (highlightFilters: boolean) => void;
+  setStickyHeaders: (stickyHeaders: boolean) => void;
 }
 
 enum DIRECTION {

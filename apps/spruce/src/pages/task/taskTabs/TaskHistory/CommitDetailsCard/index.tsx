@@ -1,8 +1,8 @@
 import { forwardRef } from "react";
-import { useMutation } from "@apollo/client";
+import { useMutation } from "@apollo/client/react";
 import styled from "@emotion/styled";
 import { Badge, Variant as BadgeVariant } from "@leafygreen-ui/badge";
-import Button, { Size as ButtonSize } from "@leafygreen-ui/button";
+import { Button, Size as ButtonSize } from "@leafygreen-ui/button";
 import { Chip, Variant as ChipVariant } from "@leafygreen-ui/chip";
 import { IconButton } from "@leafygreen-ui/icon-button";
 import { palette } from "@leafygreen-ui/palette";
@@ -18,6 +18,7 @@ import { useQueryParam } from "@evg-ui/lib/hooks";
 import { TaskStatus } from "@evg-ui/lib/types/task";
 import { shortenGithash } from "@evg-ui/lib/utils/string";
 import { useTaskHistoryAnalytics } from "analytics";
+import SetPriority, { Align } from "components/SetPriority";
 import { inactiveElementStyle } from "components/styles";
 import { statusColorMap } from "components/TaskBox";
 import { getGithubCommitUrl } from "constants/externalResources";
@@ -70,11 +71,13 @@ const CommitDetailsCard = forwardRef<HTMLDivElement, CommitDetailsCardProps>(
       activated,
       canRestart,
       canSchedule,
-      createTime,
+      canSetPriority,
       displayStatus,
       id: taskId,
+      ingestTime,
       latestExecution,
       order,
+      priority,
       revision,
       tests,
       versionMetadata,
@@ -88,8 +91,8 @@ const CommitDetailsCard = forwardRef<HTMLDivElement, CommitDetailsCardProps>(
       : taskId === currentTask.id;
     const isSelectedTask = taskId === selectedTask;
 
-    const createDate = new Date(createTime ?? "");
-    const dateCopy = getDateCopy(createDate, {
+    const ingestDate = new Date(ingestTime ?? "");
+    const dateCopy = getDateCopy(ingestDate, {
       omitSeconds: true,
       omitTimezone: true,
     });
@@ -103,7 +106,6 @@ const CommitDetailsCard = forwardRef<HTMLDivElement, CommitDetailsCardProps>(
       ScheduleTasksMutation,
       ScheduleTasksMutationVariables
     >(SCHEDULE_TASKS, {
-      variables: { taskIds: [taskId], versionId },
       onCompleted: () => {
         const newMap = new Map(expandedTasksMap);
         newMap.delete(task.id);
@@ -118,6 +120,7 @@ const CommitDetailsCard = forwardRef<HTMLDivElement, CommitDetailsCardProps>(
           id: cache.identify(task),
           fields: {
             canSchedule: () => false,
+            canSetPriority: () => true,
             displayStatus: () => TaskStatus.WillRun,
             activated: () => true,
           },
@@ -130,7 +133,6 @@ const CommitDetailsCard = forwardRef<HTMLDivElement, CommitDetailsCardProps>(
       RestartTaskMutation,
       RestartTaskMutationVariables
     >(RESTART_TASK, {
-      variables: { taskId, failedOnly: false },
       onCompleted: (data) => {
         dispatchToast.success("Task scheduled to restart");
         if (isCurrentTask) {
@@ -146,6 +148,7 @@ const CommitDetailsCard = forwardRef<HTMLDivElement, CommitDetailsCardProps>(
             id: cache.identify(task),
             fields: {
               canRestart: () => false,
+              canSetPriority: () => true,
               displayStatus: () => TaskStatus.WillRun,
               execution: (cachedExecution: number) => cachedExecution + 1,
               latestExecution: (cachedExecution: number) => cachedExecution + 1,
@@ -203,7 +206,7 @@ const CommitDetailsCard = forwardRef<HTMLDivElement, CommitDetailsCardProps>(
                   name: "Clicked restart task button",
                   "task.id": taskId,
                 });
-                restartTask();
+                restartTask({ variables: { taskId, failedOnly: false } });
               }}
               size={ButtonSize.XSmall}
             >
@@ -218,7 +221,7 @@ const CommitDetailsCard = forwardRef<HTMLDivElement, CommitDetailsCardProps>(
                   name: "Clicked schedule task button",
                   "task.id": taskId,
                 });
-                scheduleTask();
+                scheduleTask({ variables: { taskIds: [taskId], versionId } });
               }}
               size={ButtonSize.XSmall}
             >
@@ -239,22 +242,43 @@ const CommitDetailsCard = forwardRef<HTMLDivElement, CommitDetailsCardProps>(
               variant={ChipVariant.Gray}
             />
           ) : null}
-          {/* Use this to debug issues with pagination. */}
-          {!isProduction() && <OrderLabel>Order: {order}</OrderLabel>}
+          <PriorityContainer>
+            <SetPriority
+              disabled={!canSetPriority}
+              initialPriority={priority ?? 0}
+              isButton
+              popconfirmAlign={Align.Top}
+              taskIds={[taskId]}
+            />
+            {priority && priority > 0 ? (
+              <Chip
+                data-cy="priority-chip"
+                label={`Priority: ${priority}`}
+                variant={ChipVariant.Gray}
+              />
+            ) : null}
+          </PriorityContainer>
         </TopLabel>
-        {tests.testResults.length > 0 ? (
-          <Accordion
-            caretAlign={AccordionCaretAlign.Start}
-            onToggle={({ isVisible }) =>
-              sendEvent({ name: "Toggled failed tests table", open: isVisible })
-            }
-            title={<CommitDescription author={author} message={message} />}
-          >
-            <FailedTestsTable tests={tests} />
-          </Accordion>
-        ) : (
-          <CommitDescription author={author} message={message} />
-        )}
+        <BottomLabel>
+          {tests.testResults.length > 0 ? (
+            <Accordion
+              caretAlign={AccordionCaretAlign.Start}
+              onToggle={({ isVisible }) =>
+                sendEvent({
+                  name: "Toggled failed tests table",
+                  open: isVisible,
+                })
+              }
+              title={<CommitDescription author={author} message={message} />}
+            >
+              <FailedTestsTable tests={tests} />
+            </Accordion>
+          ) : (
+            <CommitDescription author={author} message={message} />
+          )}
+          {/* Use order label to debug issues with pagination. */}
+          {!isProduction() && <OrderLabel>Order: {order}</OrderLabel>}
+        </BottomLabel>
       </CommitCard>
     );
   },
@@ -292,6 +316,19 @@ const CommitCard = styled.div<{
 `;
 
 const TopLabel = styled.div`
+  display: flex;
+  align-items: center;
+  gap: ${size.xxs};
+`;
+
+const PriorityContainer = styled.div`
+  display: flex;
+  flex-direction: row;
+  gap: ${size.xs};
+  margin-left: auto;
+`;
+
+const BottomLabel = styled.div`
   display: flex;
   align-items: center;
   gap: ${size.xxs};

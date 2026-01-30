@@ -1,5 +1,5 @@
 import { cloneElement, useState } from "react";
-import { useQuery } from "@apollo/client";
+import { useQuery } from "@apollo/client/react";
 import { Menu, MenuItem } from "@leafygreen-ui/menu";
 import { PlusButton, Size, Variant } from "components/Buttons";
 import {
@@ -46,11 +46,10 @@ export const CreateDuplicateProjectButton: React.FC<Props> = ({
     skip: !identifier,
   });
 
-  const {
-    user: {
-      permissions: { canCreateProject, projectPermissions },
-    },
-  } = data ?? { user: { permissions: {} } };
+  const canCreateProject = data?.user?.permissions?.canCreateProject ?? false;
+  const projectPermissions = data?.user?.permissions?.projectPermissions ?? {
+    edit: false,
+  };
 
   const [menuOpen, setMenuOpen] = useState(false);
   const [createModalOpen, setCreateModalOpen] = useState(false);

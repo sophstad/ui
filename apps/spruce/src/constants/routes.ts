@@ -1,4 +1,4 @@
-import { generatePath } from "react-router";
+import { generatePath } from "react-router-dom";
 import { stringifyQuery } from "@evg-ui/lib/src/utils/query-string";
 import { getGithubCommitUrl } from "constants/externalResources";
 import { WaterfallFilterOptions } from "pages/waterfall/types";
@@ -28,6 +28,7 @@ export enum PreferencesTabRoutes {
   CLI = "cli",
   UISettings = "ui-settings",
   PublicKeys = "publickeys",
+  SageBotSettings = "sage-bot-settings",
 }
 
 export enum ImageTabRoutes {
