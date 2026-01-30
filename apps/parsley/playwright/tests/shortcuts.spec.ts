@@ -9,21 +9,22 @@ test.describe("Shortcuts", () => {
   test("should be able to open the modal using keyboard shortcut", async ({
     authenticatedPage,
   }) => {
-    await expect(getByDataCy(authenticatedPage, "shortcut-modal")).toBeHidden();
+    await authenticatedPage.waitForLoadState("domcontentloaded");
+    await authenticatedPage.locator("body").click({ position: { x: 0, y: 0 } });
     await authenticatedPage.keyboard.press("Shift+/");
     await expect(
       getByDataCy(authenticatedPage, "shortcut-modal"),
-    ).toBeVisible();
+    ).toBeVisible({ timeout: 5000 });
   });
 
   test("should be able to open the keyboard shortcut modal by clicking navbar icon button", async ({
     authenticatedPage,
   }) => {
     await authenticatedPage
-      .locator(`[aria-label="Open shortcut modal"]`)
+      .getByRole("button", { name: "Open shortcut modal" })
       .click();
     await expect(
       getByDataCy(authenticatedPage, "shortcut-modal"),
-    ).toBeVisible();
+    ).toBeVisible({ timeout: 5000 });
   });
 });

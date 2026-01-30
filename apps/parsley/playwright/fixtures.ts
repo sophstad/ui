@@ -71,9 +71,9 @@ export const test = base.extend<CustomFixtures>({
     if (mutationDispatched) {
       try {
         console.log("A mutation was detected. Restoring Evergreen.");
-        execSync("yarn evg-db-ops --restore evergreen");
+        execSync("pnpm evg-db-ops --restore evergreen");
         // Reseed after restore to ensure fresh test data for next test
-        execSync("yarn evg-db-ops --reseed-and-dump");
+        execSync("pnpm evg-db-ops --reseed-and-dump");
       } catch (e) {
         console.error("Failed to restore/reseed evergreen database:", e);
       }
