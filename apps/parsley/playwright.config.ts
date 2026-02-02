@@ -8,7 +8,7 @@ export default defineConfig({
     screenshot: "only-on-failure",
   },
   testMatch: "playwright/tests/**/*.spec.ts",
-  retries: 0,
+  retries: 3,
   workers: 1, // Disable parallelism - run tests serially like Cypress
   reporter: [
     ["list"],

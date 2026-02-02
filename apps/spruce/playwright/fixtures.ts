@@ -91,16 +91,16 @@ export const test = base.extend<CustomFixtures>({
           console.log(
             "A mutation that creates an Amboy job was detected. Restoring Amboy.",
           );
-          execSync("yarn evg-db-ops --restore amboy");
+          execSync("pnpm evg-db-ops --restore amboy");
         } catch (e) {
           console.error("Failed to restore amboy database:", e);
         }
       }
       try {
         console.log("A mutation was detected. Restoring Evergreen.");
-        execSync("yarn evg-db-ops --restore evergreen");
+        execSync("pnpm evg-db-ops --restore evergreen");
         // Reseed after restore to ensure fresh test data for next test
-        execSync("yarn evg-db-ops --reseed-and-dump");
+        execSync("pnpm evg-db-ops --reseed-and-dump");
       } catch (e) {
         console.error("Failed to restore/reseed evergreen database:", e);
       }
