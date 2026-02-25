@@ -62,28 +62,26 @@ const LoadingPage: React.FC<LoadingPageProps> = ({ logType }) => {
 
   const handleLogComplete = useCallback(
     (logs: string[]) => {
-      requestAnimationFrame(() => {
-        leaveBreadcrumb(
-          "ingest-log-lines",
-          { logType },
-          SentryBreadcrumbTypes.UI,
-        );
-        setLogMetadata({
-          buildID,
-          execution: execution || String(logkeeperMetadata?.execution || 0),
-          fileName,
-          groupID,
-          htmlLogURL,
-          jobLogsURL,
-          logType,
-          origin,
-          rawLogURL,
-          renderingType,
-          taskID: taskID || logkeeperMetadata?.task_id,
-          testID,
-        });
-        ingestLines(logs, renderingType, failingCommand);
+      leaveBreadcrumb(
+        "ingest-log-lines",
+        { logType },
+        SentryBreadcrumbTypes.UI,
+      );
+      setLogMetadata({
+        buildID,
+        execution: execution || String(logkeeperMetadata?.execution || 0),
+        fileName,
+        groupID,
+        htmlLogURL,
+        jobLogsURL,
+        logType,
+        origin,
+        rawLogURL,
+        renderingType,
+        taskID: taskID || logkeeperMetadata?.task_id,
+        testID,
       });
+      ingestLines(logs, renderingType, failingCommand);
     },
     [
       buildID,

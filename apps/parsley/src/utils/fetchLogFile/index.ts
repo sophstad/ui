@@ -3,7 +3,7 @@ import {
   StreamedFetchOptions,
   streamedFetch,
 } from "@evg-ui/lib/utils/request/streamedFetch";
-import { decodeStream } from "utils/streams";
+import { decodeStream } from "@evg-ui/lib/utils/streams";
 
 /**
  * `fetchLogFile` is a utility function that fetches a log file from the server
