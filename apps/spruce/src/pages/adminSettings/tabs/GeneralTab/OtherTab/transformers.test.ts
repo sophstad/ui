@@ -101,6 +101,9 @@ const mockAdminSettings: AdminSettings = {
     unexpirableVolumesPerUser: 3,
     spawnHostsPerUser: 5,
   },
+  debugSpawnHosts: {
+    setupScript: "echo debug spawn hosts",
+  },
   sleepSchedule: {
     permanentlyExemptHosts: ["build-host-1", "build-host-2"],
   },
@@ -147,6 +150,11 @@ const expectedForm: OtherFormState = {
         financeFormula: 0.5,
         savingsPlanDiscount: 0.1,
         onDemandDiscount: 0.05,
+        s3Cost: {
+          uploadCostDiscount: 0,
+          standardStorageCostDiscount: 0,
+          iAStorageCostDiscount: 0,
+        },
       },
     },
     singleTaskDistro: {
@@ -218,6 +226,9 @@ const expectedForm: OtherFormState = {
       unexpirableHostsPerUser: 2,
       unexpirableVolumesPerUser: 3,
       spawnHostsPerUser: 5,
+    },
+    debugSpawnHostsConfig: {
+      setupScript: "echo debug spawn hosts",
     },
     sleepSchedule: {
       permanentlyExemptHosts: ["build-host-1", "build-host-2"],
@@ -327,11 +338,23 @@ const expectedGql: AdminSettingsInput = {
     financeFormula: 0.5,
     savingsPlanDiscount: 0.1,
     onDemandDiscount: 0.05,
+    s3Cost: {
+      upload: {
+        uploadCostDiscount: undefined,
+      },
+      storage: {
+        standardStorageCostDiscount: undefined,
+        iAStorageCostDiscount: undefined,
+      },
+    },
   },
   spawnhost: {
     unexpirableHostsPerUser: 2,
     unexpirableVolumesPerUser: 3,
     spawnHostsPerUser: 5,
+  },
+  debugSpawnHosts: {
+    setupScript: "echo debug spawn hosts",
   },
   sleepSchedule: {
     permanentlyExemptHosts: ["build-host-1", "build-host-2"],

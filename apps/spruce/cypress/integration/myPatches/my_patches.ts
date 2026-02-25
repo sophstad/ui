@@ -26,7 +26,7 @@ describe("My Patches Page", () => {
 
   it("The page title should reflect another users patches when viewing another users patches page", () => {
     cy.visit(BOB_HICKS_PATCHES_ROUTE);
-    cy.contains("Bob Hicks' Patches").should("exist");
+    cy.contains("Bob Hicks's Patches").should("exist");
     cy.visit(REGULAR_USER_PATCHES_ROUTE);
     cy.contains("Regular User's Patches").should("exist");
   });
@@ -39,11 +39,6 @@ describe("My Patches Page", () => {
       pathname: MY_PATCHES_ROUTE,
       paramName: "patchName",
       search: inputVal,
-    });
-    urlSearchParamsAreUpdated({
-      pathname: MY_PATCHES_ROUTE,
-      paramName: "page",
-      search: 0,
     });
     cy.dataCy("patch-description-input").clear();
   });

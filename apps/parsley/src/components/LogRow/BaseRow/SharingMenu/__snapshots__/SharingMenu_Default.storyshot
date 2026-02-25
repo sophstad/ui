@@ -4,7 +4,7 @@
     aria-expanded="false"
     aria-haspopup="true"
     aria-label="Expand share menu"
-    class="emotion-MenuIcon ev9qq3j1 leafygreen-ui-1r51ix4"
+    class="emotion-MenuIcon ev9qq3j1 leafygreen-ui-1o2ji0h"
     data-cy="sharing-menu-button"
     tabindex="0"
   >
@@ -12,8 +12,11 @@
       class="leafygreen-ui-xhlipt"
     >
       <svg
+        aria-label="Ellipsis Icon"
+        class=""
         fill="none"
         height="16"
+        role="img"
         viewBox="0 0 16 16"
         width="16"
         xmlns="http://www.w3.org/2000/svg"

@@ -4,7 +4,7 @@
     data-cy="event-log"
   >
     <div
-      class="emotion-EventLogCard er8squx0 leafygreen-ui-1nx5jqg"
+      class="emotion-EventLogCard er8squx0 leafygreen-ui-17q42jt"
       data-cy="event-log-card"
     >
       <div
@@ -57,7 +57,7 @@
                   <button
                     aria-disabled="false"
                     aria-label="Sort by Property"
-                    class="leafygreen-ui-1r51ix4"
+                    class="leafygreen-ui-1o2ji0h"
                     data-lgid="lg-table-sort_button"
                     data-testid="lg-table-sort_button"
                     tabindex="0"

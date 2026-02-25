@@ -4,7 +4,7 @@ import CustomCreatedTickets from "./CustomCreatedTickets";
 
 export default {
   component: CustomCreatedTickets,
-  decorators: [(Story: () => JSX.Element) => WithToastContext(Story)],
+  decorators: [(Story: () => React.JSX.Element) => WithToastContext(Story)],
 } satisfies CustomMeta<typeof CustomCreatedTickets>;
 
 export const Default: CustomStoryObj<typeof CustomCreatedTickets> = {
@@ -31,7 +31,7 @@ export const Default: CustomStoryObj<typeof CustomCreatedTickets> = {
             assignedTeam: "evg-ui",
           },
         },
-        url: "https://spruce.mongodb.com",
+        url: "https://spruce.corp.mongodb.com",
       },
       {
         confidenceScore: 0.5,
@@ -50,7 +50,7 @@ export const Default: CustomStoryObj<typeof CustomCreatedTickets> = {
             assignedTeam: "evg-ui",
           },
         },
-        url: "https://spruce.mongodb.com",
+        url: "https://spruce.corp.mongodb.com",
       },
     ],
   },

@@ -1,4 +1,3 @@
-import { MockedProvider, MockedResponse } from "@apollo/client/testing";
 import { GraphQLError } from "graphql";
 import { RenderFakeToastContext } from "@evg-ui/lib/context/toast/__mocks__";
 import {
@@ -7,10 +6,13 @@ import {
 } from "@evg-ui/lib/gql/generated/types";
 import { UPDATE_USER_BETA_FEATURES } from "@evg-ui/lib/gql/mutations";
 import {
+  MockedProvider,
+  MockedResponse,
   render,
   screen,
   stubGetClientRects,
   userEvent,
+  waitFor,
 } from "@evg-ui/lib/test_utils";
 import { ApolloMock } from "@evg-ui/lib/test_utils/types";
 import * as analytics from "analytics";
@@ -18,9 +20,7 @@ import { ParsleyAIModal } from ".";
 
 const wrapper = (mocks: MockedResponse[] = []) => {
   const renderContent = ({ children }: React.PropsWithChildren) => (
-    <MockedProvider addTypename={false} mocks={mocks}>
-      {children}
-    </MockedProvider>
+    <MockedProvider mocks={mocks}>{children}</MockedProvider>
   );
   return renderContent;
 };
@@ -55,7 +55,9 @@ describe("parsley AI modal", () => {
     render(<Component />, { wrapper: wrapper([updateBetaFeaturesMock]) });
 
     await user.click(screen.getByRole("button", { name: "Enable it!" }));
-    expect(mockSetOpen).toHaveBeenCalledTimes(1);
+    await waitFor(() => {
+      expect(mockSetOpen).toHaveBeenCalledTimes(1);
+    });
     expect(mockSetOpen).toHaveBeenCalledWith(false);
     expect(mockSendEvent).toHaveBeenCalledTimes(1);
     expect(mockSendEvent).toHaveBeenCalledWith({
@@ -77,7 +79,9 @@ describe("parsley AI modal", () => {
     render(<Component />, { wrapper: wrapper([updateBetaFeaturesErrorMock]) });
 
     await user.click(screen.getByRole("button", { name: "Enable it!" }));
-    expect(dispatchToast.error).toHaveBeenCalledTimes(1);
+    await waitFor(() => {
+      expect(dispatchToast.error).toHaveBeenCalledTimes(1);
+    });
     expect(mockSetOpen).toHaveBeenCalledTimes(1);
     expect(mockSetOpen).toHaveBeenCalledWith(false);
     expect(mockSendEvent).toHaveBeenCalledTimes(1);

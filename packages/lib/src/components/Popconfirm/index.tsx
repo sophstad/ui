@@ -1,8 +1,8 @@
 import { useEffect, useRef, useState } from "react";
 import styled from "@emotion/styled";
-import Button from "@leafygreen-ui/button";
+import { Button } from "@leafygreen-ui/button";
 import { Tooltip, TooltipProps, Align, Justify } from "@leafygreen-ui/tooltip";
-import { size, zIndex } from "../../constants/tokens";
+import { size } from "../../constants/tokens";
 import { wordBreakCss } from "../styles";
 
 export { Align, Justify };
@@ -63,7 +63,6 @@ const Popconfirm: React.FC<PopconfirmProps> = ({
     <Tooltip
       onClose={onClose}
       open={open}
-      popoverZIndex={zIndex.popover}
       refEl={refEl}
       setOpen={setOpen}
       triggerEvent="click"
@@ -73,6 +72,7 @@ const Popconfirm: React.FC<PopconfirmProps> = ({
         {children}
         <ButtonWrapper>
           <Button
+            as="button"
             onClick={() => {
               onClose();
               setOpen(false);
@@ -82,6 +82,7 @@ const Popconfirm: React.FC<PopconfirmProps> = ({
             Cancel
           </Button>
           <Button
+            as="button"
             disabled={confirmDisabled}
             onClick={(e) => {
               onConfirm(e);

@@ -1,6 +1,5 @@
 import styled from "@emotion/styled";
 import { Badge, Variant } from "@leafygreen-ui/badge";
-import { Theme } from "@leafygreen-ui/lib";
 import { color } from "@leafygreen-ui/tokens";
 import { Body, InlineCode } from "@leafygreen-ui/typography";
 import { Link } from "react-router-dom";
@@ -8,6 +7,7 @@ import { wordBreakCss } from "@evg-ui/lib/components/styles";
 import { size as sizeToken } from "@evg-ui/lib/constants/tokens";
 import { shortenGithash } from "@evg-ui/lib/utils/string";
 import { useWaterfallAnalytics } from "analytics";
+import { Requester } from "constants/requesters";
 import { getVersionRoute } from "constants/routes";
 import { useSpruceConfig, useDateFormat } from "hooks";
 import { jiraLinkify } from "utils/string";
@@ -31,7 +31,6 @@ type Props = Version & {
 
 export const VersionLabel: React.FC<Props> = ({
   activated,
-  author,
   className,
   createTime,
   errors,
@@ -40,8 +39,10 @@ export const VersionLabel: React.FC<Props> = ({
   id,
   isFirstVersion,
   message,
+  requester,
   revision,
   shouldDisableText = false,
+  user,
   view,
 }) => {
   const getDateCopy = useDateFormat();
@@ -91,13 +92,17 @@ export const VersionLabel: React.FC<Props> = ({
           <TaskStatsTooltip id={id} isFirstVersion={isFirstVersion} />
         )}
       </HeaderLine>
-      <UpstreamProjectLink commitType={commitType} versionId={id} />
+      <UpstreamProjectLink
+        commitType={commitType}
+        isTrigger={requester === Requester.Trigger}
+        versionId={id}
+      />
       <CommitMessage
         /* @ts-expect-error - the native title attribute works here */
         title={view === VersionLabelView.Waterfall ? message : undefined}
         view={view}
       >
-        <strong>{author}</strong> &bull;{" "}
+        <strong>{user.displayName}</strong> &bull;{" "}
         {jiraLinkify(message, jiraHost, () => {
           sendEvent({
             name: "Clicked commit label",
@@ -127,14 +132,13 @@ const VersionContainer = styled.div<
       : !activated &&
         shouldDisableText &&
         `> * {
-      color: ${color[Theme.Light].text.disabled.default};}`}
+      color: ${color.light.text.disabled.default};}`}
 
   p {
     ${wordBreakCss}
   }
   ${({ highlighted }) =>
-    highlighted &&
-    `background-color: ${color[Theme.Light].background.primary.focus};`}
+    highlighted && `background-color: ${color.light.background.primary.focus};`}
 `;
 
 const CommitMessage = styled(Body)<{ view: VersionLabelView }>`

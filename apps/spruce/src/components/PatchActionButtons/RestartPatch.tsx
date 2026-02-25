@@ -1,9 +1,9 @@
 import { useState } from "react";
-import Button, { Size as ButtonSize } from "@leafygreen-ui/button";
+import { SplitButton } from "@leafygreen-ui/split-button";
 import { Tooltip, Align, Justify } from "@leafygreen-ui/tooltip";
-import { zIndex } from "@evg-ui/lib/constants/tokens";
 import { DropdownItem } from "components/ButtonDropdown";
 import { VersionRestartModal } from "components/VersionRestartModal";
+import { RestartFailedTasks } from "./RestartFailedTasks";
 
 interface RestartPatchProps {
   disabled?: boolean;
@@ -40,17 +40,23 @@ export const RestartPatch: React.FC<RestartPatchProps> = ({
         align={isButton ? Align.Top : Align.Left}
         enabled={disabled}
         justify={Justify.End}
-        popoverZIndex={zIndex.tooltip}
         trigger={
           isButton ? (
-            <Button
+            <SplitButton
               data-cy="restart-version"
               disabled={disabled}
+              label="Restart"
+              menuItems={[
+                <RestartFailedTasks
+                  key="restart-failed"
+                  disabled={disabled}
+                  patchId={patchId}
+                  refetchQueries={refetchQueries}
+                />,
+              ]}
               onClick={onClick}
-              size={ButtonSize.Small}
-            >
-              Restart
-            </Button>
+              size="small"
+            />
           ) : (
             <span>
               <DropdownItem

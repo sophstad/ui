@@ -1,6 +1,6 @@
 import { useState } from "react";
 import styled from "@emotion/styled";
-import Button from "@leafygreen-ui/button";
+import { Button } from "@leafygreen-ui/button";
 import {
   SegmentedControl,
   SegmentedControlOption,
@@ -149,7 +149,9 @@ const Logs: React.FC<Props> = ({ execution, logLinks, taskId }) => {
           </ButtonContainer>
         )}
       </LogHeader>
-      {LogComp && <LogComp setNoLogs={setNoLogs} />}
+      {LogComp && (
+        <LogComp execution={execution} setNoLogs={setNoLogs} taskId={taskId} />
+      )}
     </LogContainer>
   );
 };

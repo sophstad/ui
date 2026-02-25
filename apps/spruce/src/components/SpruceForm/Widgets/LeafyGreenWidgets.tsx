@@ -20,7 +20,7 @@ import { Toggle } from "@leafygreen-ui/toggle";
 import { Tooltip } from "@leafygreen-ui/tooltip";
 import { Description, Label } from "@leafygreen-ui/typography";
 import Icon from "@evg-ui/lib/components/Icon";
-import { size, zIndex } from "@evg-ui/lib/constants/tokens";
+import { size } from "@evg-ui/lib/constants/tokens";
 import { OneOf } from "@evg-ui/lib/types/utils";
 import ElementWrapper from "../ElementWrapper";
 import { EnumSpruceWidgetProps, SpruceWidgetProps } from "./types";
@@ -66,6 +66,7 @@ export const LeafyGreenTextInput: React.FC<
       <StyledTextInput
         aria-label={ariaLabel}
         aria-labelledby={ariaLabelledBy}
+        autoComplete="off"
         data-cy={dataCy}
         description={description}
         disabled={disabled || readonly}
@@ -131,7 +132,6 @@ export const LeafyGreenCheckBox: React.FC<SpruceWidgetProps> = ({
             {tooltipDescription && (
               <Tooltip
                 justify="middle"
-                popoverZIndex={zIndex.tooltip}
                 trigger={
                   <IconContainer>
                     <Icon glyph="InfoWithCircle" size="small" />
@@ -263,9 +263,8 @@ export const LeafyGreenSelect: React.FC<
         errorMessage={hasError ? rawErrors?.join(", ") : ""}
         id={dataCy}
         name={dataCy}
-        onChange={onChange}
+        onChange={(v: string) => onChange(v)}
         placeholder={placeholder}
-        popoverZIndex={zIndex.dropdown}
         size={sizeVariant as SelectSize}
         state={hasError && !disabled ? "error" : "none"}
       >
@@ -360,7 +359,9 @@ export const LeafyGreenRadio: React.FC<EnumSpruceWidgetProps> = ({
 };
 
 export const LeafyGreenRadioBox: React.FC<
-  { options: { description: string | JSX.Element } } & EnumSpruceWidgetProps
+  {
+    options: { description: string | React.JSX.Element };
+  } & EnumSpruceWidgetProps
 > = ({ disabled, id, label, onChange, options, uiSchema, value }) => {
   const {
     "data-cy": dataCy,

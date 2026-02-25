@@ -1,12 +1,13 @@
 import { ChangeEvent, FormEvent, useCallback, useEffect } from "react";
 import styled from "@emotion/styled";
 import { Badge, Variant as BadgeVariant } from "@leafygreen-ui/badge";
-import { Chat, MessageRatingValue } from "@evg-ui/fungi/Chat";
-import { ChatDrawer } from "@evg-ui/fungi/ChatDrawer";
 import {
+  Chat,
+  ChatDrawer,
   ChatProvider as FungiProvider,
+  MessageRatingValue,
   useChatContext,
-} from "@evg-ui/fungi/Context";
+} from "@evg-ui/fungi";
 import { size } from "@evg-ui/lib/constants/tokens";
 import { post } from "@evg-ui/lib/utils/request/post";
 import { useAIAgentAnalytics } from "analytics";
@@ -26,7 +27,7 @@ export const Chatbot: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
   const { sendEvent } = useAIAgentAnalytics();
-  const { logMetadata } = useLogContext();
+  const { logMetadata, openSectionAndScrollToLine } = useLogContext();
   const { drawerOpen } = useChatContext();
   const { execution, fileName, groupID, logType, origin, taskID, testID } =
     logMetadata ?? {};
@@ -105,12 +106,28 @@ export const Chatbot: React.FC<{ children: React.ReactNode }> = ({
           handleRatingChange={handleFeedback}
           handleSubmitFeedback={handleFeedback}
           loginUrl={loginURL}
+          onChipClick={(chip) => {
+            const lineNumber = chip.metadata?.startingLine;
+            if (typeof lineNumber === "number") {
+              openSectionAndScrollToLine(lineNumber);
+            }
+          }}
           onClickCopy={handleCopy}
           onClickSuggestion={(suggestion) => {
             sendEvent({ name: "Clicked suggestion", suggestion });
           }}
           onSendMessage={(message) => {
             sendEvent({ message, name: "Interacted with Parsley AI" });
+          }}
+          transformMessage={(message, { pendingChips: chips }) => {
+            let transformed = message;
+            if (chips && chips.length > 0) {
+              const contextText = chips
+                .map((chip) => `[${chip.badgeLabel}]: ${chip.content}`)
+                .join("\n");
+              transformed = `${message}\nThe user also supplied the following lines as context for their query:\n${contextText}`;
+            }
+            return transformed;
           }}
         />
       }

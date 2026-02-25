@@ -1,6 +1,6 @@
 import styled from "@emotion/styled";
 import { palette } from "@leafygreen-ui/palette";
-import { H2, H2Props, Body, BodyProps } from "@leafygreen-ui/typography";
+import { H2, Body } from "@leafygreen-ui/typography";
 import { size, fontSize } from "@evg-ui/lib/constants/tokens";
 
 const { gray, red } = palette;
@@ -50,11 +50,9 @@ export const PageLayout = styled.section<{ hasSider?: boolean }>`
 export const siderCardWidth = 275;
 
 export const PageSider = styled.aside<{ width?: number }>`
-  ${({ width = siderCardWidth }) => `
-   max-width: ${width}px;
-   min-width: ${width}px;
-   width: ${width}px;
-   `}
+  max-width: ${({ width }) => width ?? siderCardWidth}px;
+  min-width: ${({ width }) => width ?? siderCardWidth}px;
+  width: ${({ width }) => width ?? siderCardWidth}px;
 `;
 export const PageContent = styled.main`
   flex: auto;
@@ -62,9 +60,7 @@ export const PageContent = styled.main`
   overflow: hidden;
 `;
 
-PageSider.defaultProps = { width: siderCardWidth };
-
-export const PageTitle = styled(H2)<H2Props>`
+export const PageTitle = styled(H2)`
   margin-bottom: ${size.s};
 `;
 
@@ -84,6 +80,6 @@ export const InputLabel = styled.label`
   color: ${gray.dark2};
 `;
 
-export const ErrorMessage = styled(Body)<BodyProps>`
+export const ErrorMessage = styled(Body)`
   color: ${red.base};
 `;

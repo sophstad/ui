@@ -3,18 +3,18 @@
 import {
   composeStories,
   Meta,
-  setProjectAnnotations,
   StoryFn,
+  setProjectAnnotations,
 } from "@storybook/react-vite";
 import { expect } from "vitest";
 import path from "path";
-import { projectAnnotations } from "@evg-ui/storybook-addon";
+import * as addonAnnotations from "@evg-ui/storybook-addon/src/preview";
 import { act, render } from "test_utils";
 import snapshotSerializer from "test_utils/snapshotSerializer";
+import * as libPreview from "../.storybook/preview";
 
 expect.addSnapshotSerializer(snapshotSerializer);
-
-setProjectAnnotations([projectAnnotations]);
+setProjectAnnotations([addonAnnotations, libPreview]);
 
 type StoryFile = {
   default: Meta;
@@ -125,8 +125,9 @@ describe(`${options.suite}`, () => {
         it(`${name}`, async () => {
           const { container } = render(story());
           await act(async () => {
+            // Wait for GraphQL queries to resolve with MockLink's default delay.
             await new Promise((resolve) => {
-              setTimeout(resolve, 0);
+              setTimeout(resolve, 100);
             });
           });
           const storyDirectory = path.dirname(filePath);

@@ -1,4 +1,4 @@
-import { useQuery } from "@apollo/client";
+import { useQuery } from "@apollo/client/react";
 import { useAnalyticsRoot } from "@evg-ui/lib/analytics/hooks";
 import { AnalyticsIdentifier } from "analytics/types";
 import {
@@ -40,6 +40,10 @@ type Action =
   | {
       name: "Clicked restart tasks button";
       abort: boolean;
+      "task.modified_count": number;
+    }
+  | {
+      name: "Clicked restart failed tasks button";
       "task.modified_count": number;
     }
   | { name: "Clicked schedule tasks button"; "task.scheduled_count": number }

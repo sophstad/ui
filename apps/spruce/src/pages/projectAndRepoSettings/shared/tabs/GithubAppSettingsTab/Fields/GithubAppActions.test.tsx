@@ -1,10 +1,11 @@
-import { MockedProvider } from "@apollo/client/testing";
 import { FieldProps } from "@rjsf/core";
 import { RenderFakeToastContext } from "@evg-ui/lib/context/toast/__mocks__";
 import {
+  MockedProvider,
   renderWithRouterMatch as render,
   screen,
   userEvent,
+  waitFor,
 } from "@evg-ui/lib/test_utils";
 import { ApolloMock } from "@evg-ui/lib/test_utils/types";
 import {
@@ -72,9 +73,11 @@ describe("githubAppActions", () => {
       });
       expect(deleteButton).toBeEnabled();
       await user.click(deleteButton);
-      expect(dispatchToast.success).toHaveBeenCalledWith(
-        "GitHub app credentials were successfully deleted.",
-      );
+      await waitFor(() => {
+        expect(dispatchToast.success).toHaveBeenCalledWith(
+          "GitHub app credentials were successfully deleted.",
+        );
+      });
     });
   });
 });

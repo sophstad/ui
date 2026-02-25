@@ -8,7 +8,7 @@
       <button
         aria-disabled="false"
         aria-label="Accordion icon"
-        class="emotion-AccordionIcon e1omze813 leafygreen-ui-1r51ix4"
+        class="emotion-AccordionIcon e1omze813 leafygreen-ui-1o2ji0h"
         open=""
         style="align-self: start;"
         tabindex="0"
@@ -51,7 +51,7 @@
             aria-disabled="false"
             aria-label="Hide filter"
             aria-labelledby=":rc:"
-            class="lg-ui-toggle-button-0000 leafygreen-ui-16u1u0t"
+            class="lg-ui-toggle-button-0000 leafygreen-ui-1cvury1"
             data-lgid="lg-toggle"
             data-testid="lg-toggle"
             role="switch"
@@ -65,7 +65,7 @@
           <button
             aria-disabled="false"
             aria-label="Edit filter"
-            class="leafygreen-ui-1r51ix4"
+            class="leafygreen-ui-1o2ji0h"
             tabindex="0"
             title="Edit filter"
           >
@@ -73,8 +73,11 @@
               class="leafygreen-ui-xhlipt"
             >
               <svg
-                fill="#889397"
+                aria-label="Edit Icon"
+                class="leafygreen-ui-a4wnk0"
+                fill="none"
                 height="16"
+                role="img"
                 viewBox="0 0 16 16"
                 width="16"
                 xmlns="http://www.w3.org/2000/svg"
@@ -89,7 +92,7 @@
           <button
             aria-disabled="false"
             aria-label="Delete filter"
-            class="leafygreen-ui-1r51ix4"
+            class="leafygreen-ui-1o2ji0h"
             tabindex="0"
             title="Delete filter"
           >
@@ -97,10 +100,13 @@
               class="leafygreen-ui-xhlipt"
             >
               <svg
-                fill="#889397"
+                aria-label="X Icon"
+                class="leafygreen-ui-a4wnk0"
+                fill="none"
                 height="16"
+                role="img"
                 viewBox="0 0 16 16"
-                width="17"
+                width="16"
                 xmlns="http://www.w3.org/2000/svg"
               >
                 <path
@@ -135,8 +141,8 @@
               Case
             </div>
             <div
-              aria-label="segmented-control-34"
-              aria-owns="segmented-control-34-0 segmented-control-34-1"
+              aria-label="segmented-control-17"
+              aria-owns="segmented-control-17-0 segmented-control-17-1"
               class="leafygreen-ui-1698cdy"
               role="tablist"
             >
@@ -151,8 +157,8 @@
                   <button
                     aria-controls="Toggle case sensitivity"
                     aria-selected="false"
-                    class="leafygreen-ui-qlnhrg"
-                    id="segmented-control-34-0"
+                    class="leafygreen-ui-zcita1"
+                    id="segmented-control-17-0"
                     role="tab"
                     tabindex="-1"
                     type="button"
@@ -180,8 +186,8 @@
                   <button
                     aria-controls="Toggle case sensitivity"
                     aria-selected="true"
-                    class="leafygreen-ui-qlnhrg"
-                    id="segmented-control-34-1"
+                    class="leafygreen-ui-zcita1"
+                    id="segmented-control-17-1"
                     role="tab"
                     tabindex="0"
                     type="button"
@@ -215,8 +221,8 @@
               Match
             </div>
             <div
-              aria-label="segmented-control-35"
-              aria-owns="segmented-control-35-0 segmented-control-35-1"
+              aria-label="segmented-control-18"
+              aria-owns="segmented-control-18-0 segmented-control-18-1"
               class="leafygreen-ui-1698cdy"
               role="tablist"
             >
@@ -231,8 +237,8 @@
                   <button
                     aria-controls="Toggle match type"
                     aria-selected="true"
-                    class="leafygreen-ui-qlnhrg"
-                    id="segmented-control-35-0"
+                    class="leafygreen-ui-zcita1"
+                    id="segmented-control-18-0"
                     role="tab"
                     tabindex="0"
                     type="button"
@@ -260,8 +266,8 @@
                   <button
                     aria-controls="Toggle match type"
                     aria-selected="false"
-                    class="leafygreen-ui-qlnhrg"
-                    id="segmented-control-35-1"
+                    class="leafygreen-ui-zcita1"
+                    id="segmented-control-18-1"
                     role="tab"
                     tabindex="-1"
                     type="button"

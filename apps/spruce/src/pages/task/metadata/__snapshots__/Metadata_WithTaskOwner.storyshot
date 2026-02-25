@@ -3,7 +3,7 @@
     class="emotion-0"
   >
     <div
-      class="emotion-SiderCard e1am38ss0 leafygreen-ui-1nx5jqg"
+      class="emotion-SiderCard e1am38ss0 leafygreen-ui-17q42jt"
     >
       <p
         class="emotion-MetadataCardTitle e1130wzj2 leafygreen-ui-53k4vi"
@@ -89,7 +89,7 @@
             href="/task/spruce_ubuntu1604_e2e_test_e0ece5ad52ad01630bdf29f55b9382a26d6256b3_20_08_26_19_20_41"
           >
             <code
-              class="leafygreen-ui-i6ovbf"
+              class="leafygreen-ui-7hb0hw"
             >
               e0ece5a
             </code>
@@ -143,7 +143,7 @@
         <button
           aria-disabled="true"
           aria-label="more info"
-          class="leafygreen-ui-1vktzzb"
+          class="leafygreen-ui-149kr66"
           data-testid="info-sprinkle-icon"
           type="button"
         >
@@ -188,7 +188,7 @@
             <button
               aria-disabled="true"
               aria-label="more info"
-              class="leafygreen-ui-1vktzzb"
+              class="leafygreen-ui-149kr66"
               data-testid="info-sprinkle-icon"
               type="button"
             >
@@ -222,7 +222,7 @@
       </span>
     </div>
     <div
-      class="emotion-SiderCard e1am38ss0 leafygreen-ui-1nx5jqg"
+      class="emotion-SiderCard e1am38ss0 leafygreen-ui-17q42jt"
     >
       <p
         class="emotion-MetadataCardTitle e1130wzj2 leafygreen-ui-53k4vi"
@@ -277,7 +277,7 @@
             <button
               aria-disabled="false"
               aria-label="Copy text to clipboard"
-              class="emotion-StyledIconButton e1i52nq80 leafygreen-ui-12yvaoo"
+              class="emotion-StyledIconButton e1i52nq80 leafygreen-ui-ypejx5"
               data-cy="copy-button"
               tabindex="0"
             >
@@ -285,8 +285,11 @@
                 class="leafygreen-ui-xhlipt"
               >
                 <svg
+                  aria-label="Copy Icon"
+                  class=""
                   fill="none"
                   height="16"
+                  role="img"
                   viewBox="0 0 16 16"
                   width="16"
                   xmlns="http://www.w3.org/2000/svg"
@@ -324,7 +327,7 @@
       </span>
     </div>
     <div
-      class="emotion-SiderCard e1am38ss0 leafygreen-ui-1nx5jqg"
+      class="emotion-SiderCard e1am38ss0 leafygreen-ui-17q42jt"
     >
       <div
         class="emotion-CardHeader e1h3ssq00"
@@ -338,7 +341,7 @@
           aria-disabled="false"
           aria-expanded="false"
           aria-haspopup="true"
-          class="lg-ui-button-0000 leafygreen-ui-168frnw"
+          class="lg-ui-button-0000 leafygreen-ui-ys0yem"
           data-lgid="lg-button"
           type="button"
         >
@@ -426,7 +429,7 @@
       </span>
     </div>
     <div
-      class="emotion-SiderCard e1am38ss0 leafygreen-ui-1nx5jqg"
+      class="emotion-SiderCard e1am38ss0 leafygreen-ui-17q42jt"
     >
       <p
         class="emotion-MetadataCardTitle e1130wzj2 leafygreen-ui-53k4vi"
@@ -541,7 +544,7 @@
       </span>
     </div>
     <div
-      class="emotion-SiderCard e1am38ss0 leafygreen-ui-1nx5jqg"
+      class="emotion-SiderCard e1am38ss0 leafygreen-ui-17q42jt"
     >
       <p
         class="emotion-MetadataCardTitle e1130wzj2 leafygreen-ui-53k4vi"

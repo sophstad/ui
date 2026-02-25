@@ -25,6 +25,10 @@ query SpruceConfig {
         }
       }
     }
+    serviceFlags {
+      debugSpawnHostDisabled
+      jwtTokenForCLIDisabled
+    }
     slack {
       name
     }

@@ -10,9 +10,9 @@ query TaskHistory($options: TaskHistoryOpts!) {
       canRestart
       canSchedule
       canSetPriority
-      createTime
       displayStatus
       execution
+      ingestTime
       latestExecution
       order
       priority
@@ -29,8 +29,11 @@ query TaskHistory($options: TaskHistoryOpts!) {
       }
       versionMetadata {
         id
-        author
         message
+        user {
+          displayName
+          userId
+        }
       }
     }
   }

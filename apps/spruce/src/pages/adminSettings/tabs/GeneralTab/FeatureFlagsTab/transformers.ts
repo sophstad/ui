@@ -57,6 +57,11 @@ export const gqlToForm = ((data) => ({
       staticAPIKeysDisabled: data.serviceFlags?.staticAPIKeysDisabled ?? false,
       elasticIPsDisabled: data.serviceFlags?.elasticIPsDisabled ?? false,
       releaseModeDisabled: data.serviceFlags?.releaseModeDisabled ?? false,
+      debugSpawnHostDisabled:
+        data.serviceFlags?.debugSpawnHostDisabled ?? false,
+      psLoggingDisabled: data.serviceFlags?.psLoggingDisabled ?? false,
+      useMergeQueuePathFilteringDisabled:
+        data.serviceFlags?.useMergeQueuePathFilteringDisabled ?? false,
     },
 
     batchJobs: {
@@ -65,6 +70,8 @@ export const gqlToForm = ((data) => ({
       cacheStatsJobDisabled: data.serviceFlags?.cacheStatsJobDisabled ?? false,
       cacheStatsEndpointDisabled:
         data.serviceFlags?.cacheStatsEndpointDisabled ?? false,
+      s3LifecycleSyncDisabled:
+        data.serviceFlags?.s3LifecycleSyncDisabled ?? false,
     },
   },
 })) satisfies GqlToFormFunction<Tab>;

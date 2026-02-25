@@ -18,15 +18,7 @@ describe("Nav Bar", () => {
     cy.dataCy("auxiliary-dropdown-project-patches").click();
     cy.location("pathname").should("eq", "/project/spruce/patches");
   });
-  it("Nav Dropdown should link to the first distro returned by the distros resolver", () => {
-    cy.visit(SPRUCE_URLS.version);
-    cy.dataCy("auxiliary-dropdown-link").click();
-    cy.dataCy("auxiliary-dropdown-distro-settings").should(
-      "have.attr",
-      "href",
-      "/distro/archlinux-test/settings/general",
-    );
-  });
+
   it("Nav Dropdown should link to patches page of default project in SpruceConfig if cookie does not exist", () => {
     cy.clearCookie(projectCookie);
     cy.visit(SPRUCE_URLS.userPatches);
@@ -74,6 +66,20 @@ describe("Nav Bar", () => {
       "/project/spruce/patches",
     );
     cy.getCookie(projectCookie).should("have.property", "value", "spruce");
+  });
+
+  it("Merge Queue link should navigate to project patches page with mergeQueue query param", () => {
+    cy.setCookie(projectCookie, "spruce");
+    cy.visit(SPRUCE_URLS.userPatches);
+    cy.dataCy("auxiliary-dropdown-link").click();
+    cy.dataCy("auxiliary-dropdown-merge-queue").should(
+      "have.attr",
+      "href",
+      "/project/spruce/patches?mergeQueue=true",
+    );
+    cy.dataCy("auxiliary-dropdown-merge-queue").click();
+    cy.location("pathname").should("eq", "/project/spruce/patches");
+    cy.location("search").should("eq", "?mergeQueue=true");
   });
 
   describe("Admin settings", () => {

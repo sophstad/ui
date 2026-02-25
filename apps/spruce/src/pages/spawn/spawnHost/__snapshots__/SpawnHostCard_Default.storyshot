@@ -1,6 +1,6 @@
 <div>
   <div
-    class="emotion-CardContainer e9wutqn0 leafygreen-ui-1nx5jqg"
+    class="emotion-CardContainer e9wutqn0 leafygreen-ui-17q42jt"
     data-cy="spawn-host-card"
   >
     <div
@@ -218,7 +218,7 @@
           <button
             aria-disabled="true"
             aria-label="more info"
-            class="leafygreen-ui-1vktzzb"
+            class="leafygreen-ui-149kr66"
             data-testid="info-sprinkle-icon"
             type="button"
           >

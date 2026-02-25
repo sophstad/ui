@@ -8,17 +8,17 @@
       data-testid="lg-select"
     >
       <button
-        aria-controls="select-24-menu"
-        aria-describedby="select-24-description"
+        aria-controls="select-11-menu"
+        aria-describedby="select-11-description"
         aria-disabled="false"
         aria-expanded="false"
         aria-invalid="false"
         aria-labelledby="searchbar-select"
-        class="lg-ui-button-0000 leafygreen-ui-1p6i2zy"
+        class="lg-ui-button-0000 leafygreen-ui-q3iwhh"
         data-cy="searchbar-select"
         data-lgid="lg-select-trigger"
         data-testid="leafygreen-ui-select-menubutton"
-        id="select-25"
+        id="select-12"
         type="button"
         value="filter"
       >
@@ -75,7 +75,7 @@
         <button
           aria-disabled="false"
           aria-labelledby="View search suggestions"
-          class="leafygreen-ui-1r51ix4"
+          class="leafygreen-ui-1o2ji0h"
           data-cy="search-suggestion-button"
           tabindex="0"
           title="View search suggestions"
@@ -84,8 +84,11 @@
             class="leafygreen-ui-xhlipt"
           >
             <svg
-              fill="#889397"
+              aria-label="Bulb Icon"
+              class="leafygreen-ui-a4wnk0"
+              fill="none"
               height="16"
+              role="img"
               viewBox="0 0 16 16"
               width="16"
               xmlns="http://www.w3.org/2000/svg"
@@ -100,8 +103,11 @@
               />
             </svg>
             <svg
-              fill="#889397"
+              aria-label="Caret Down Icon"
+              class="leafygreen-ui-a4wnk0"
+              fill="none"
               height="16"
+              role="img"
               viewBox="0 0 16 16"
               width="16"
               xmlns="http://www.w3.org/2000/svg"
@@ -130,7 +136,7 @@
             class="leafygreen-ui-1iyoj2o"
           />
           <div
-            class="leafygreen-ui-14vpn2b"
+            class="leafygreen-ui-ogxdmc"
           >
             <div
               class="leafygreen-ui-1ago99h"
@@ -143,7 +149,7 @@
                 autocomplete="on"
                 class="lg-ui-form-field-input-0000 leafygreen-ui-1ago99h"
                 data-cy="searchbar-input"
-                id="lg-form_field-input-29"
+                id="lg-form_field-input-16"
                 placeholder="optional, regexp to search"
                 required=""
                 spellcheck="false"
@@ -158,7 +164,7 @@
             class="leafygreen-ui-11ydt2g"
             data-lgid="lg-text_input-feedback"
             data-testid="lg-text_input-feedback"
-            id="lg-form_field-feedback-28"
+            id="lg-form_field-feedback-15"
           />
         </div>
       </div>
@@ -168,7 +174,7 @@
         <button
           aria-disabled="true"
           aria-label="Select plus"
-          class="leafygreen-ui-1dt4k34"
+          class="leafygreen-ui-mfinn"
           data-cy="searchbar-submit"
           tabindex="0"
         >
@@ -176,8 +182,11 @@
             class="leafygreen-ui-xhlipt"
           >
             <svg
+              aria-label="Plus Icon"
+              class=""
               fill="none"
               height="16"
+              role="img"
               viewBox="0 0 16 16"
               width="16"
               xmlns="http://www.w3.org/2000/svg"

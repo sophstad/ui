@@ -3,7 +3,7 @@
     style="width: 300px;"
   >
     <div
-      class="emotion-SiderCard e1am38ss0 leafygreen-ui-1nx5jqg"
+      class="emotion-SiderCard e1am38ss0 leafygreen-ui-17q42jt"
     >
       <p
         class="emotion-MetadataCardTitle e1130wzj2 leafygreen-ui-53k4vi"
@@ -43,7 +43,7 @@
         <button
           aria-disabled="true"
           aria-label="more info"
-          class="leafygreen-ui-1vktzzb"
+          class="leafygreen-ui-149kr66"
           data-testid="info-sprinkle-icon"
           type="button"
         >

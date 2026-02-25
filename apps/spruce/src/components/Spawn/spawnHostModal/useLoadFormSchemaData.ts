@@ -1,4 +1,4 @@
-import { useQuery } from "@apollo/client";
+import { useQuery } from "@apollo/client/react";
 import { defaultEC2Region } from "constants/hosts";
 import {
   DistrosQuery,
@@ -56,10 +56,17 @@ export const useLoadFormSchemaData = (p?: Props) => {
       isVolume: false,
     }) ?? "";
 
+  const oAuthDisabled =
+    spruceConfig?.serviceFlags?.jwtTokenForCLIDisabled ?? false;
+  const debugSpawnHostDisabled =
+    spruceConfig?.serviceFlags?.debugSpawnHostDisabled ?? false;
+
   return {
     formSchemaInput: {
       disableExpirationCheckbox,
       distros: distrosData?.distros ?? [],
+      debugSpawnHostDisabled,
+      oAuthDisabled,
       myPublicKeys: publicKeysData?.myPublicKeys ?? [],
       noExpirationCheckboxTooltip,
       userAwsRegion: userAwsRegion ?? defaultEC2Region,

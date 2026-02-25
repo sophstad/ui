@@ -7,6 +7,20 @@ mutation SaveAdminSettings($adminSettings: AdminSettingsInput!) {
     }
     banner
     bannerTheme
+    cost {
+      financeFormula
+      onDemandDiscount
+      s3Cost {
+        storage {
+          iAStorageCostDiscount
+          standardStorageCostDiscount
+        }
+        upload {
+          uploadCostDiscount
+        }
+      }
+      savingsPlanDiscount
+    }
     disabledGQLQueries
     hostInit {
       cloudStatusBatchSize
@@ -29,6 +43,9 @@ mutation SaveAdminSettings($adminSettings: AdminSettingsInput!) {
       maxRepoRevisionsToSearch
       numNewRepoRevisionsToFetch
     }
+    sage {
+      baseUrl
+    }
     scheduler {
       acceptableHostIdleTimeSeconds
       cacheDurationSeconds
@@ -49,6 +66,7 @@ mutation SaveAdminSettings($adminSettings: AdminSettingsInput!) {
       targetTimeSeconds
       taskFinder
     }
+
     serviceFlags {
       agentStartDisabled
       alertsDisabled
@@ -59,6 +77,7 @@ mutation SaveAdminSettings($adminSettings: AdminSettingsInput!) {
       checkBlockedTasksDisabled
       cliUpdatesDisabled
       cloudCleanupDisabled
+      debugSpawnHostDisabled
       degradedModeDisabled
       elasticIPsDisabled
       emailNotificationsDisabled
@@ -73,8 +92,10 @@ mutation SaveAdminSettings($adminSettings: AdminSettingsInput!) {
       monitorDisabled
       podAllocatorDisabled
       podInitDisabled
+      psLoggingDisabled
       releaseModeDisabled
       repotrackerDisabled
+      s3LifecycleSyncDisabled
       schedulerDisabled
       slackNotificationsDisabled
       sleepScheduleDisabled
@@ -86,7 +107,6 @@ mutation SaveAdminSettings($adminSettings: AdminSettingsInput!) {
       unrecognizedPodCleanupDisabled
       webhookNotificationsDisabled
     }
-
     taskLimits {
       maxConcurrentLargeParserProjectTasks
       maxDailyAutomaticRestarts
@@ -110,7 +130,6 @@ mutation SaveAdminSettings($adminSettings: AdminSettingsInput!) {
       csrfKey
       defaultProject
       fileStreamingContentTypes
-      helpUrl
       httpListenAddr
       loginDomain
       parsleyUrl

@@ -52,11 +52,18 @@ const form: ExternalCommunicationsFormState = {
   fws: {
     url: "fws.example.com",
   },
+  graphite: {
+    ciOptimizationToken: "graphite-token",
+    serverUrl: "graphite.example.com",
+  },
   cedar: {
     dbUrl: "cedar-db.example.com",
     dbName: "cedar-db",
     spsUrl: "sps.example.com",
     spsKanopyUrl: "sps-kanopy.example.com",
+  },
+  sage: {
+    baseUrl: "https://sage.devprod.prod.corp.mongodb.com",
   },
 };
 
@@ -101,12 +108,19 @@ const gql: AdminSettingsInput = {
   fws: {
     url: "fws.example.com",
   },
+  graphite: {
+    ciOptimizationToken: "graphite-token",
+    serverUrl: "graphite.example.com",
+  },
   cedar: {
     dbUrl: "cedar-db.example.com",
     dbName: "cedar-db",
   },
   perfMonitoringURL: "sps.example.com",
   perfMonitoringKanopyURL: "sps-kanopy.example.com",
+  sage: {
+    baseUrl: "https://sage.devprod.prod.corp.mongodb.com",
+  },
 };
 
 const mockAdminSettings: AdminSettings = {
@@ -151,10 +165,17 @@ const mockAdminSettings: AdminSettings = {
   fws: {
     url: "fws.example.com",
   },
+  graphite: {
+    ciOptimizationToken: "graphite-token",
+    serverUrl: "graphite.example.com",
+  },
   cedar: {
     dbUrl: "cedar-db.example.com",
     dbName: "cedar-db",
   },
   perfMonitoringURL: "sps.example.com",
   perfMonitoringKanopyURL: "sps-kanopy.example.com",
+  sage: {
+    baseUrl: "https://sage.devprod.prod.corp.mongodb.com",
+  },
 };

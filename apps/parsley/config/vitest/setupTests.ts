@@ -1,5 +1,6 @@
-// jest-dom adds custom matchers for asserting on DOM nodes. Works for Vitest too!
-import "@testing-library/jest-dom";
+import "@testing-library/jest-dom/vitest";
+import "vitest-canvas-mock";
+import { vi } from "vitest";
 
 // The following two variables are dummy values used in auth.test.tsx.
 process.env.REACT_APP_EVERGREEN_URL = "http://test-evergreen.com";
@@ -26,11 +27,7 @@ if (process.env.CI) {
 // @ts-expect-error: Workaround for a bug in @testing-library/react.
 // It prevents Vitest's fake timers from functioning with user-event.
 // https://github.com/testing-library/react-testing-library/issues/1197
-globalThis.jest = {
-  // @ts-expect-error globalThis.jest is untyped, but that's okay here.
-  ...globalThis.jest,
-  advanceTimersByTime: vi.advanceTimersByTime.bind(vi),
-};
+globalThis.jest = vi;
 
 // LeafyGreen tables require an IntersectionObserver.
 beforeEach(() => {

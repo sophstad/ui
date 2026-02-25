@@ -1,8 +1,7 @@
-import { useQuery } from "@apollo/client";
+import { useQuery } from "@apollo/client/react";
 import styled from "@emotion/styled";
 import { Code } from "@leafygreen-ui/code";
-import { Body, BodyProps, InlineCode } from "@leafygreen-ui/typography";
-import get from "lodash/get";
+import { Body, InlineCode } from "@leafygreen-ui/typography";
 import { size } from "@evg-ui/lib/constants/tokens";
 import { SettingsCard } from "components/SettingsCard";
 import {
@@ -16,7 +15,7 @@ export const VerifyCard = () => {
     CLIENT_CONFIG,
   );
 
-  const latestRevision = get(data, "clientConfig.latestRevision", "");
+  const latestRevision = data?.clientConfig?.latestRevision;
   const verificationCode = `
 [message='Binary is already up to date - not updating.' revision='${latestRevision}']`;
 
@@ -33,6 +32,6 @@ export const VerifyCard = () => {
   );
 };
 
-const StyledBody = styled(Body)<BodyProps>`
+const StyledBody = styled(Body)`
   margin-bottom: ${size.s};
 `;

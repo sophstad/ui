@@ -1,26 +1,19 @@
-import { memo, useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { css } from "@emotion/react";
 import styled from "@emotion/styled";
 import { IconButton } from "@leafygreen-ui/icon-button";
 import { palette } from "@leafygreen-ui/palette";
 import { spacing } from "@leafygreen-ui/tokens";
-import { Link } from "react-router-dom";
 import Icon from "@evg-ui/lib/components/Icon";
 import { StyledLink } from "@evg-ui/lib/components/styles";
-import { taskStatusToCopy } from "@evg-ui/lib/constants/task";
 import { size } from "@evg-ui/lib/constants/tokens";
-import { TaskStatus } from "@evg-ui/lib/types/task";
 import { useWaterfallAnalytics } from "analytics";
-import { SQUARE_WITH_BORDER, TaskBox } from "components/TaskBox";
+import { SQUARE_WITH_BORDER } from "components/TaskBox";
 import VisibilityContainer from "components/VisibilityContainer";
-import { getTaskRoute, getVariantHistoryRoute } from "constants/routes";
+import { getVariantHistoryRoute } from "constants/routes";
 import { useDimensions } from "hooks/useDimensions";
 import { useBuildVariantContext } from "./BuildVariantContext";
-import {
-  walkthroughSteps,
-  waterfallGuideId,
-  displayStatusCacheAddedDate,
-} from "./constants";
+import { walkthroughSteps, waterfallGuideId } from "./constants";
 import {
   BuildVariantTitle,
   columnBasis,
@@ -29,6 +22,7 @@ import {
   Row,
 } from "./styles";
 import { Build, BuildVariant, GroupedVersion } from "./types";
+import { WaterfallTask } from "./WaterfallTask";
 
 const { gray } = palette;
 
@@ -52,17 +46,36 @@ export const BuildRow: React.FC<Props> = ({
   versions,
 }) => {
   const { sendEvent } = useWaterfallAnalytics();
+  const [openTaskId, setOpenTaskId] = useState<string | null>(null);
+
   const handleVariantClick = useCallback(
     () => sendEvent({ name: "Clicked variant label" }),
     [sendEvent],
   );
+
   const handleTaskClick = useCallback(
-    (status: string) => () =>
-      sendEvent({
-        name: "Clicked task box",
-        "task.status": status,
-      }),
-    [sendEvent],
+    (taskId: string, e: React.MouseEvent<HTMLElement>) => {
+      // Open the popup on Alt + Click.
+      if (e.altKey) {
+        e.preventDefault();
+        setOpenTaskId((prevOpenTaskId) =>
+          prevOpenTaskId === taskId ? null : taskId,
+        );
+        sendEvent({
+          name: "Clicked task overview popup",
+          "task.id": taskId,
+          open: openTaskId !== taskId,
+        });
+      } else {
+        const status =
+          (e.target as HTMLDivElement)?.getAttribute("status") ?? "";
+        sendEvent({
+          name: "Clicked task box",
+          "task.status": status,
+        });
+      }
+    },
+    [openTaskId, sendEvent],
   );
 
   const { builds, displayName } = build;
@@ -136,8 +149,6 @@ export const BuildRow: React.FC<Props> = ({
         Builds are sorted in descending revision order and so match the versions' sort order. */
           if (version && version.id === builds?.[buildIndex]?.version) {
             const b = builds[buildIndex];
-            const useCachedStatus =
-              new Date(version.createTime) > displayStatusCacheAddedDate;
             buildIndex += 1;
             return (
               <BuildGrid
@@ -146,7 +157,8 @@ export const BuildRow: React.FC<Props> = ({
                 firstActiveTaskId={firstActiveTaskId}
                 handleTaskClick={handleTaskClick}
                 isRightmostBuild={b.version === lastActiveVersionId}
-                useCachedStatus={useCachedStatus}
+                openTaskId={openTaskId}
+                setOpenTaskId={setOpenTaskId}
               />
             );
           }
@@ -157,64 +169,51 @@ export const BuildRow: React.FC<Props> = ({
   );
 };
 
-const BuildGrid: React.FC<{
-  build: Build;
-  firstActiveTaskId: string;
-  handleTaskClick: (s: string) => () => void;
-  isRightmostBuild: boolean;
-  useCachedStatus: boolean;
-}> = ({
-  build,
-  firstActiveTaskId,
-  handleTaskClick,
-  isRightmostBuild,
-  useCachedStatus,
-}) => {
-  const rowRef = useRef<HTMLDivElement>(null);
-  const { width } = useDimensions<HTMLDivElement>(rowRef);
-
+const WidthWatcher: React.FC<{
+  children: React.ReactNode;
+}> = ({ children }) => {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const { width } = useDimensions<HTMLDivElement>(containerRef);
   const { columnWidth, setColumnWidth } = useBuildVariantContext();
+
   useEffect(() => {
     if (width !== 0 && columnWidth !== width) {
       setColumnWidth(width);
     }
   }, [setColumnWidth, columnWidth, width]);
 
-  return (
-    <BuildContainer
-      ref={rowRef}
-      onClick={(event: React.MouseEvent) => {
-        handleTaskClick(
-          (event.target as HTMLDivElement)?.getAttribute("status") ?? "",
-        );
-      }}
-    >
-      {build.tasks.map(
-        ({ displayName, displayStatusCache, execution, id, status }) => {
-          const squareProps =
-            id === firstActiveTaskId
-              ? { [waterfallGuideId]: walkthroughSteps[0].targetId }
-              : {};
-          const taskStatus = (
-            useCachedStatus ? displayStatusCache : status
-          ) as TaskStatus;
-          return (
-            <SquareMemo
-              key={id}
-              as={Link}
-              data-tooltip={`${displayName} - ${taskStatusToCopy[taskStatus]}`}
-              rightmost={isRightmostBuild}
-              status={taskStatus}
-              to={getTaskRoute(id, { execution })}
-              tooltip={`${displayName} - ${taskStatusToCopy[taskStatus]}`}
-              {...squareProps}
-            />
-          );
-        },
-      )}
-    </BuildContainer>
-  );
+  return <BuildContainer ref={containerRef}>{children}</BuildContainer>;
 };
+
+const BuildGrid: React.FC<{
+  build: Build;
+  firstActiveTaskId: string;
+  handleTaskClick: (taskId: string, e: React.MouseEvent<HTMLElement>) => void;
+  isRightmostBuild: boolean;
+  openTaskId: string | null;
+  setOpenTaskId: (taskId: string | null) => void;
+}> = ({
+  build,
+  firstActiveTaskId,
+  handleTaskClick,
+  isRightmostBuild,
+  openTaskId,
+  setOpenTaskId,
+}) => (
+  <WidthWatcher>
+    {build.tasks.map((task) => (
+      <WaterfallTask
+        key={task.id}
+        handleTaskClick={handleTaskClick}
+        isFirstActiveTask={task.id === firstActiveTaskId}
+        isRightmostBuild={isRightmostBuild}
+        open={openTaskId === task.id}
+        setOpen={(open) => setOpenTaskId(open ? task.id : null)}
+        task={task}
+      />
+    ))}
+  </WidthWatcher>
+);
 
 const padding = spacing[200];
 const border = 1;
@@ -248,5 +247,3 @@ const StyledIconButton = styled(IconButton)<{ active: boolean }>`
   top: -${size.xxs};
   ${({ active }) => active && "transform: rotate(-30deg);"}
 `;
-
-const SquareMemo = memo(TaskBox);

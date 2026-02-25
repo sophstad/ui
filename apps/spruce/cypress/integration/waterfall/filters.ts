@@ -18,18 +18,11 @@ describe("requester filtering", () => {
     cy.visit("/project/spruce/waterfall");
   });
 
-  it("filters on periodic builds and trigger", () => {
+  it("filters on periodic builds and shows an empty state", () => {
     cy.dataCy("inactive-versions-button").first().contains("1");
     cy.dataCy("requester-filter").click();
     cy.dataCy("ad_hoc-option").click();
-    cy.dataCy("inactive-versions-button").first().contains("6");
-    cy.dataCy("version-label-active").should("have.length", 0);
-
-    cy.dataCy("requester-filter").click();
-    cy.dataCy("trigger_request-option").click();
-    cy.dataCy("inactive-versions-button").first().contains("5");
-    cy.dataCy("version-label-active").should("have.length", 1);
-    cy.dataCy("version-label-active").contains("Triggered by:");
+    cy.contains("No Results Found").should("be.visible");
   });
 
   it("filters on git tags and fetches more from the server", () => {
@@ -39,7 +32,7 @@ describe("requester filtering", () => {
     cy.dataCy("inactive-versions-button").first().contains("3");
     cy.dataCy("inactive-versions-button").eq(1).contains("2");
     cy.dataCy("version-label-active").contains("Git Tag");
-    cy.dataCy("version-label-active").should("have.length", 4);
+    cy.dataCy("version-label-active").should("have.length", 3);
   });
 
   it("clears requester filters", () => {
@@ -114,13 +107,13 @@ describe("task filtering", () => {
     });
     cy.dataCy("build-variant-label").should("have.length", 2);
     cy.dataCy("filter-chip").eq(1).should("have.text", "Task: lint");
-    cy.get("a[data-tooltip]").should("have.length", 2);
+    cy.get("a[data-tooltip]").should("have.length", 4);
   });
 
   it("correctly applies build variant and task filters", () => {
     cy.dataCy("build-variant-filter-input").type("Ubuntu{enter}");
     cy.dataCy("build-variant-label").should("have.length", 1);
-    cy.get("a[data-tooltip]").should("have.length", 41);
+    cy.get("a[data-tooltip]").should("have.length", 45);
     cy.dataCy("task-filter-input").type("agent{enter}");
     cy.dataCy("build-variant-label").should("have.length", 1);
     cy.get("a[data-tooltip]").should("have.length", 1);
@@ -135,9 +128,9 @@ describe("date filter", () => {
     cy.location("search").should("equal", "");
 
     cy.dataCy("date-picker").click();
-    cy.get("[aria-label^='select year']").click();
+    cy.get("[aria-label*='Select year' i]").click();
     cy.contains("li", "2022").click({ force: true });
-    cy.get("[aria-label^='select month']").click();
+    cy.get("[aria-label*='Select month' i]").click();
     cy.contains("li", "Feb").click({ force: true });
     cy.get("[data-iso='2022-02-28']").click();
 

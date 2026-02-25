@@ -1,6 +1,6 @@
 <div>
   <div
-    class="emotion-SiderCard ehoeyp90 leafygreen-ui-1nx5jqg"
+    class="emotion-SiderCard ehoeyp90 leafygreen-ui-17q42jt"
   >
     <div
       class="emotion-TableTitle e1p1q3sw1"
@@ -31,11 +31,13 @@
               class="leafygreen-ui-16tr4y"
             >
               <svg
+                aria-label="Chevron Left Icon"
                 class="leafygreen-ui-yk23yl"
                 fill="none"
-                height="16"
+                height="14"
+                role="img"
                 viewBox="0 0 16 16"
-                width="16"
+                width="14"
                 xmlns="http://www.w3.org/2000/svg"
               >
                 <path
@@ -72,11 +74,13 @@
               class="leafygreen-ui-16tr4y"
             >
               <svg
+                aria-label="Chevron Right Icon"
                 class="leafygreen-ui-17pifwg"
                 fill="none"
-                height="16"
+                height="14"
+                role="img"
                 viewBox="0 0 16 16"
-                width="16"
+                width="14"
                 xmlns="http://www.w3.org/2000/svg"
               >
                 <path
@@ -95,17 +99,17 @@
           data-testid="lg-select"
         >
           <button
-            aria-controls="select-177-menu"
-            aria-describedby="select-177-description"
+            aria-controls="select-141-menu"
+            aria-describedby="select-141-description"
             aria-disabled="false"
             aria-expanded="false"
             aria-invalid="false"
             aria-labelledby="page-size-select"
-            class="lg-ui-button-0000 leafygreen-ui-c19aul"
+            class="lg-ui-button-0000 leafygreen-ui-1g90lpl"
             data-cy="host-event-table-page-size-selector"
             data-lgid="lg-select-trigger"
             data-testid="leafygreen-ui-select-menubutton"
-            id="select-178"
+            id="select-142"
             type="button"
             value="10"
           >
@@ -207,7 +211,7 @@
                   <button
                     aria-disabled="false"
                     aria-label="Table Filter Popover Icon"
-                    class="leafygreen-ui-1r51ix4"
+                    class="leafygreen-ui-1o2ji0h"
                     data-cy="event-type-filter"
                     data-highlighted="false"
                     tabindex="0"
@@ -724,7 +728,7 @@
                           <button
                             aria-disabled="false"
                             aria-label="Accordion icon"
-                            class="emotion-AccordionIcon e1omze813 leafygreen-ui-1r51ix4"
+                            class="emotion-AccordionIcon e1omze813 leafygreen-ui-1o2ji0h"
                             style="align-self: center;"
                             tabindex="0"
                           >
@@ -871,7 +875,7 @@
                           <button
                             aria-disabled="false"
                             aria-label="Accordion icon"
-                            class="emotion-AccordionIcon e1omze813 leafygreen-ui-1r51ix4"
+                            class="emotion-AccordionIcon e1omze813 leafygreen-ui-1o2ji0h"
                             style="align-self: center;"
                             tabindex="0"
                           >
@@ -1017,7 +1021,7 @@
                           <button
                             aria-disabled="false"
                             aria-label="Accordion icon"
-                            class="emotion-AccordionIcon e1omze813 leafygreen-ui-1r51ix4"
+                            class="emotion-AccordionIcon e1omze813 leafygreen-ui-1o2ji0h"
                             style="align-self: center;"
                             tabindex="0"
                           >
@@ -1459,7 +1463,7 @@
                           <button
                             aria-disabled="false"
                             aria-label="Accordion icon"
-                            class="emotion-AccordionIcon e1omze813 leafygreen-ui-1r51ix4"
+                            class="emotion-AccordionIcon e1omze813 leafygreen-ui-1o2ji0h"
                             style="align-self: center;"
                             tabindex="0"
                           >
@@ -1606,7 +1610,7 @@
                           <button
                             aria-disabled="false"
                             aria-label="Accordion icon"
-                            class="emotion-AccordionIcon e1omze813 leafygreen-ui-1r51ix4"
+                            class="emotion-AccordionIcon e1omze813 leafygreen-ui-1o2ji0h"
                             style="align-self: center;"
                             tabindex="0"
                           >
@@ -1870,7 +1874,7 @@
                           <button
                             aria-disabled="false"
                             aria-label="Accordion icon"
-                            class="emotion-AccordionIcon e1omze813 leafygreen-ui-1r51ix4"
+                            class="emotion-AccordionIcon e1omze813 leafygreen-ui-1o2ji0h"
                             style="align-self: center;"
                             tabindex="0"
                           >
@@ -2016,7 +2020,7 @@
                           <button
                             aria-disabled="false"
                             aria-label="Accordion icon"
-                            class="emotion-AccordionIcon e1omze813 leafygreen-ui-1r51ix4"
+                            class="emotion-AccordionIcon e1omze813 leafygreen-ui-1o2ji0h"
                             style="align-self: center;"
                             tabindex="0"
                           >
@@ -2300,7 +2304,7 @@
                           <button
                             aria-disabled="false"
                             aria-label="Accordion icon"
-                            class="emotion-AccordionIcon e1omze813 leafygreen-ui-1r51ix4"
+                            class="emotion-AccordionIcon e1omze813 leafygreen-ui-1o2ji0h"
                             style="align-self: center;"
                             tabindex="0"
                           >
@@ -2446,7 +2450,7 @@
                           <button
                             aria-disabled="false"
                             aria-label="Accordion icon"
-                            class="emotion-AccordionIcon e1omze813 leafygreen-ui-1r51ix4"
+                            class="emotion-AccordionIcon e1omze813 leafygreen-ui-1o2ji0h"
                             style="align-self: center;"
                             tabindex="0"
                           >
@@ -2593,7 +2597,7 @@
                           <button
                             aria-disabled="false"
                             aria-label="Accordion icon"
-                            class="emotion-AccordionIcon e1omze813 leafygreen-ui-1r51ix4"
+                            class="emotion-AccordionIcon e1omze813 leafygreen-ui-1o2ji0h"
                             style="align-self: center;"
                             tabindex="0"
                           >
@@ -2753,7 +2757,7 @@
                           <button
                             aria-disabled="false"
                             aria-label="Accordion icon"
-                            class="emotion-AccordionIcon e1omze813 leafygreen-ui-1r51ix4"
+                            class="emotion-AccordionIcon e1omze813 leafygreen-ui-1o2ji0h"
                             style="align-self: center;"
                             tabindex="0"
                           >
@@ -2864,7 +2868,7 @@
                           <button
                             aria-disabled="false"
                             aria-label="Accordion icon"
-                            class="emotion-AccordionIcon e1omze813 leafygreen-ui-1r51ix4"
+                            class="emotion-AccordionIcon e1omze813 leafygreen-ui-1o2ji0h"
                             style="align-self: center;"
                             tabindex="0"
                           >
@@ -3198,7 +3202,7 @@
                           <button
                             aria-disabled="false"
                             aria-label="Accordion icon"
-                            class="emotion-AccordionIcon e1omze813 leafygreen-ui-1r51ix4"
+                            class="emotion-AccordionIcon e1omze813 leafygreen-ui-1o2ji0h"
                             style="align-self: center;"
                             tabindex="0"
                           >
@@ -3401,7 +3405,7 @@
                           <button
                             aria-disabled="false"
                             aria-label="Accordion icon"
-                            class="emotion-AccordionIcon e1omze813 leafygreen-ui-1r51ix4"
+                            class="emotion-AccordionIcon e1omze813 leafygreen-ui-1o2ji0h"
                             style="align-self: center;"
                             tabindex="0"
                           >

@@ -123,7 +123,19 @@ query AdminSettings {
     cost {
       financeFormula
       onDemandDiscount
+      s3Cost {
+        storage {
+          iAStorageCostDiscount
+          standardStorageCostDiscount
+        }
+        upload {
+          uploadCostDiscount
+        }
+      }
       savingsPlanDiscount
+    }
+    debugSpawnHosts {
+      setupScript
     }
     disabledGQLQueries
     domainName
@@ -137,6 +149,10 @@ query AdminSettings {
     githubOrgs
     githubPRCreatorOrg
     githubWebhookSecret
+    graphite {
+      ciOptimizationToken
+      serverUrl
+    }
     hostInit {
       cloudStatusBatchSize
       hostThrottle
@@ -291,6 +307,9 @@ query AdminSettings {
       apiKey
       baseUrl
     }
+    sage {
+      baseUrl
+    }
     scheduler {
       acceptableHostIdleTimeSeconds
       cacheDurationSeconds
@@ -322,6 +341,7 @@ query AdminSettings {
       checkBlockedTasksDisabled
       cliUpdatesDisabled
       cloudCleanupDisabled
+      debugSpawnHostDisabled
       degradedModeDisabled
       elasticIPsDisabled
       emailNotificationsDisabled
@@ -336,8 +356,10 @@ query AdminSettings {
       monitorDisabled
       podAllocatorDisabled
       podInitDisabled
+      psLoggingDisabled
       releaseModeDisabled
       repotrackerDisabled
+      s3LifecycleSyncDisabled
       schedulerDisabled
       slackNotificationsDisabled
       sleepScheduleDisabled
@@ -347,6 +369,7 @@ query AdminSettings {
       taskLoggingDisabled
       taskReliabilityDisabled
       unrecognizedPodCleanupDisabled
+      useMergeQueuePathFilteringDisabled
       webhookNotificationsDisabled
     }
     shutdownWaitSeconds
@@ -432,7 +455,6 @@ query AdminSettings {
       csrfKey
       defaultProject
       fileStreamingContentTypes
-      helpUrl
       httpListenAddr
       loginDomain
       parsleyUrl

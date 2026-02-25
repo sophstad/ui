@@ -1,4 +1,3 @@
-import { ApolloError } from "@apollo/client";
 import styled from "@emotion/styled";
 import { palette } from "@leafygreen-ui/palette";
 import { InlineCode } from "@leafygreen-ui/typography";
@@ -45,7 +44,7 @@ const { red } = palette;
 interface Props {
   loading: boolean;
   task: TaskQuery["task"];
-  error?: ApolloError;
+  error?: Error;
 }
 
 export const Metadata: React.FC<Props> = ({ error, loading, task }) => {
@@ -111,7 +110,7 @@ export const Metadata: React.FC<Props> = ({ error, loading, task }) => {
     testSelection,
   } = project || {};
   const { allowed: testSelectionEnabledForProject } = testSelection || {};
-  const { author } = versionMetadata ?? {};
+  const { user } = versionMetadata ?? {};
   const oomTracker = details?.oomTracker;
   const taskTrace = details?.traceID;
   const diskDevices = details?.diskDevices;
@@ -140,7 +139,7 @@ export const Metadata: React.FC<Props> = ({ error, loading, task }) => {
           </StyledRouterLink>
         </MetadataItem>
         <MetadataItem>
-          <MetadataLabel>Submitted by:</MetadataLabel> {author}
+          <MetadataLabel>Submitted by:</MetadataLabel> {user.userId}
         </MetadataItem>
         {ingestTime && (
           <MetadataItem data-cy="task-metadata-submitted-at">

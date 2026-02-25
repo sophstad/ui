@@ -1,15 +1,21 @@
-import { useRef } from "react";
+import { useMemo, useRef } from "react";
 import styled from "@emotion/styled";
 import { Modal } from "@leafygreen-ui/modal";
 import { Body, H3, InlineKeyCode } from "@leafygreen-ui/typography";
 import { CharKey, ModifierKey } from "@evg-ui/lib/constants/keys";
-import { size, zIndex } from "@evg-ui/lib/constants/tokens";
+import { size } from "@evg-ui/lib/constants/tokens";
 import { useKeyboardShortcut, useOnClickOutside } from "@evg-ui/lib/hooks";
+import { useIsParsleyAIAvailable } from "hooks";
 
 const shortcuts = [
-  { description: "Open or close the shortcut modal", keys: [["SHIFT", "?"]] },
+  {
+    description: "Open or close the shortcut modal",
+    id: "shortcut-modal",
+    keys: [["SHIFT", "?"]],
+  },
   {
     description: "Focus on the search input",
+    id: "search-focus",
     keys: [
       ["CTRL", "F"],
       ["⌘", "F"],
@@ -17,6 +23,7 @@ const shortcuts = [
   },
   {
     description: "Toggle between filter and highlight",
+    id: "search-toggle",
     keys: [
       ["CTRL", "S"],
       ["⌘", "S"],
@@ -24,25 +31,38 @@ const shortcuts = [
   },
   {
     description: "Apply the filter or highlight",
+    id: "search-apply",
     keys: [
       ["CTRL", "ENTER"],
       ["⌘", "ENTER"],
     ],
   },
-  { description: "Toggle the side panel", keys: [["["]] },
+  {
+    description: "Toggle the side panel",
+    id: "side-panel-toggle",
+    keys: [["["]],
+  },
+  {
+    description: "Toggle the Parsley AI chat window",
+    id: "parsley-ai-toggle",
+    keys: [["]"]],
+  },
   {
     description: "Paginate forward to the next search result",
+    id: "search-next",
     keys: [["N"], ["ENTER"]],
   },
   {
     description: "Paginate backwards to the previous search result",
+    id: "search-prev",
     keys: [["P"], ["SHIFT", "ENTER"]],
   },
   {
     description: "Tab to complete a search suggestion",
+    id: "search-autocomplete",
     keys: [["TAB"]],
   },
-];
+] as const;
 
 interface ShortcutModalProps {
   open: boolean;
@@ -51,6 +71,16 @@ interface ShortcutModalProps {
 
 const ShortcutModal: React.FC<ShortcutModalProps> = ({ open, setOpen }) => {
   const modalRef = useRef<HTMLDivElement>(null);
+  const isParsleyAIAvailable = useIsParsleyAIAvailable();
+
+  const visibleShortcuts = useMemo(
+    () =>
+      shortcuts.filter(
+        (shortcut) =>
+          shortcut.id !== "parsley-ai-toggle" || isParsleyAIAvailable,
+      ),
+    [isParsleyAIAvailable],
+  );
 
   useKeyboardShortcut(
     { charKey: CharKey.QuestionMark, modifierKeys: [ModifierKey.Shift] },
@@ -64,14 +94,14 @@ const ShortcutModal: React.FC<ShortcutModalProps> = ({ open, setOpen }) => {
   });
 
   return (
-    <StyledModal data-cy="shortcut-modal" open={open} setOpen={setOpen}>
+    <Modal data-cy="shortcut-modal" open={open} setOpen={setOpen}>
       <div ref={modalRef}>
         <ModalTitle>
           <H3>Parsley Keyboard Shortcuts</H3>
         </ModalTitle>
 
-        {shortcuts.map(({ description, keys }) => (
-          <ModalRow key={description}>
+        {visibleShortcuts.map(({ description, id, keys }) => (
+          <ModalRow key={id}>
             <ShortcutKeys>
               {keys.map((k, idx) => (
                 <span key={k[0]}>
@@ -84,11 +114,11 @@ const ShortcutModal: React.FC<ShortcutModalProps> = ({ open, setOpen }) => {
           </ModalRow>
         ))}
       </div>
-    </StyledModal>
+    </Modal>
   );
 };
 interface KeyTupleProps {
-  keys: string[];
+  keys: readonly string[];
 }
 const KeyTuple: React.FC<KeyTupleProps> = ({ keys }) => (
   <span>
@@ -100,10 +130,6 @@ const KeyTuple: React.FC<KeyTupleProps> = ({ keys }) => (
     ))}
   </span>
 );
-
-const StyledModal = styled(Modal)`
-  z-index: ${zIndex.modal};
-`;
 
 const ModalTitle = styled.div`
   margin-bottom: ${size.l};

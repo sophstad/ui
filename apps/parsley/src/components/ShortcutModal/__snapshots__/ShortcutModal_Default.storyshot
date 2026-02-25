@@ -5,11 +5,11 @@
     Open Modal
   </button>
   <dialog
-    class="emotion-StyledModal ewsr9c74 leafygreen-ui-1i73k7k"
+    class="leafygreen-ui-1i73k7k"
     data-cy="shortcut-modal"
     data-lgid="lg-modal"
     data-testid="lg-modal"
-    id="modal-32"
+    id="modal-44"
     open=""
   >
     <div>
@@ -286,6 +286,30 @@
                 <code
                   class="leafygreen-ui-lxrbgu"
                 >
+                  ]
+                </code>
+              </span>
+            </span>
+          </span>
+        </div>
+        <p
+          class="leafygreen-ui-26vqpd"
+        >
+          Toggle the Parsley AI chat window
+        </p>
+      </div>
+      <div
+        class="emotion-ModalRow ewsr9c72"
+      >
+        <div
+          class="emotion-ShortcutKeys ewsr9c71"
+        >
+          <span>
+            <span>
+              <span>
+                <code
+                  class="leafygreen-ui-lxrbgu"
+                >
                   N
                 </code>
               </span>
@@ -394,10 +418,10 @@
     <button
       aria-disabled="false"
       aria-label="Close modal"
-      class="leafygreen-ui-qya81r"
+      class="leafygreen-ui-1i75kq4"
       data-lgid="lg-modal-close"
       data-testid="lg-modal-close"
-      id="modal-close_button-31"
+      id="modal-close_button-43"
       tabindex="0"
     >
       <div

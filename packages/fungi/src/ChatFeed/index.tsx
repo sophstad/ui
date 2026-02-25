@@ -5,9 +5,10 @@ import { LeafyGreenChatProvider } from "@lg-chat/leafygreen-chat-provider";
 import { MessageActionsProps } from "@lg-chat/message";
 import { MessageFeed } from "@lg-chat/message-feed";
 import { DefaultChatTransport } from "ai";
-import { useChatContext } from "../Context";
-import { FungiUIMessage, MessageRenderer } from "../MessageRenderer";
-import { Suggestions } from "../Suggestions";
+import { ContextChip, useChatContext } from "#Context";
+import { ContextChips } from "#ContextChips";
+import { FungiUIMessage, MessageRenderer } from "#MessageRenderer";
+import { Suggestions } from "#Suggestions";
 
 export type ChatFeedProps = {
   apiUrl: string;
@@ -22,6 +23,13 @@ export type ChatFeedProps = {
   onClickCopy?: MessageActionsProps["onClickCopy"];
   onClickSuggestion?: (suggestion: string) => void;
   onSendMessage?: (message: string) => void;
+  transformMessage?: (
+    message: string,
+    transformers: {
+      pendingChips?: ContextChip[];
+    },
+  ) => string;
+  onChipClick?: (chip: ContextChip) => void;
 };
 
 export const ChatFeed: React.FC<ChatFeedProps> = ({
@@ -30,11 +38,14 @@ export const ChatFeed: React.FC<ChatFeedProps> = ({
   chatSuggestions,
   handleRatingChange,
   handleSubmitFeedback,
+  onChipClick,
   onClickCopy,
   onClickSuggestion,
   onSendMessage,
+  transformMessage,
 }) => {
-  const { appName } = useChatContext();
+  const { appName, chips, clearChips, toggleChip } = useChatContext();
+
   const { error, messages, sendMessage, status } = useChat<FungiUIMessage>({
     transport: new DefaultChatTransport({
       api: apiUrl,
@@ -53,7 +64,17 @@ export const ChatFeed: React.FC<ChatFeedProps> = ({
 
   const handleSend = (message: string) => {
     onSendMessage?.(message);
-    sendMessage({ text: message });
+    const transformed = transformMessage
+      ? transformMessage(message, { pendingChips: chips })
+      : message;
+    sendMessage({
+      text: transformed,
+      metadata: {
+        chips,
+        originalMessage: message,
+      },
+    });
+    clearChips();
   };
 
   const inputState = getInputState({ error, status });
@@ -77,6 +98,7 @@ export const ChatFeed: React.FC<ChatFeedProps> = ({
               return (
                 <MessageRenderer
                   key={m.id}
+                  onChipClick={onChipClick}
                   onClickCopy={onClickCopy}
                   onRatingChange={
                     spanId ? handleRatingChange?.(spanId) : undefined
@@ -90,6 +112,12 @@ export const ChatFeed: React.FC<ChatFeedProps> = ({
             })
           )}
         </MessageFeed>
+        <ContextChips
+          chips={chips}
+          dismissible
+          onClick={onChipClick}
+          onDismiss={toggleChip}
+        />
         <InputBar {...inputState} onMessageSend={handleSend} />
       </ChatWindow>
     </LeafyGreenChatProvider>

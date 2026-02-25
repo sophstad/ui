@@ -1,5 +1,5 @@
-import { useMutation } from "@apollo/client";
-import Button, { Variant as ButtonVariant } from "@leafygreen-ui/button";
+import { useMutation } from "@apollo/client/react";
+import { Button, Variant as ButtonVariant } from "@leafygreen-ui/button";
 import { useParams } from "react-router-dom";
 import { useToastContext } from "@evg-ui/lib/context/toast";
 import { AdminSettingsTabRoutes, slugs } from "constants/routes";
@@ -24,8 +24,13 @@ export const AdminSaveButton: React.FC<AdminSaveButtonProps> = ({
     [slugs.tab]: AdminSettingsTabRoutes;
   }>();
 
-  const { checkHasUnsavedChanges, getChangedTabs, getTab, saveTab } =
-    useAdminSettingsContext();
+  const {
+    checkHasUnsavedChanges,
+    getChangedTabs,
+    getTab,
+    saveTab,
+    validateTabs,
+  } = useAdminSettingsContext();
   const changedTabs = getChangedTabs();
   const hasUnsavedChanges = checkHasUnsavedChanges();
   const dispatchToast = useToastContext();
@@ -44,6 +49,19 @@ export const AdminSaveButton: React.FC<AdminSaveButtonProps> = ({
   });
 
   const handleSave = () => {
+    const { errors, isValid } = validateTabs(changedTabs);
+    if (!isValid) {
+      const fieldNames = [
+        ...new Set(errors.map((e) => e.property.split(".").pop())),
+      ].join(", ");
+      dispatchToast.error(
+        `Please fix errors in the following fields: ${fieldNames}`,
+        true,
+        { shouldTimeout: false },
+      );
+      return;
+    }
+
     const changedSettings = changedTabs.reduce((acc, tab) => {
       const formToGql = formToGqlMap[tab];
       if (formToGql) {

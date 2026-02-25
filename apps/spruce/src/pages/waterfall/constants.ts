@@ -4,6 +4,10 @@ import { WalkthroughStep } from "components/WalkthroughGuideCue";
 import { validators } from "utils";
 import { ServerFilters } from "./types";
 
+/**
+ * Total number of versions checked by the server. Defined on the backend too, so make sure to update both.
+ */
+export const VERSION_SEARCH_LIMIT = 300;
 export const VERSION_LIMIT = 5;
 
 export const waterfallPageContainerId = "waterfall-page";
@@ -64,15 +68,6 @@ export const tupleSelectOptions = [
     validator: () => true,
   },
 ];
-
-/**
- * Timestamp of the last deploy that made changes to `displayStatusCache`, in UTC.
- * This timestamp should correspond to 2025/01/21 10:05AM EST.
- * TODO: Remove in DEVPROD-15269.
- */
-export const displayStatusCacheAddedDate = new Date(
-  Date.UTC(2025, 0, 21, 15, 5),
-);
 
 export const resetFilterState: ServerFilters = {
   requesters: undefined,
