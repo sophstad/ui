@@ -49,14 +49,14 @@ export const readVersions = ((existing, { args, readField }) => {
   let endIndex = maxOrder ? existingVersions.length : idx;
 
   const activeVersionIds = [];
-  const allActiveVersions =
-    readField<Set<string>>("allActiveVersions", existing) ?? new Set();
+  const allActiveVersionIds =
+    readField<string[]>("allActiveVersionIds", existing) ?? [];
 
   // Count backwards for paginating backwards.
   if (minOrder) {
     for (let i = endIndex; i >= 0; i--) {
       const id = readField<string>("id", existingVersions[i]) ?? "";
-      if (allActiveVersions.has(id)) {
+      if (allActiveVersionIds.includes(id)) {
         activeVersionIds.push(id);
         if (activeVersionIds.length === limit) {
           startIndex = i;
@@ -64,7 +64,7 @@ export const readVersions = ((existing, { args, readField }) => {
           i -= 1;
           while (
             i >= 0 &&
-            !allActiveVersions.has(
+            !allActiveVersionIds.includes(
               readField<string>("id", existingVersions[i]) ?? "",
             )
           ) {
@@ -81,7 +81,7 @@ export const readVersions = ((existing, { args, readField }) => {
   if (maxOrder) {
     for (let i = startIndex; i < existingVersions.length; i++) {
       const id = readField<string>("id", existingVersions[i]) ?? "";
-      if (allActiveVersions.has(id)) {
+      if (allActiveVersionIds.includes(id)) {
         activeVersionIds.push(id);
         if (activeVersionIds.length === limit) {
           endIndex = i;
@@ -110,8 +110,7 @@ export const readVersions = ((existing, { args, readField }) => {
   return {
     flattenedVersions,
     pagination: {
-      // Sort is only necessary for consistency in testing
-      activeVersionIds: activeVersionIds.sort(),
+      activeVersionIds,
       mostRecentVersionOrder,
       prevPageOrder: prevOrderNumber,
       nextPageOrder: nextOrderNumber,
@@ -141,11 +140,9 @@ export const mergeVersions = ((existing, incoming, { readField }) => {
     versionsMap.set(order, v);
   });
 
-  const v = Array.from(versionsMap.values()).sort((a, b) => {
-    const aOrder = readField<number>("order", a) ?? 0;
-    const bOrder = readField<number>("order", b) ?? 0;
-    return bOrder - aOrder;
-  });
+  const v = Array.from(versionsMap.entries())
+    .sort(([a], [b]) => b - a)
+    .map(([, version]) => version);
 
   const pagination = readField<WaterfallQuery["waterfall"]["pagination"]>(
     "pagination",
@@ -159,16 +156,17 @@ export const mergeVersions = ((existing, incoming, { readField }) => {
     prevPageOrder: 0,
   };
 
-  const existingActiveVersions =
-    readField<Set<string>>("allActiveVersions", existing) ?? new Set();
-  const incomingActiveVersions =
+  const existingActiveVersionIds =
+    readField<string[]>("allActiveVersionIds", existing) ?? [];
+  const incomingActiveVersionIds =
     readField<string[]>("activeVersionIds", pagination) ?? [];
-  incomingActiveVersions.forEach((vId) => existingActiveVersions.add(vId));
   return {
     flattenedVersions: v,
     pagination,
-    allActiveVersions: existingActiveVersions,
+    allActiveVersionIds: [
+      ...new Set([...existingActiveVersionIds, ...incomingActiveVersionIds]),
+    ],
   };
 }) satisfies FieldMergeFunction<
-  WaterfallQuery["waterfall"] & { allActiveVersions?: Set<string> }
+  WaterfallQuery["waterfall"] & { allActiveVersionIds?: string[] }
 >;

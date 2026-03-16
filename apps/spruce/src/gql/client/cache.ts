@@ -187,6 +187,9 @@ export const cache = new InMemoryCache({
     ServiceFlag: {
       keyFields: ["name"],
     },
+    WaterfallBuild: {
+      keyFields: false,
+    },
     WaterfallTask: {
       keyFields: false,
     },
