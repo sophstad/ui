@@ -7,6 +7,7 @@ const GQLWrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   if (!client) {
     return <FullPageLoad />;
   }
+  console.log(client);
   return <ApolloProvider client={client}>{children}</ApolloProvider>;
 };
 

@@ -1,4 +1,4 @@
-import { useCallback } from "react";
+import { Suspense, useCallback } from "react";
 import styled from "@emotion/styled";
 import { useQueryParam, useQueryParams } from "@evg-ui/lib/hooks";
 import { useWaterfallAnalytics } from "analytics";
@@ -18,6 +18,7 @@ type WaterfallFiltersProps = {
   omitInactiveBuilds: boolean;
   projectIdentifier: string;
   pagination: Pagination | undefined;
+  queryRef: any;
   restartWalkthrough: () => void;
   setOmitInactiveBuilds: (value: boolean) => void;
 };
@@ -26,6 +27,7 @@ export const WaterfallFilters: React.FC<WaterfallFiltersProps> = ({
   omitInactiveBuilds,
   pagination,
   projectIdentifier,
+  queryRef,
   restartWalkthrough,
   setOmitInactiveBuilds,
 }) => {
@@ -92,7 +94,14 @@ export const WaterfallFilters: React.FC<WaterfallFiltersProps> = ({
         restartWalkthrough={restartWalkthrough}
         setOmitInactiveBuilds={setOmitInactiveBuilds}
       />
-      <PaginationButtons pagination={pagination} />
+      <Suspense>
+        <PaginationButtons
+          omitInactiveBuilds={omitInactiveBuilds}
+          pagination={pagination}
+          projectIdentifier={projectIdentifier}
+          queryRef={queryRef}
+        />
+      </Suspense>
     </Container>
   );
 };

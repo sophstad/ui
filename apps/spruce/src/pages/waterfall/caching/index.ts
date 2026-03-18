@@ -2,22 +2,25 @@ import { FieldMergeFunction, FieldReadFunction } from "@apollo/client";
 import { WaterfallQuery } from "gql/generated/types";
 import { VERSION_LIMIT } from "../constants";
 
-export const readVersions = ((existing, { args, readField }) => {
+export const readVersions = ((existing, { args, readField, ...rest }) => {
+  console.count("readVersions");
+  console.log("readVersions", args, rest);
   if (!existing) {
     return undefined;
   }
 
   const minOrder = args?.options?.minOrder ?? 0;
-  let maxOrder = args?.options?.maxOrder ?? 0;
   const limit = args?.options?.limit ?? VERSION_LIMIT;
   const date = args?.options?.date ?? "";
   const revision = args?.options?.revision ?? "";
 
-  const { mostRecentVersionOrder = 0 } =
+  const { mostRecentVersionOrder = 0, prevPageOrder: storedPrevPageOrder = 0 } =
     readField<WaterfallQuery["waterfall"]["pagination"]>(
       "pagination",
       existing,
     ) ?? {};
+  let maxOrder = storedPrevPageOrder > 0 ? storedPrevPageOrder + 1 : 0;
+  console.log("maxOrder", maxOrder, "storedPrevPageOrder", storedPrevPageOrder);
 
   // Leverage cache if there are no other query params.
   if (minOrder === 0 && maxOrder === 0 && !date && !revision) {
@@ -42,6 +45,7 @@ export const readVersions = ((existing, { args, readField }) => {
   });
 
   if (idx === -1) {
+    console.log("missing", existingVersions);
     return undefined;
   }
 
@@ -79,6 +83,7 @@ export const readVersions = ((existing, { args, readField }) => {
 
   // Count forwards for paginating forwards.
   if (maxOrder) {
+    console.log(existingVersions, startIndex, allActiveVersionIds);
     for (let i = startIndex; i < existingVersions.length; i++) {
       const id = readField<string>("id", existingVersions[i]) ?? "";
       if (allActiveVersionIds.includes(id)) {
@@ -107,6 +112,7 @@ export const readVersions = ((existing, { args, readField }) => {
     ) ?? 0;
   const nextOrderNumber = lastVersionOrder === 1 ? 0 : lastVersionOrder;
 
+  console.log("read", nextOrderNumber);
   return {
     flattenedVersions,
     pagination: {
@@ -160,6 +166,7 @@ export const mergeVersions = ((existing, incoming, { readField }) => {
     readField<string[]>("allActiveVersionIds", existing) ?? [];
   const incomingActiveVersionIds =
     readField<string[]>("activeVersionIds", pagination) ?? [];
+  console.log("merge", pagination);
   return {
     flattenedVersions: v,
     pagination,
