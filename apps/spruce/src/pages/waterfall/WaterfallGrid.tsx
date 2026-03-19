@@ -1,8 +1,7 @@
-import { useCallback, useEffect, useRef, useState, useTransition } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useSuspenseQuery } from "@apollo/client/react";
 import styled from "@emotion/styled";
 import { size, transitionDuration } from "@evg-ui/lib/constants/tokens";
-import { useQueryParam } from "@evg-ui/lib/hooks";
 import {
   parseQueryString,
   stringifyQuery,
@@ -13,16 +12,9 @@ import {
   DEFAULT_POLL_INTERVAL,
   WATERFALL_PINNED_VARIANTS_KEY,
 } from "constants/index";
-import { utcTimeZone } from "constants/time";
-import {
-  WaterfallOptions,
-  WaterfallQuery,
-  WaterfallQueryVariables,
-} from "gql/generated/types";
+import { WaterfallQuery, WaterfallQueryVariables } from "gql/generated/types";
 import { WATERFALL } from "gql/queries";
-import { useUserTimeZone } from "hooks";
 import useIntersectionObserver from "hooks/useIntersectionObserver";
-import { getUTCEndOfDay } from "utils/date";
 import { getObject, setObject } from "utils/localStorage";
 import { BuildRow } from "./BuildRow";
 import { BuildVariantProvider } from "./BuildVariantContext";
@@ -37,34 +29,26 @@ import {
   InactiveVersion,
   Row,
 } from "./styles";
-import { Pagination, Version, WaterfallFilterOptions } from "./types";
+import { Pagination, Version } from "./types";
 import { useFilters } from "./useFilters";
 import { useWaterfallTrace } from "./useWaterfallTrace";
 import { VersionLabel, VersionLabelView } from "./VersionLabel";
 
-type ServerFilters = Pick<
-  WaterfallOptions,
-  "requesters" | "statuses" | "tasks" | "variants"
->;
-
 type WaterfallGridProps = {
   guideCueRef: React.RefObject<WalkthroughGuideCueRef>;
+  isPending: boolean;
   omitInactiveBuilds: boolean;
   projectIdentifier: string;
+  queryVariables: WaterfallQueryVariables;
   setPagination: (pagination: Pagination) => void;
-};
-
-const resetFilterState: ServerFilters = {
-  requesters: [],
-  statuses: [],
-  tasks: [],
-  variants: [],
 };
 
 export const WaterfallGrid: React.FC<WaterfallGridProps> = ({
   guideCueRef,
+  isPending,
   omitInactiveBuilds,
   projectIdentifier,
+  queryVariables,
   setPagination,
 }) => {
   useWaterfallTrace();
@@ -109,78 +93,14 @@ export const WaterfallGrid: React.FC<WaterfallGridProps> = ({
     });
   }, [pins, projectIdentifier]);
 
-  const [maxOrder] = useQueryParam<number>(WaterfallFilterOptions.MaxOrder, 0);
-  const [minOrder] = useQueryParam<number>(WaterfallFilterOptions.MinOrder, 0);
-  const [revision] = useQueryParam<string | null>(
-    WaterfallFilterOptions.Revision,
-    null,
-  );
-  const [date] = useQueryParam<string>(WaterfallFilterOptions.Date, "");
-  const timezone = useUserTimeZone() ?? utcTimeZone;
-  const utcDate = getUTCEndOfDay(date, timezone);
-
-  const [requesters] = useQueryParam<string[]>(
-    WaterfallFilterOptions.Requesters,
-    [],
-  );
-  const [statuses] = useQueryParam<string[]>(
-    WaterfallFilterOptions.Statuses,
-    [],
-  );
-  const [tasks] = useQueryParam<string[]>(WaterfallFilterOptions.Task, []);
-  const [variants] = useQueryParam<string[]>(
-    WaterfallFilterOptions.BuildVariant,
-    [],
-  );
-
-  // TODO: It would be ideal to represent serverFilters with useDeferredValue to ditch the useState/useEffect pattern.
-  // However, useDeferredValue's initialState option is introduced in React 19.
-  const [serverFilters, setServerFilters] =
-    useState<ServerFilters>(resetFilterState);
-  const serverFiltersRef = useRef(resetFilterState);
-  const [isPending, startTransition] = useTransition();
-
-  useEffect(() => {
-    const newFilters = { requesters, statuses, tasks, variants };
-    const hasFilters = Object.values(newFilters).some((f) => f.length);
-
-    // Mount in particular can introduce a lot of useEffect calls due to different array references, so compare strictly
-    const hasChanges =
-      JSON.stringify(serverFiltersRef.current) !== JSON.stringify(newFilters);
-
-    if (hasChanges) {
-      serverFiltersRef.current = newFilters;
-      if (hasFilters) {
-        startTransition(() => {
-          setServerFilters(newFilters);
-        });
-      } else {
-        // Don't use a transition: if cached, the data will appear immediately
-        // If not a skeleton will appear, which makes more sense than 'fetching more'
-        setServerFilters(newFilters);
-      }
-    }
-  }, [requesters, statuses, tasks, variants]);
-
   const { data, dataState } = useSuspenseQuery<
     WaterfallQuery,
     WaterfallQueryVariables
   >(WATERFALL, {
-    variables: {
-      options: {
-        projectIdentifier,
-        limit: VERSION_LIMIT,
-        maxOrder,
-        minOrder,
-        omitInactiveBuilds,
-        revision,
-        date: utcDate,
-        ...serverFilters,
-      },
-    },
+    variables: queryVariables,
+    refetchWritePolicy: "merge",
     // @ts-expect-error pollInterval isn't officially supported by useSuspenseQuery, but it works so let's use it anyway.
     pollInterval: DEFAULT_POLL_INTERVAL,
-    nextFetchPolicy: "cache-and-network",
   });
   // TODO DEVPROD-26717: This can be removed if the invalid arguments are fixed in useSuspenseQuery.
   const dataIsComplete = dataState === "complete";
@@ -218,8 +138,10 @@ export const WaterfallGrid: React.FC<WaterfallGridProps> = ({
   const firstActiveVersionId = activeVersionIds[0];
   const lastActiveVersionId = activeVersionIds[activeVersionIds.length - 1];
 
+  const { revision } = queryVariables.options;
   const isHighlighted = (v: Version, i: number) =>
-    (revision !== null && v.revision.includes(revision)) || (!!date && i === 0);
+    (revision !== null && v.revision.includes(revision ?? "")) ||
+    (!!queryVariables.options.date && i === 0);
 
   if (
     dataIsComplete &&

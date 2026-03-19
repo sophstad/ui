@@ -13,6 +13,7 @@ import { OMIT_INACTIVE_WATERFALL_BUILDS } from "constants/cookies";
 import { slugs } from "constants/routes";
 import { waterfallPageContainerId } from "./constants";
 import { Pagination, WaterfallFilterOptions } from "./types";
+import { useQueryVariables } from "./useQueryVariables";
 import WaterfallErrorBoundary from "./WaterfallErrorBoundary";
 import { WaterfallFilters } from "./WaterfallFilters";
 import { WaterfallGrid } from "./WaterfallGrid";
@@ -38,6 +39,11 @@ const Waterfall: React.FC = () => {
   const restartWalkthrough = useCallback(
     () => guideCueRef.current?.restart(),
     [],
+  );
+
+  const { isPending, queryVariables } = useQueryVariables(
+    projectIdentifier ?? "",
+    omitInactiveBuilds,
   );
 
   return (
@@ -71,8 +77,10 @@ const Waterfall: React.FC = () => {
             <WaterfallGrid
               key={projectIdentifier}
               guideCueRef={guideCueRef}
+              isPending={isPending}
               omitInactiveBuilds={omitInactiveBuilds}
               projectIdentifier={projectIdentifier ?? ""}
+              queryVariables={queryVariables}
               setPagination={setPagination}
             />
           </WaterfallErrorBoundary>

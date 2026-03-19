@@ -1,3 +1,5 @@
+// This must be imported before any Apollo code to set the cache size in advance
+import "gql/client/apolloCacheSize";
 import React from "react";
 import { createRoot } from "react-dom/client";
 import { initializeErrorHandling } from "@evg-ui/lib/utils/errorReporting";
