@@ -2540,7 +2540,9 @@ export type Patch = {
   taskStatuses: Array<Scalars["String"]["output"]>;
   tasks: Array<Scalars["String"]["output"]>;
   time?: Maybe<PatchTime>;
+  /** @deprecated Use userLite instead. */
   user: User;
+  userLite: UserLite;
   variants: Array<Scalars["String"]["output"]>;
   variantsTasks: Array<VariantTask>;
   version?: Maybe<VersionLite>;
@@ -3173,6 +3175,7 @@ export type Query = {
   taskTestSample?: Maybe<Array<TaskTestResultSample>>;
   user: User;
   userConfig?: Maybe<UserConfig>;
+  userLite: UserLite;
   variantQuarantineStatus: VariantQuarantineStatus;
   version: Version;
   viewableProjectRefs: Array<GroupedProjects>;
@@ -3315,6 +3318,10 @@ export type QueryTaskTestSampleArgs = {
 };
 
 export type QueryUserArgs = {
+  userId?: InputMaybe<Scalars["String"]["input"]>;
+};
+
+export type QueryUserLiteArgs = {
   userId?: InputMaybe<Scalars["String"]["input"]>;
 };
 
@@ -4794,12 +4801,31 @@ export type UserConfig = {
   user: Scalars["String"]["output"];
 };
 
-/** UserLite replaces User by sidestepping the APIUser field. It does not contain all fields at this time. */
+/**
+ * UserLite replaces User by sidestepping the APIDBUser API model and binding directly to the
+ * service-layer user model. New clients should query UserLite instead of User.
+ */
 export type UserLite = {
   __typename?: "UserLite";
+  betaFeatures?: Maybe<BetaFeatures>;
   displayName?: Maybe<Scalars["String"]["output"]>;
   emailAddress?: Maybe<Scalars["String"]["output"]>;
+  hasTokenExchangePending: Scalars["Boolean"]["output"];
   id: Scalars["String"]["output"];
+  parsleyFilters?: Maybe<Array<ParsleyFilter>>;
+  patches?: Maybe<Patches>;
+  permissions?: Maybe<Permissions>;
+  settings?: Maybe<UserSettings>;
+  subscriptions?: Maybe<Array<GeneralSubscription>>;
+  tokenAccessTokenExpiresAt?: Maybe<Scalars["Time"]["output"]>;
+};
+
+/**
+ * UserLite replaces User by sidestepping the APIDBUser API model and binding directly to the
+ * service-layer user model. New clients should query UserLite instead of User.
+ */
+export type UserLitePatchesArgs = {
+  patchesInput: PatchesInput;
 };
 
 export type UserServiceFlags = {
@@ -4908,7 +4934,9 @@ export type Version = {
   taskStatuses: Array<Scalars["String"]["output"]>;
   tasks: VersionTasks;
   upstreamProject?: Maybe<UpstreamProject>;
+  /** @deprecated Use userLite instead. */
   user: User;
+  userLite: UserLite;
   versionTiming?: Maybe<VersionTiming>;
   warnings: Array<Scalars["String"]["output"]>;
   waterfallBuilds?: Maybe<Array<WaterfallBuild>>;
@@ -5250,7 +5278,11 @@ export type BasePatchFragment = {
   projectID: string;
   status: string;
   parameters: Array<{ __typename?: "Parameter"; key: string; value: string }>;
-  user: { __typename?: "User"; displayName?: string | null; userId: string };
+  user: {
+    __typename?: "UserLite";
+    displayName?: string | null;
+    userId: string;
+  };
   variantsTasks: Array<{
     __typename?: "VariantTask";
     name: string;
@@ -5361,7 +5393,11 @@ export type PatchesPagePatchesFragment = {
       owner: string;
       repo: string;
     } | null;
-    user: { __typename?: "User"; displayName?: string | null; userId: string };
+    user: {
+      __typename?: "UserLite";
+      displayName?: string | null;
+      userId: string;
+    };
     versionFull?: {
       __typename?: "Version";
       id: string;
@@ -7262,7 +7298,11 @@ export type SchedulePatchMutation = {
       childVersions?: Array<{ __typename?: "Version"; id: string }> | null;
     } | null;
     parameters: Array<{ __typename?: "Parameter"; key: string; value: string }>;
-    user: { __typename?: "User"; displayName?: string | null; userId: string };
+    user: {
+      __typename?: "UserLite";
+      displayName?: string | null;
+      userId: string;
+    };
     variantsTasks: Array<{
       __typename?: "VariantTask";
       name: string;
@@ -7472,7 +7512,11 @@ export type UpdatePatchDescriptionMutation = {
     projectID: string;
     status: string;
     parameters: Array<{ __typename?: "Parameter"; key: string; value: string }>;
-    user: { __typename?: "User"; displayName?: string | null; userId: string };
+    user: {
+      __typename?: "UserLite";
+      displayName?: string | null;
+      userId: string;
+    };
     variantsTasks: Array<{
       __typename?: "VariantTask";
       name: string;
@@ -8957,7 +9001,7 @@ export type MainlineCommitsForHistoryQuery = {
           tag: string;
         }> | null;
         user: {
-          __typename?: "User";
+          __typename?: "UserLite";
           displayName?: string | null;
           userId: string;
         };
@@ -8987,7 +9031,7 @@ export type MainlineCommitsForHistoryQuery = {
           tag: string;
         }> | null;
         user: {
-          __typename?: "User";
+          __typename?: "UserLite";
           displayName?: string | null;
           userId: string;
         };
@@ -9170,7 +9214,11 @@ export type ConfigurePatchQuery = {
     time?: { __typename?: "PatchTime"; submittedAt: string } | null;
     versionFull?: { __typename?: "Version"; id: string } | null;
     parameters: Array<{ __typename?: "Parameter"; key: string; value: string }>;
-    user: { __typename?: "User"; displayName?: string | null; userId: string };
+    user: {
+      __typename?: "UserLite";
+      displayName?: string | null;
+      userId: string;
+    };
     variantsTasks: Array<{
       __typename?: "VariantTask";
       name: string;
@@ -9198,7 +9246,11 @@ export type PatchQuery = {
     status: string;
     versionFull?: { __typename?: "Version"; id: string } | null;
     parameters: Array<{ __typename?: "Parameter"; key: string; value: string }>;
-    user: { __typename?: "User"; displayName?: string | null; userId: string };
+    user: {
+      __typename?: "UserLite";
+      displayName?: string | null;
+      userId: string;
+    };
     variantsTasks: Array<{
       __typename?: "VariantTask";
       name: string;
@@ -9721,7 +9773,7 @@ export type ProjectPatchesQuery = {
           repo: string;
         } | null;
         user: {
-          __typename?: "User";
+          __typename?: "UserLite";
           displayName?: string | null;
           userId: string;
         };
@@ -11536,7 +11588,7 @@ export type TaskQuery = {
       projectIdentifier: string;
       revision: string;
       user: {
-        __typename?: "User";
+        __typename?: "UserLite";
         displayName?: string | null;
         userId: string;
       };
@@ -11633,7 +11685,7 @@ export type UserDistroSettingsPermissionsQueryVariables = Exact<{
 export type UserDistroSettingsPermissionsQuery = {
   __typename?: "Query";
   user: {
-    __typename?: "User";
+    __typename?: "UserLite";
     userId: string;
     permissions?: {
       __typename?: "Permissions";
@@ -11656,7 +11708,7 @@ export type UserPatchesQueryVariables = Exact<{
 export type UserPatchesQuery = {
   __typename?: "Query";
   user: {
-    __typename?: "User";
+    __typename?: "UserLite";
     displayName?: string | null;
     userId: string;
     patches?: {
@@ -11680,7 +11732,7 @@ export type UserPatchesQuery = {
           repo: string;
         } | null;
         user: {
-          __typename?: "User";
+          __typename?: "UserLite";
           displayName?: string | null;
           userId: string;
         };
@@ -11710,7 +11762,7 @@ export type UserProjectSettingsPermissionsQueryVariables = Exact<{
 export type UserProjectSettingsPermissionsQuery = {
   __typename?: "Query";
   user: {
-    __typename?: "User";
+    __typename?: "UserLite";
     userId: string;
     permissions?: {
       __typename?: "Permissions";
@@ -11731,7 +11783,7 @@ export type UserRepoSettingsPermissionsQueryVariables = Exact<{
 export type UserRepoSettingsPermissionsQuery = {
   __typename?: "Query";
   user: {
-    __typename?: "User";
+    __typename?: "UserLite";
     userId: string;
     permissions?: {
       __typename?: "Permissions";
@@ -11749,7 +11801,7 @@ export type UserSettingsQueryVariables = Exact<{ [key: string]: never }>;
 export type UserSettingsQuery = {
   __typename?: "Query";
   user: {
-    __typename?: "User";
+    __typename?: "UserLite";
     userId: string;
     settings?: {
       __typename?: "UserSettings";
@@ -11780,7 +11832,7 @@ export type UserSubscriptionsQueryVariables = Exact<{ [key: string]: never }>;
 export type UserSubscriptionsQuery = {
   __typename?: "Query";
   user: {
-    __typename?: "User";
+    __typename?: "UserLite";
     userId: string;
     settings?: {
       __typename?: "UserSettings";
@@ -11825,7 +11877,7 @@ export type UserTokenExchangeQueryVariables = Exact<{ [key: string]: never }>;
 export type UserTokenExchangeQuery = {
   __typename?: "Query";
   user: {
-    __typename?: "User";
+    __typename?: "UserLite";
     hasTokenExchangePending: boolean;
     tokenAccessTokenExpiresAt?: Date | null;
     userId: string;
@@ -11837,7 +11889,7 @@ export type UserQueryVariables = Exact<{ [key: string]: never }>;
 export type UserQuery = {
   __typename?: "Query";
   user: {
-    __typename?: "User";
+    __typename?: "UserLite";
     displayName?: string | null;
     emailAddress?: string | null;
     userId: string;
@@ -12077,7 +12129,11 @@ export type VersionQuery = {
       owner: string;
       repo: string;
     } | null;
-    user: { __typename?: "User"; displayName?: string | null; userId: string };
+    user: {
+      __typename?: "UserLite";
+      displayName?: string | null;
+      userId: string;
+    };
     versionTiming?: {
       __typename?: "VersionTiming";
       makespan?: number | null;
@@ -12158,7 +12214,7 @@ export type WaterfallQuery = {
       revision: string;
       gitTags?: Array<{ __typename?: "GitTag"; tag: string }> | null;
       user: {
-        __typename?: "User";
+        __typename?: "UserLite";
         displayName?: string | null;
         userId: string;
       };

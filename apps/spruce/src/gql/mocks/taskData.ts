@@ -118,7 +118,7 @@ export const taskQuery: TaskQueryType = {
       __typename: "Version",
       id: "spruce_ubuntu1604_e0ece5ad52ad01630bdf29f55b9382a26d6256b3_20_08_26_19_20_41",
       user: {
-        __typename: "User",
+        __typename: "UserLite",
         userId: "mohamed.khelif",
         displayName: "Mohamed Khelif",
       },

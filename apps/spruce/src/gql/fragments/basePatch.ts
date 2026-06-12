@@ -12,9 +12,9 @@ export const BASE_PATCH = gql`
     }
     projectID
     status
-    user {
+    user: userLite {
       displayName
-      userId
+      userId: id
     }
     variantsTasks {
       name

@@ -155,9 +155,9 @@ export const TASK = gql`
         project
         projectIdentifier
         revision
-        user {
+        user: userLite {
           displayName
-          userId
+          userId: id
         }
       }
     }
