@@ -33,9 +33,10 @@ export enum TaskStatus {
   TestTimedOut = "test-timed-out",
   TaskTimedOut = "task-timed-out",
 
+  SetupFailed = "setup-failed",
+
   // These statuses indicate that the task failed, and it is likely a problem
   // with the systems running the task
-  SetupFailed = "setup-failed",
   SystemFailed = "system-failed",
   SystemTimedOut = "system-timed-out",
   SystemUnresponsive = "system-unresponsive",

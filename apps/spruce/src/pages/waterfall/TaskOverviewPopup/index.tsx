@@ -27,7 +27,6 @@ import { FailingTests } from "./FailingTests";
 
 interface Props {
   execution: number;
-  isRightmostBuild?: boolean;
   open: boolean;
   setOpen: (o: boolean) => void;
   taskBoxRef: React.RefObject<HTMLElement>;
@@ -36,7 +35,6 @@ interface Props {
 
 export const TaskOverviewPopup: React.FC<Props> = ({
   execution,
-  isRightmostBuild = false,
   open,
   setOpen,
   taskBoxRef,
@@ -85,7 +83,7 @@ export const TaskOverviewPopup: React.FC<Props> = ({
     <Popover
       ref={popoverRef}
       active={open}
-      align={isRightmostBuild ? Align.Left : Align.Right}
+      align={Align.Right}
       dismissMode={DismissMode.Manual}
       refEl={taskBoxRef}
     >

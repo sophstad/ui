@@ -30,7 +30,6 @@ const { gray } = palette;
 type Props = {
   build: BuildVariant;
   isFirstBuild: boolean;
-  lastActiveVersionId: string;
   onPinClick: (buildVariant: string, wasPinned: boolean) => void;
   pinned: boolean;
   projectIdentifier: string;
@@ -40,7 +39,6 @@ type Props = {
 const BuildRowInner: React.FC<Props> = ({
   build,
   isFirstBuild,
-  lastActiveVersionId,
   onPinClick,
   pinned,
   projectIdentifier,
@@ -127,7 +125,6 @@ const BuildRowInner: React.FC<Props> = ({
           build={b}
           firstActiveTaskId={firstActiveTaskId}
           handleTaskClick={handleTaskClick}
-          isRightmostBuild={b.version === lastActiveVersionId}
           openTaskId={openTaskId}
           setOpenTaskId={setOpenTaskId}
         />,
@@ -197,24 +194,21 @@ const BuildGrid: React.FC<{
   build: Build;
   firstActiveTaskId: string;
   handleTaskClick: (taskId: string, e: React.MouseEvent<HTMLElement>) => void;
-  isRightmostBuild: boolean;
   openTaskId: string | null;
   setOpenTaskId: (taskId: string | null) => void;
 }> = ({
   build,
   firstActiveTaskId,
   handleTaskClick,
-  isRightmostBuild,
   openTaskId,
   setOpenTaskId,
 }) => (
-  <WidthWatcher data-rightmost-build={isRightmostBuild || undefined}>
+  <WidthWatcher>
     {build.tasks.map((task) => (
       <WaterfallTask
         key={task.id}
         handleTaskClick={handleTaskClick}
         isFirstActiveTask={task.id === firstActiveTaskId}
-        isRightmostBuild={isRightmostBuild}
         open={openTaskId === task.id}
         setOpenTaskId={setOpenTaskId}
         task={task}

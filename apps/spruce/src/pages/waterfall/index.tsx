@@ -1,3 +1,4 @@
+import "./style.css";
 import { Suspense, useCallback, useRef, useState } from "react";
 import { Global, css } from "@emotion/react";
 import styled from "@emotion/styled";

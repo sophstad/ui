@@ -1,13 +1,11 @@
 import { forwardRef } from "react";
-import { css as classNameCss } from "@emotion/css"; // Using non-React Emotion generates a static class, avoiding runtime performance impacts on pages like the waterfall.
-import { css } from "@emotion/react";
 import styled from "@emotion/styled";
 import { palette } from "@leafygreen-ui/palette";
 import { size } from "@evg-ui/lib/constants/tokens";
 import { TaskStatus } from "@evg-ui/lib/types/task";
 import { statusColorMap, statusIconMap } from "./icons";
 
-const { black, gray, white } = palette;
+const { gray, white } = palette;
 
 const DEFAULT_SQUARE_SIZE = 16;
 const SQUARE_BORDER = 1;
@@ -35,7 +33,7 @@ const statusStyles = Object.entries(statusColorMap)
   })
   .join("\n");
 
-const taskBoxStyles = css`
+const PolymorphicTaskBox = styled.div`
   width: ${DEFAULT_SQUARE_SIZE}px;
   height: ${DEFAULT_SQUARE_SIZE}px;
   border: ${SQUARE_BORDER}px solid ${white};
@@ -45,51 +43,6 @@ const taskBoxStyles = css`
   cursor: pointer;
 
   ${statusStyles}
-
-  /* A centered tooltip is rendered above the box containing the element's data-tooltip string */
-  &[data-tooltip]:before {
-    content: attr(data-tooltip);
-    position: absolute;
-    bottom: calc(100% + 5px);
-    left: 50%;
-    transform: translate(-50%);
-    z-index: 1;
-    width: max-content;
-    max-width: 450px;
-    overflow-wrap: break-word;
-    padding: ${size.xs};
-    border-radius: 6px;
-    background: ${black};
-    color: ${white};
-    text-align: center;
-    display: none;
-  }
-
-  /* If a parent specifies [data-rightmost-build=true], render the tooltip to the left */
-  [data-rightmost-build] &[data-tooltip]:before {
-    transform: translate(-90%);
-  }
-
-  &[data-tooltip]:hover:before {
-    display: block;
-  }
-
-  &[data-tooltip]:hover:after {
-    content: "";
-    position: absolute;
-    bottom: calc(100% - 5px);
-    left: 50%;
-    margin-left: -5px;
-    border-width: 5px;
-    border-style: solid;
-    border-color: ${black} transparent transparent transparent;
-  }
-`;
-
-export const taskBoxClassName = classNameCss(taskBoxStyles.styles);
-
-const PolymorphicTaskBox = styled.div`
-  ${taskBoxStyles}
 `;
 
 export const TaskBox = forwardRef<
