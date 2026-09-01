@@ -17,6 +17,31 @@ const createWrapper = (props = {}) => {
 };
 
 describe("useFilters", () => {
+  it("does not reapply filters to a server-filtered response", () => {
+    const { result } = renderHook(
+      () =>
+        useFilters({
+          activeVersionIds: ["b", "c", "f"],
+          applyClientFilters: false,
+          flattenedVersions: versions,
+          omitInactiveBuilds: false,
+          pins: [],
+        }),
+      {
+        wrapper: createWrapper({
+          initialEntry:
+            "/project/spruce/waterfall?requesters=git_tag_request&statuses=failed&tasks=missing&buildVariants=missing",
+        }),
+      },
+    );
+
+    expect(result.current).toStrictEqual({
+      activeVersionIds: ["b", "c", "f"],
+      buildVariants,
+      versions: groupedVersions,
+    });
+  });
+
   describe("requester filters", () => {
     it("should not make any versions inactive when no filters are applied", () => {
       const { result } = renderHook(

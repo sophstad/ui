@@ -13,6 +13,7 @@ import { groupBuildVariants, groupInactiveVersions } from "./utils";
 
 type UseFiltersProps = {
   activeVersionIds: Pagination["activeVersionIds"];
+  applyClientFilters?: boolean;
   flattenedVersions: Version[];
   omitInactiveBuilds: boolean;
   pins: string[];
@@ -20,6 +21,7 @@ type UseFiltersProps = {
 
 export const useFilters = ({
   activeVersionIds,
+  applyClientFilters = true,
   flattenedVersions,
   omitInactiveBuilds,
   pins,
@@ -61,11 +63,13 @@ export const useFilters = ({
 
     const activeVersions = flattenedVersions.filter(
       (v) =>
-        activeVersionIds.includes(v.id) && matchesRequesters(v, requesters),
+        activeVersionIds.includes(v.id) &&
+        (!applyClientFilters || matchesRequesters(v, requesters)),
     );
 
     buildVariants.forEach((bv) => {
       const passesBVFilter =
+        !applyClientFilters ||
         !buildVariantFilterRegex.length ||
         buildVariantFilterRegex.some(
           (r) => bv.displayName.match(r) || bv.id.match(r),
@@ -80,13 +84,17 @@ export const useFilters = ({
         if (activeVersions.find(({ id }) => id === b.version)) {
           // Omit inactive builds if setting is enabled and filtering is active
           if (
+            applyClientFilters &&
             omitInactiveBuilds &&
             buildVariantFilterRegex.length &&
             !b.activated
           ) {
             return;
           }
-          if (taskFilterRegex.length || statuses.length) {
+          if (
+            applyClientFilters &&
+            (taskFilterRegex.length || statuses.length)
+          ) {
             const activeTasks = b.tasks.filter(
               (t) =>
                 matchesTasksFilter(t, taskFilterRegex) &&
@@ -107,6 +115,7 @@ export const useFilters = ({
     return bvs;
   }, [
     activeVersionIds,
+    applyClientFilters,
     buildVariantFilterRegex,
     buildVariants,
     flattenedVersions,

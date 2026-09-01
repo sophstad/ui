@@ -77,6 +77,7 @@ const Waterfall: React.FC = () => {
               key={projectIdentifier}
               guideCueRef={guideCueRef}
               omitInactiveBuilds={omitInactiveBuilds}
+              pagination={pagination}
               projectIdentifier={projectIdentifier ?? ""}
               setPagination={setPagination}
             />
