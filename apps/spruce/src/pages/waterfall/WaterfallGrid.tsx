@@ -1,4 +1,11 @@
-import { useCallback, useEffect, useRef, useState, useTransition } from "react";
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  useTransition,
+} from "react";
 import { useSuspenseQuery } from "@apollo/client/react";
 import styled from "@emotion/styled";
 import { size, transitionDuration } from "@evg-ui/lib/constants/tokens";
@@ -141,18 +148,19 @@ export const WaterfallGrid: React.FC<WaterfallGridProps> = ({
     WaterfallFilterOptions.BuildVariant,
     [],
   );
-  const hasFilters = [requesters, statuses, tasks, variants].some(
-    (filter) => filter.length,
+  const filters = useMemo(
+    () => ({ requesters, statuses, tasks, variants }),
+    [requesters, statuses, tasks, variants],
   );
-  const [serverFilters, setServerFilters] =
-    useState<ServerFilters>(resetFilterState);
-  const serverFiltersRef = useRef(resetFilterState);
+  const hasFilters = Object.values(filters).some((filter) => filter.length);
+  const [serverFilters, setServerFilters] = useState<ServerFilters | null>(
+    null,
+  );
+  const filtersHaveChanged =
+    JSON.stringify(serverFilters) !== JSON.stringify(filters);
   const [isPending, startTransition] = useTransition();
   const serverFilteringEnabled =
-    hasFilters &&
-    (isNavigatingToPage ||
-      JSON.stringify(serverFilters) ===
-        JSON.stringify({ requesters, statuses, tasks, variants }));
+    hasFilters && (isNavigatingToPage || !filtersHaveChanged);
 
   const { data, dataState } = useSuspenseQuery<
     WaterfallQuery,
@@ -168,9 +176,7 @@ export const WaterfallGrid: React.FC<WaterfallGridProps> = ({
         revision,
         date: utcDate,
         includeAllBuildsAndTasks: false,
-        ...(serverFilteringEnabled
-          ? { requesters, statuses, tasks, variants }
-          : resetFilterState),
+        ...(serverFilteringEnabled ? filters : resetFilterState),
       },
     },
     // @ts-expect-error pollInterval isn't officially supported by useSuspenseQuery, but it works so let's use it anyway.
@@ -222,30 +228,23 @@ export const WaterfallGrid: React.FC<WaterfallGridProps> = ({
     activeVersionIds.length < VERSION_LIMIT;
 
   useEffect(() => {
-    const nextServerFilters = { requesters, statuses, tasks, variants };
-    const filtersHaveChanged =
-      JSON.stringify(serverFiltersRef.current) !==
-      JSON.stringify(nextServerFilters);
-    if (!hasFilters && filtersHaveChanged) {
-      serverFiltersRef.current = nextServerFilters;
+    if (!hasFilters && serverFilters !== null) {
       // eslint-disable-next-line react-hooks/set-state-in-effect
-      setServerFilters(nextServerFilters);
+      setServerFilters(null);
       return;
     }
     if ((isNavigatingToPage || shouldFetchFilteredData) && filtersHaveChanged) {
-      serverFiltersRef.current = nextServerFilters;
       startTransition(() => {
-        setServerFilters(nextServerFilters);
+        setServerFilters(filters);
       });
     }
   }, [
+    filters,
+    filtersHaveChanged,
     hasFilters,
     isNavigatingToPage,
-    requesters,
+    serverFilters,
     shouldFetchFilteredData,
-    statuses,
-    tasks,
-    variants,
   ]);
 
   const firstActiveVersionId = activeVersionIds[0];

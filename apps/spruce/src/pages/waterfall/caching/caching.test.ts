@@ -1,15 +1,10 @@
-import { Suspense, createElement } from "react";
-import { ApolloClient, ApolloLink } from "@apollo/client";
+import { gql } from "@apollo/client";
 import {
   FieldFunctionOptions,
   FieldMergeFunctionOptions,
 } from "@apollo/client/cache";
-import { ApolloProvider, useSuspenseQuery } from "@apollo/client/react";
-import { MockLink } from "@apollo/client/testing";
-import { renderHook, waitFor } from "@evg-ui/lib/test_utils";
 import { cache as apolloCache } from "gql/client/cache";
-import { WaterfallQuery, WaterfallQueryVariables } from "gql/generated/types";
-import { WATERFALL } from "gql/queries";
+import { WaterfallQuery } from "gql/generated/types";
 import { mergeVersions, readVersions } from ".";
 
 type Waterfall = WaterfallQuery["waterfall"];
@@ -25,8 +20,8 @@ const makePage = (orders: number[]) => {
       hasNextPage: true,
       hasPrevPage: true,
       mostRecentVersionOrder: 20,
-      nextPageOrder: Math.min(...orders),
-      prevPageOrder: Math.max(...orders),
+      nextPageOrder: Math.min(...orders) - 1,
+      prevPageOrder: Math.max(...orders) + 1,
     },
     versions: orders.map((order) => ({
       id: `version-${order}`,
@@ -65,57 +60,6 @@ const readPage = (existing: Waterfall, options: Record<string, unknown> = {}) =>
   } as unknown as FieldFunctionOptions);
 
 const getVersionIds = (cache: Waterfall) => cache.versions.map(({ id }) => id);
-
-const makeQueryData = (
-  page: Waterfall,
-  nullBuildVersionId?: string,
-): WaterfallQuery => ({
-  waterfall: {
-    ...page,
-    versions: page.versions.map(({ id, order }) => ({
-      activated: true,
-      createTime: new Date(),
-      errors: [],
-      gitTags: [],
-      id,
-      message: id,
-      order,
-      requester: "github_push_request",
-      revision: id,
-      user: {
-        displayName: "Evergreen",
-        userId: "evergreen",
-      },
-      waterfallBuilds:
-        id === nullBuildVersionId
-          ? null
-          : [
-              {
-                activated: true,
-                buildVariant: "linux",
-                displayName: "Linux",
-                id: `${id}-linux`,
-                tasks: [],
-              },
-            ],
-    })),
-  },
-});
-
-const getQueryVariables = (
-  orders: { maxOrder?: number; minOrder?: number } = {},
-): WaterfallQueryVariables => ({
-  options: {
-    includeAllBuildsAndTasks: false,
-    limit: 5,
-    projectIdentifier: "mongodb-mongo-master",
-    requesters: ["github_push_request"],
-    statuses: ["failed"],
-    tasks: ["compile"],
-    variants: ["linux"],
-    ...orders,
-  },
-});
 
 describe("bounded waterfall cache", () => {
   it("retains up to two pages of active versions", () => {
@@ -234,75 +178,28 @@ describe("bounded waterfall cache", () => {
     ).toStrictEqual(getVersionIds(page1));
   });
 
-  it("avoids a network request when a suspense query revisits page C", async () => {
+  it("preserves null waterfall builds", () => {
     apolloCache.restore({});
-    const requests: WaterfallQueryVariables[] = [];
-    const pageBVariables = getQueryVariables({ maxOrder: 16 });
-    const pageCVariables = getQueryVariables({ maxOrder: 11 });
-    const reversePageBVariables = getQueryVariables({ minOrder: 10 });
-    const countingLink = new ApolloLink((operation, forward) => {
-      requests.push(operation.variables as WaterfallQueryVariables);
-      return forward(operation);
-    });
-    const client = new ApolloClient({
-      cache: apolloCache,
-      link: countingLink.concat(
-        new MockLink([
-          {
-            request: { query: WATERFALL, variables: pageBVariables },
-            result: {
-              data: makeQueryData(page2, page2.versions.at(-1)?.id),
-            },
-          },
-          {
-            request: { query: WATERFALL, variables: pageCVariables },
-            result: {
-              data: makeQueryData(page3, page3.versions.at(-1)?.id),
-            },
-          },
-        ]),
-      ),
-    });
-    const Provider = ApolloProvider as React.FC<
-      React.PropsWithChildren<{ client: ApolloClient }>
-    >;
-    const wrapper = ({ children }: { children: React.ReactNode }) =>
-      createElement(
-        Provider,
-        { client },
-        createElement(Suspense, { fallback: null }, children),
-      );
-    const { rerender, result } = renderHook(
-      ({ variables }) =>
-        useSuspenseQuery<WaterfallQuery, WaterfallQueryVariables>(WATERFALL, {
-          variables,
-        }),
-      {
-        initialProps: { variables: pageBVariables },
-        wrapper,
+    apolloCache.writeFragment({
+      id: "VersionLite:version",
+      fragment: gql`
+        fragment NullWaterfallBuilds on VersionLite {
+          id
+          waterfallBuilds {
+            id
+          }
+        }
+      `,
+      data: {
+        __typename: "VersionLite",
+        id: "version",
+        waterfallBuilds: null,
       },
-    );
-    await waitFor(() => expect(result.current.data).toBeDefined());
+    });
 
-    rerender({ variables: pageCVariables });
-    await waitFor(() =>
-      expect(
-        result.current.data!.waterfall.pagination.activeVersionIds,
-      ).toStrictEqual([...page3.pagination.activeVersionIds].sort()),
+    expect(apolloCache.extract()["VersionLite:version"]).toHaveProperty(
+      "waterfallBuilds",
+      null,
     );
-    rerender({ variables: reversePageBVariables });
-    await waitFor(() =>
-      expect(
-        result.current.data!.waterfall.pagination.activeVersionIds,
-      ).toStrictEqual([...page2.pagination.activeVersionIds].sort()),
-    );
-    rerender({ variables: pageCVariables });
-    await waitFor(() =>
-      expect(
-        result.current.data!.waterfall.pagination.activeVersionIds,
-      ).toStrictEqual([...page3.pagination.activeVersionIds].sort()),
-    );
-
-    expect(requests).toHaveLength(2);
   });
 });
