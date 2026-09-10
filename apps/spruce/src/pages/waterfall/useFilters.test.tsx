@@ -17,6 +17,78 @@ const createWrapper = (props = {}) => {
 };
 
 describe("useFilters", () => {
+  it("does not reapply client filters to server-filtered data", () => {
+    const { result } = renderHook(
+      () =>
+        useFilters({
+          activeVersionIds: ["b", "c", "f"],
+          applyClientFilters: false,
+          flattenedVersions: versions,
+          omitInactiveBuilds: true,
+          pins: ["3"],
+        }),
+      {
+        wrapper: createWrapper({
+          initialEntry:
+            "/project/spruce/waterfall?tasks=missing&buildVariants=missing&statuses=failed&requesters=git_tag_request",
+        }),
+      },
+    );
+    expect(result.current).toStrictEqual({
+      activeVersionIds: ["b", "c", "f"],
+      buildVariants: [buildVariants[2], buildVariants[0], buildVariants[1]],
+      versions: groupedVersions,
+    });
+  });
+
+  describe("omitting inactive builds", () => {
+    const versionWithInactiveBuild = {
+      ...versions[1],
+      waterfallBuilds: versions[1].waterfallBuilds?.map((build, index) => ({
+        ...build,
+        activated: index === 0,
+      })),
+    };
+
+    it.each([
+      "tasks=Task",
+      "buildVariants=BV",
+      "statuses=started",
+      "requesters=gitter_request",
+    ])("omits inactive builds with %s", (filter) => {
+      const { result } = renderHook(
+        () =>
+          useFilters({
+            activeVersionIds: ["b"],
+            flattenedVersions: [versionWithInactiveBuild],
+            omitInactiveBuilds: true,
+            pins: [],
+          }),
+        {
+          wrapper: createWrapper({
+            initialEntry: `/project/spruce/waterfall?${filter}`,
+          }),
+        },
+      );
+      expect(result.current.buildVariants).toHaveLength(1);
+      expect(result.current.buildVariants[0].id).toBe("1");
+    });
+
+    it("keeps inactive builds when no filters are active", () => {
+      const { result } = renderHook(
+        () =>
+          useFilters({
+            activeVersionIds: ["b"],
+            flattenedVersions: [versionWithInactiveBuild],
+            omitInactiveBuilds: true,
+            pins: [],
+          }),
+        { wrapper: createWrapper() },
+      );
+      expect(result.current.buildVariants).toHaveLength(2);
+    });
+  });
+
   describe("requester filters", () => {
     it("should not make any versions inactive when no filters are applied", () => {
       const { result } = renderHook(
